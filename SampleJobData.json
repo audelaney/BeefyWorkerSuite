@@ -1,0 +1,12 @@
+{
+  "InputInterval": "0-10.677",
+  "VideoFileName": "Sounan_desu_ka_-_01.mkv",
+  "VideoFilePath": "",
+  "ConfigFilePath": "/var/local/svt-config/hi.cfg",
+  "AdditionalCommandArguments": "-enc-mode 3 -irefresh-type 1 -tbr 1000 -intra-period 71",
+  "Priority": 2,
+  "MaxAttempts": 7,
+  "MinPsnr": 40.0,
+  "MinVmaf": 94.0,
+  "AdjustmentFactor": 0
+}
