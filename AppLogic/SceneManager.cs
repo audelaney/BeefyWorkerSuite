@@ -5,12 +5,16 @@ using System.Collections.Generic;
 
 namespace AppLogic
 {
+    /// <summary>
+    /// Scene related logic operations
+    /// </summary>
     public class SceneManager
     {
         /// <summary>
-        /// Mushes the scenes together based on desired speed/efficiency/accuracy/
+        /// Mushes scenes together based on desired speed/efficiency/accuracy/
         /// precision.
         /// </summary>
+        /// <param name="sceneData">The scenes to mush together.</param>
         private static Scene[] AnalyzeScenes(Scene[] sceneData)
         {
             var chunks = new List<Scene>();
@@ -28,16 +32,23 @@ namespace AppLogic
             return chunks.ToArray();
         }
 
-        public static bool MeetsCriteria(Scene scene)
+        /// <summary>
+        /// If the scene 
+        /// </summary>
+        /// <todo>Should be adding a 'criteria' object of some kind as
+        /// a param.</todo>
+        private static bool MeetsCriteria(Scene scene)
         {
             var minTime = new TimeSpan(0, 0, 20);
 
             if (scene.Duration.TotalSeconds < minTime.TotalSeconds)
             { return false; }
-
             else { return true; }
         }
 
+        /// <summary>
+        /// Converts a video into timestamped scenes that match criteria
+        /// </summary>
         public static Scene[] AnalyzeVideoInput(string videoPath)
         {
             return AnalyzeScenes(SceneAccessor.AnalyzeVideoInput(videoPath));

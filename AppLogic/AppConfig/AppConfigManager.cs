@@ -25,6 +25,12 @@ namespace AppLogic
                 return _instance;
             }
         }
+
+        /// <summary>
+        /// Sets the config instance to whatever is found at the path, or throws
+        /// an exception if there is nothing at the end of the path or the file
+        /// is not compatible. Also resets the EncodeJobManager instance.
+        /// </summary>
         public static void SetConfig(string configFilePath)
         {
             EncodeJobManager.ConfigReset();

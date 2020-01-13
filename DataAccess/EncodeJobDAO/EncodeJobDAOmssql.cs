@@ -8,8 +8,10 @@ using DataObjects;
 
 namespace DataAccess
 {
+	/// <summary></summary>
 	public class EncodeJobDAOmssql : IEncodeJobDAO
 	{
+		/// <summary></summary>
 		public EncodeJobDAOmssql(string dBConnectionString)
 		{
 			sqlConnectionString = dBConnectionString;
@@ -26,6 +28,7 @@ namespace DataAccess
 			}
 		}
 
+		/// <summary></summary>
 		public bool AddEncodeJobToQueue(EncodeJob job)
 		{
 			bool result = false;
@@ -62,51 +65,61 @@ namespace DataAccess
 			return result;
 		}
 
+		/// <summary></summary>
         public bool RemoveEncodeJobFromQueue(Guid id)
         {
             throw new NotImplementedException();
         }
 
+		/// <summary></summary>
         public IEnumerable<EncodeJob> RetrieveCompleteEncodeJobs()
         {
             throw new NotImplementedException();
         }
 
+		/// <summary></summary>
         public IEnumerable<EncodeJob> RetrieveIncompleteEncodeJobs()
         {
             throw new NotImplementedException();
         }
 
+		/// <summary></summary>
         public IEnumerable<EncodeJob> RetrieveIncompleteEncodeJobs(int priority)
         {
             throw new NotImplementedException();
         }
 
+		/// <summary></summary>
         public bool MarkEncodeJobCheckedOut(Guid id, bool completed)
         {
             throw new NotImplementedException();
         }
 
+		/// <summary></summary>
         public bool MarkEncodeJobCheckedOut(EncodeJob job, bool completed)
         {
             throw new NotImplementedException();
         }
 
+		/// <summary></summary>
         public bool MarkJobCompletedStatus(Guid id, bool completed)
         {
             throw new NotImplementedException();
         }
 
+		/// <summary></summary>
         public bool MarkJobCompletedStatus(EncodeJob job, bool completed)
         {
             throw new NotImplementedException();
         }
 
+		/// <summary></summary>
         public EncodeJob RetrieveEncodeJob(Guid id)
         {
             throw new NotImplementedException();
         }
 
+		/// <summary></summary>
         public bool UpdateJob(EncodeJob oldData, EncodeJob newData)
         {
             throw new NotImplementedException();

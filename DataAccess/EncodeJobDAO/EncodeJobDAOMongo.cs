@@ -10,11 +10,13 @@ using System.Linq;
 
 namespace DataAccess
 {
+    /// <summary></summary>
     public class EncodeJobDAOMongo : IEncodeJobDAO
     {
         private static readonly string DEFAULT_DB_NAME = "encodedb";
         private static readonly string encodeJobCollectionName = "prodencodejob";
         private readonly IMongoDatabase database;
+        /// <summary></summary>
         public EncodeJobDAOMongo(string? connString = null, string? dbName = null)
         {
             try
@@ -35,6 +37,7 @@ namespace DataAccess
             }
         }
 
+        /// <summary></summary>
         public bool AddEncodeJobToQueue(EncodeJob job)
         {
             if (!job.IsValid)
@@ -69,11 +72,7 @@ namespace DataAccess
             return true;
         }
 
-        public bool CheckoutEncodeJob(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
+        /// <summary></summary>
         public bool MarkEncodeJobCheckedOut(EncodeJob job, bool checkedOut)
         {
             if (!checkedOut)
@@ -110,10 +109,12 @@ namespace DataAccess
             }
             else
             {
-                result = CheckoutEncodeJob(job.Id);
+                result = MarkEncodeJobCheckedOut(job.Id, checkedOut);
             }
             return result;
         }
+
+        /// <summary></summary>
         public bool MarkEncodeJobCheckedOut(Guid id, bool completed)
         {
             if (id == Guid.Empty)
@@ -136,6 +137,7 @@ namespace DataAccess
             return true;
         }
 
+        /// <summary></summary>
         public bool MarkJobCompletedStatus(Guid id, bool completed)
         {
             if (id == Guid.Empty)
@@ -154,6 +156,7 @@ namespace DataAccess
             }
         }
 
+        /// <summary></summary>
         public bool MarkJobCompletedStatus(EncodeJob job, bool completed)
         {
             if (!job.IsValid)
@@ -184,11 +187,12 @@ namespace DataAccess
             }
             else
             {
-                result = CheckoutEncodeJob(job.Id);
+                result = MarkJobCompletedStatus(job.Id,completed);
             }
             return result;
         }
 
+        /// <summary></summary>
         public bool RemoveEncodeJobFromQueue(Guid id)
         {
             if (id == Guid.Empty)
@@ -196,6 +200,7 @@ namespace DataAccess
             throw new NotImplementedException();
         }
 
+        /// <summary></summary>
         public IEnumerable<EncodeJob> RetrieveIncompleteEncodeJobs()
         {
             IEnumerable<EncodeJob> result = new List<EncodeJob>();
@@ -214,6 +219,7 @@ namespace DataAccess
             return result;
         }
 
+        /// <summary></summary>
         public IEnumerable<EncodeJob> RetrieveIncompleteEncodeJobs(int priority)
         {
             IEnumerable<EncodeJob> result = new List<EncodeJob>();
@@ -233,6 +239,7 @@ namespace DataAccess
             return result;
         }
 
+        /// <summary></summary>
         public EncodeJob RetrieveEncodeJob(Guid id)
         {
             if (id == Guid.Empty)
@@ -261,6 +268,7 @@ namespace DataAccess
             }
         }
 
+        /// <summary></summary>
         public IEnumerable<EncodeJob> RetrieveCompleteEncodeJobs()
         {
             IEnumerable<EncodeJob> result = new List<EncodeJob>();
@@ -279,6 +287,7 @@ namespace DataAccess
             return result;
         }
 
+        /// <summary></summary>
         public bool UpdateJob(EncodeJob oldData, EncodeJob newData)
         {
             if (!oldData.IsValid)

@@ -14,6 +14,7 @@ namespace DataAccess
     public class EncodeJobDAOMockAlive : IEncodeJobDAO
     {
         private List<EncodeJob> _repository = new List<EncodeJob>();
+        /// <summary></summary>
         public bool AddEncodeJobToQueue(EncodeJob job)
         {
             if (_repository.Where(j => j.Id == job.Id).Count() > 0)
@@ -33,6 +34,7 @@ namespace DataAccess
             }
         }
 
+        /// <summary></summary>
         public bool MarkEncodeJobCheckedOut(Guid id, bool completed)
         {
             var item = _repository.FirstOrDefault(job => job.Id == id);
@@ -47,6 +49,7 @@ namespace DataAccess
             }
         }
 
+        /// <summary></summary>
         public bool MarkEncodeJobCheckedOut(EncodeJob job, bool checkedOut)
         {
             var item = _repository.FirstOrDefault(j => j.Id == job.Id);
@@ -63,6 +66,7 @@ namespace DataAccess
             }
         }
 
+        /// <summary></summary>
         public bool MarkJobCompletedStatus(Guid id, bool completed)
         {
             var item = _repository.FirstOrDefault(j => j.Id == id);
@@ -77,6 +81,7 @@ namespace DataAccess
             }
         }
 
+        /// <summary></summary>
         public bool MarkJobCompletedStatus(EncodeJob job, bool completed)
         {
             var item = _repository.FirstOrDefault(j => j.Id == job.Id);
@@ -91,6 +96,7 @@ namespace DataAccess
             }
         }
 
+        /// <summary></summary>
         public bool RemoveEncodeJobFromQueue(Guid id)
         {
             var item = _repository.FirstOrDefault(j => j.Id == id);
@@ -104,11 +110,13 @@ namespace DataAccess
             }
         }
 
+        /// <summary></summary>
         public IEnumerable<EncodeJob> RetrieveCompleteEncodeJobs()
         {
             return _repository.Where(j => j.Completed);
         }
 
+        /// <summary></summary>
         public EncodeJob RetrieveEncodeJob(Guid id)
         {
             var item = _repository.FirstOrDefault(j => j.Id == id);
@@ -122,16 +130,19 @@ namespace DataAccess
             }
         }
 
+        /// <summary></summary>
         public IEnumerable<EncodeJob> RetrieveIncompleteEncodeJobs()
         {
             return _repository.Where(j => !j.Completed);
         }
 
+        /// <summary></summary>
         public IEnumerable<EncodeJob> RetrieveIncompleteEncodeJobs(int priority)
         {
             return _repository.Where(j => !j.Completed && j.Priority == priority);
         }
 
+        /// <summary></summary>
         public bool UpdateJob(EncodeJob oldData, EncodeJob newData)
         {
             var count = _repository.Where(j => j.Equals(oldData)).Count();

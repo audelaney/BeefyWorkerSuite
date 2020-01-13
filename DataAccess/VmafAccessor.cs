@@ -7,8 +7,18 @@ namespace DataAccess.Vmaf
 {
     public static class VmafAccessor
     {
+        /// <summary>
+        /// Gets vmaf using ffmpeg from a source and path
+        /// </summary>
+        /// <exception cref="System.ArgumentException">
+        /// Throws if:
+        ///     - Either path does not exist
+        /// </exception>
         public static double GetVmaf(string sourcePath, string encodedPath)
         {
+            if (!File.Exists(sourcePath) || !File.Exists(encodedPath))
+            { throw new ArgumentException("Either path is invalid"); }
+            
             double output = 0;
 
             ProcessStartInfo vmafFfmpegStartInfo = new ProcessStartInfo
@@ -39,8 +49,18 @@ namespace DataAccess.Vmaf
             return output;
         }
 
+        /// <summary>
+        /// Gets vmaf using ffmpeg piping to ffmpeg from a source and path
+        /// </summary>
+        /// <exception cref="System.ArgumentException">
+        /// Throws if:
+        ///     - Either path does not exist
+        /// </exception>
         public static double GetVmafScene(string sourcePath, string scenePath, double sceneStartTime, double sceneEndTime)
         {
+            if (!File.Exists(sourcePath) || !File.Exists(scenePath))
+            { throw new ArgumentException("Either path is invalid"); }
+
             double output = 0;
 
             string processArgs = "ffmepg";

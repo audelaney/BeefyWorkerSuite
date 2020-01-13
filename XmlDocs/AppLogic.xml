@@ -1,0 +1,246 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>AppLogic</name>
+    </assembly>
+    <members>
+        <member name="M:AppLogic.AppConfigManager.SetConfig(System.String)">
+            <summary>
+            Sets the config instance to whatever is found at the path, or throws
+            an exception if there is nothing at the end of the path or the file
+            is not compatible. Also resets the EncodeJobManager instance.
+            </summary>
+        </member>
+        <member name="P:AppLogic.XMLAppConfigReader.ConfigFileChanged">
+            <summary>
+            Check if the config file was changed to enable the use of cached values.
+            </summary>
+            <returns>If the file was changed since last check.</returns>
+        </member>
+        <member name="T:AppLogic.EncodeJobManager">
+            <summary>
+            Logical encode job operations
+            </summary>
+        </member>
+        <member name="F:AppLogic.EncodeJobManager._logger">
+            <summary>
+            For logging purposes
+            </summary>
+        </member>
+        <member name="P:AppLogic.EncodeJobManager.Instance">
+            <summary>Pointer for manager operations</summary>
+        </member>
+        <member name="M:AppLogic.EncodeJobManager.ImproveQuality(DataObjects.EncodeJob)">
+            <summary>
+            Improves the quality of a job by altering command line arguments
+            </summary>
+            <todo>This isn't even close to being done</todo>
+        </member>
+        <member name="M:AppLogic.EncodeJobManager.EncodeMeetsRequirements(DataObjects.EncodeJob,System.String)">
+            <summary>
+            Determines if an output file meets the requirements of a jobs specs.
+            </summary>
+            <todo>Move to EncoderManager</todo>
+        </member>
+        <member name="M:AppLogic.EncodeJobManager.GetGuidFromWorkingDirectory(System.String)">
+            <summary>
+            Gets the guid from a designated working directory, passing back an empty if the directory 
+            is found/exists but does not translate to a guid.
+            </summary>
+            <todo>Move to accessor of some kind</todo>
+        </member>
+        <member name="M:AppLogic.EncodeJobManager.SetLogger(Microsoft.Extensions.Logging.ILogger)">
+            <summary>
+            Passes a logger into the manager for logging purposes
+            </summary>
+        </member>
+        <member name="M:AppLogic.EncodeJobManager.AddEncodeJobToQueue(DataObjects.EncodeJob)">
+            <summary>
+            Adds an encode job to the database queue to await encoding.
+            </summary>
+            <param name="job">The job to be added to the database queue.</param>
+            <returns>If the operation was a success.</returns>
+            <remarks>Should this generate and return a guid for guidless jobs?</remarks>
+            <exception cref="T:System.ApplicationException">
+            Thrown if:
+                - Database becomes unreachable
+            </exception>
+            <exception cref="T:System.ArgumentException">
+            Thrown if:
+                - Job to add to the database is invalid
+            </exception>
+        </member>
+        <member name="M:AppLogic.EncodeJobManager.FindEncodeJob(System.Guid)">
+            <summary>
+            Searches the database for a job with the matching GUID, and if its unable to find
+            it, returns null instead.
+            </summary>
+            <param name="id">The GUID to search the database for.</param>
+            <returns>The encode job pulled from the database queue that matches the GUID, or 
+            null if no matching jobs are found.</returns>
+            <exception cref="T:System.ApplicationException">
+            Thrown if:
+                - Database becomes unreachable
+            </exception>
+        </member>
+        <member name="M:AppLogic.EncodeJobManager.MarkJobComplete(DataObjects.EncodeJob,System.Boolean)">
+            <summary>
+            Changes the completion state of a job in the database.
+            </summary>
+            <todo>Ensure that CompletedTime property is properly implemented.</todo>
+            <param name="job">The job that should be marked as completed or not.</param>
+            <param name="completedStatus">The new status of the job.</param>
+            <returns>If the operation was a success.</returns>
+            <exception cref="T:System.ApplicationException">
+            Thrown if:
+                - database becomes unreachable
+            </exception>
+        </member>
+        <member name="M:AppLogic.EncodeJobManager.MarkJobComplete(System.Guid,System.Boolean)">
+            <summary>
+            Changes the completion state of a job in the database.
+            </summary>
+            <todo>Ensure that CompletedTime property is properly implemented.</todo>
+            <param name="id">The Id of the job to mark completion for.</param>
+            <param name="completedStatus">The new status of the job.</param>
+            <returns>If the operation was a success.</returns>
+            <exception cref="T:System.ApplicationException">
+            Thrown if:
+                - database becomes unreachable
+            </exception>
+        </member>
+        <member name="M:AppLogic.EncodeJobManager.MarkJobCheckedOut(DataObjects.EncodeJob,System.Boolean)">
+            <summary>
+            Marks a jobs checked out state in the database.
+            </summary>
+            <param name="job">The job object that needs its status changed</param>
+            <param name="checkedOutStatus">The new checked out status of the job</param>
+            <exception cref="T:System.ApplicationException">
+            Thrown if:
+                - database becomes unreachable
+            </exception>
+        </member>
+        <member name="M:AppLogic.EncodeJobManager.MarkJobCheckedOut(System.Guid,System.Boolean)">
+            <summary>
+            Marks a jobs checked out state in the database.
+            </summary>
+            <param name="id">The Id of the job to mark completion for.</param>
+            <param name="checkedOutStatus">The new checked out status of the job</param>
+            <returns>If the operation was a success.</returns>
+            <exception cref="T:System.ApplicationException">
+            Thrown if:
+                - database becomes unreachable
+            </exception>
+        </member>
+        <member name="M:AppLogic.EncodeJobManager.UpdateJob(DataObjects.EncodeJob,DataObjects.EncodeJob)">
+            <summary>
+            Updates a job's information in the database.
+            </summary>
+            <param name="oldJob">The old job information, current in the database.</param>
+            <param name="job">The new information to use for the job</param>
+            <returns>If the operation was a success.</returns>
+            <exception cref="T:System.ApplicationException">
+            Thrown if:
+                - database becomes unreachable
+            </exception>
+        </member>
+        <member name="M:AppLogic.EncodeJobManager.GetIncompleteUncheckedOutEncodeJobs(System.Int32)">
+            <summary>
+            Gets all jobs that are not completed and not checked out residing in the database.
+            </summary>
+            <returns>Generic collection of jobs, or an empty colletion if there are none.</returns>
+            <exception cref="T:System.ApplicationException">
+            Thrown if:
+                - Database becomes unreachable
+            </exception>
+            <exception cref="T:System.ArgumentException">
+            Thrown if:
+                - If the priority is out of range.
+            </exception>
+        </member>
+        <member name="M:AppLogic.EncodeJobManager.GetIncompleteUncheckedOutEncodeJobs">
+            <summary>
+            Gets all jobs that are not completed and not checked out residing in the database.
+            </summary>
+            <returns>Generic collection of jobs, or an empty colletion if there are none.</returns>
+            <exception cref="T:System.ApplicationException">
+            Thrown if:
+                - database becomes unreachable
+            </exception>
+        </member>
+        <member name="M:AppLogic.EncodeJobManager.GetIncompleteEncodeJobs(System.Int32)">
+            <summary>
+            Gets all jobs that are not completed residing in the database.
+            </summary>
+            <returns>Generic collection of jobs, or an empty colletion if there are none.</returns>
+            <exception cref="T:System.ApplicationException">
+            Thrown if:
+                - database becomes unreachable
+            </exception>
+            <exception cref="T:System.ArgumentException">
+            Thrown if:
+                - If the priority is out of range.
+            </exception>
+        </member>
+        <member name="M:AppLogic.EncodeJobManager.GetIncompleteEncodeJobs">
+            <summary>
+            Gets all jobs that are not completed residing in the database.
+            </summary>
+            <returns>Generic collection of jobs, or an empty colletion if there are none.</returns>
+            <exception cref="T:System.ApplicationException">
+            Thrown if:
+                - database becomes unreachable
+            </exception>
+        </member>
+        <member name="M:AppLogic.Encoders.EncoderFfmpegVp9Tester.Encode(DataObjects.EncodeJob,System.String)">
+            <summary>
+            Job info is mostly irrelevant, just use the input file and
+            toss everything else. Otherwise a good demonstration of how
+            to make your own implementation.
+            </summary>
+        </member>
+        <member name="M:AppLogic.Encoders.IEncoder.Encode(DataObjects.EncodeJob,System.String)">
+            <summary>
+            Encodes the specified job, returning the new filename of the encode if successful,
+            or null if unsuccessful.
+            </summary>
+        </member>
+        <member name="T:AppLogic.EncoderManager">
+            <summary>
+            Encoding related logic operations
+            </summary>
+        </member>
+        <member name="M:AppLogic.EncoderManager.StartJob(DataObjects.EncodeJob,System.String)">
+            <summary>
+            Opens an encoder and starts encoding a specified job
+            </summary>
+        </member>
+        <member name="M:AppLogic.RealEncodeJobManager.PrintDB">
+            Helper for using the logger
+        </member>
+        <member name="T:AppLogic.SceneManager">
+            <summary>
+            Scene related logic operations
+            </summary>
+        </member>
+        <member name="M:AppLogic.SceneManager.AnalyzeScenes(DataObjects.Scene[])">
+            <summary>
+            Mushes scenes together based on desired speed/efficiency/accuracy/
+            precision.
+            </summary>
+            <param name="sceneData">The scenes to mush together.</param>
+        </member>
+        <member name="M:AppLogic.SceneManager.MeetsCriteria(DataObjects.Scene)">
+            <summary>
+            If the scene 
+            </summary>
+            <todo>Should be adding a 'criteria' object of some kind as
+            a param.</todo>
+        </member>
+        <member name="M:AppLogic.SceneManager.AnalyzeVideoInput(System.String)">
+            <summary>
+            Converts a video into timestamped scenes that match criteria
+            </summary>
+        </member>
+    </members>
+</doc>

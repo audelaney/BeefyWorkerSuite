@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <DocumentationFile>../XmlDocs/DataAccess.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

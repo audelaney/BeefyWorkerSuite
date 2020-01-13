@@ -1,0 +1,298 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DataAccess</name>
+    </assembly>
+    <members>
+        <member name="T:DataAccess.EncodeJobDAOMockAlive">
+            <summary>
+            Mock data accessor object with a "live" repo attached.
+            </summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMockAlive.AddEncodeJobToQueue(DataObjects.EncodeJob)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMockAlive.MarkEncodeJobCheckedOut(System.Guid,System.Boolean)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMockAlive.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Boolean)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMockAlive.MarkJobCompletedStatus(System.Guid,System.Boolean)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMockAlive.MarkJobCompletedStatus(DataObjects.EncodeJob,System.Boolean)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMockAlive.RemoveEncodeJobFromQueue(System.Guid)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMockAlive.RetrieveCompleteEncodeJobs">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMockAlive.RetrieveEncodeJob(System.Guid)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMockAlive.RetrieveIncompleteEncodeJobs">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMockAlive.RetrieveIncompleteEncodeJobs(System.Int32)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMockAlive.UpdateJob(DataObjects.EncodeJob,DataObjects.EncodeJob)">
+            <summary></summary>
+        </member>
+        <member name="T:DataAccess.EncodeJobDAOMockBadDb">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMockBadDb.AddEncodeJobToQueue(DataObjects.EncodeJob)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMockBadDb.MarkEncodeJobCheckedOut(System.Guid,System.Boolean)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMockBadDb.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Boolean)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMockBadDb.MarkJobCompletedStatus(System.Guid,System.Boolean)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMockBadDb.MarkJobCompletedStatus(DataObjects.EncodeJob,System.Boolean)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMockBadDb.RemoveEncodeJobFromQueue(System.Guid)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMockBadDb.RetrieveCompleteEncodeJobs">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMockBadDb.RetrieveEncodeJob(System.Guid)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMockBadDb.RetrieveIncompleteEncodeJobs">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMockBadDb.RetrieveIncompleteEncodeJobs(System.Int32)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMockBadDb.UpdateJob(DataObjects.EncodeJob,DataObjects.EncodeJob)">
+            <summary></summary>
+        </member>
+        <member name="T:DataAccess.EncodeJobDAOMongo">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMongo.#ctor(System.String,System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMongo.AddEncodeJobToQueue(DataObjects.EncodeJob)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMongo.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Boolean)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMongo.MarkEncodeJobCheckedOut(System.Guid,System.Boolean)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMongo.MarkJobCompletedStatus(System.Guid,System.Boolean)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMongo.MarkJobCompletedStatus(DataObjects.EncodeJob,System.Boolean)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMongo.RemoveEncodeJobFromQueue(System.Guid)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMongo.RetrieveIncompleteEncodeJobs">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMongo.RetrieveIncompleteEncodeJobs(System.Int32)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMongo.RetrieveEncodeJob(System.Guid)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMongo.RetrieveCompleteEncodeJobs">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOMongo.UpdateJob(DataObjects.EncodeJob,DataObjects.EncodeJob)">
+            <summary></summary>
+        </member>
+        <member name="T:DataAccess.EncodeJobDAOmssql">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOmssql.#ctor(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOmssql.AddEncodeJobToQueue(DataObjects.EncodeJob)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOmssql.RemoveEncodeJobFromQueue(System.Guid)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOmssql.RetrieveCompleteEncodeJobs">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOmssql.RetrieveIncompleteEncodeJobs">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOmssql.RetrieveIncompleteEncodeJobs(System.Int32)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOmssql.MarkEncodeJobCheckedOut(System.Guid,System.Boolean)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOmssql.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Boolean)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOmssql.MarkJobCompletedStatus(System.Guid,System.Boolean)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOmssql.MarkJobCompletedStatus(DataObjects.EncodeJob,System.Boolean)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOmssql.RetrieveEncodeJob(System.Guid)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.EncodeJobDAOmssql.UpdateJob(DataObjects.EncodeJob,DataObjects.EncodeJob)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.IEncodeJobDAO.AddEncodeJobToQueue(DataObjects.EncodeJob)">
+            <summary>
+            Adds an encode job to the queue of pending encodes.
+            </summary>
+            <exception cref="T:DataAccess.Exceptions.BadConnectionStringException">
+            Throws if:
+            	- Database connection times out
+            </exception>
+        </member>
+        <member name="M:DataAccess.IEncodeJobDAO.RemoveEncodeJobFromQueue(System.Guid)">
+            <summary>
+            I don't exactly know what this is supposed to do
+            </summary>
+            <exception cref="T:DataAccess.Exceptions.BadConnectionStringException">
+            Throws if:
+            	- Database connection times out
+            </exception>
+        </member>
+        <member name="M:DataAccess.IEncodeJobDAO.RetrieveCompleteEncodeJobs">
+            <summary>
+            Gets the collection of all completed encode jobs from database
+            </summary>
+            <exception cref="T:DataAccess.Exceptions.BadConnectionStringException">
+            Throws if:
+            	- Database connection times out
+            </exception>
+        </member>
+        <member name="M:DataAccess.IEncodeJobDAO.RetrieveIncompleteEncodeJobs">
+            <summary>
+            Gets the collection of all incompleted encode jobs from database
+            </summary>
+            <exception cref="T:DataAccess.Exceptions.BadConnectionStringException">
+            Throws if:
+            	- Database connection times out
+            </exception>
+        </member>
+        <member name="M:DataAccess.IEncodeJobDAO.RetrieveIncompleteEncodeJobs(System.Int32)">
+            <summary>
+            Gets the collection of all incompleted encode jobs from database
+            that match a certain priority
+            </summary>
+            <exception cref="T:DataAccess.Exceptions.BadConnectionStringException">
+            Throws if:
+            	- Database connection times out
+            </exception>
+        </member>
+        <member name="M:DataAccess.IEncodeJobDAO.MarkEncodeJobCheckedOut(System.Guid,System.Boolean)">
+            <summary>
+            Changes the passed in jobs status to "Checked out", implying that
+            the job is currently in progress or undergoing interrim evaluation.
+            </summary>
+            <exception cref="T:DataAccess.Exceptions.BadConnectionStringException">
+            Throws if:
+            	- Database connection times out
+            </exception>
+        </member>
+        <member name="M:DataAccess.IEncodeJobDAO.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Boolean)">
+            <summary>
+            Changes the passed in jobs status to "Checked out", implying that
+            the job is currently in progress or undergoing interrim evaluation.
+            </summary>
+            <exception cref="T:DataAccess.Exceptions.BadConnectionStringException">
+            Throws if:
+            	- Database connection times out
+            </exception>
+        </member>
+        <member name="M:DataAccess.IEncodeJobDAO.MarkJobCompletedStatus(System.Guid,System.Boolean)">
+            <summary>
+            Marks a designated encode job as completed
+            </summary>
+            <exception cref="T:DataAccess.Exceptions.BadConnectionStringException">
+            Throws if:
+            	- Database connection times out
+            </exception>
+        </member>
+        <member name="M:DataAccess.IEncodeJobDAO.MarkJobCompletedStatus(DataObjects.EncodeJob,System.Boolean)">
+            <summary>
+            Marks a designated encode job as completed
+            </summary>
+            <exception cref="T:DataAccess.Exceptions.BadConnectionStringException">
+            Throws if:
+            	- Database connection times out
+            </exception>
+        </member>
+        <member name="M:DataAccess.IEncodeJobDAO.RetrieveEncodeJob(System.Guid)">
+            <summary>
+            Gets the matching encode job for specified GUID
+            </summary>
+            <exception cref="T:DataAccess.Exceptions.BadConnectionStringException">
+            Throws if:
+            	- Database connection times out
+            </exception>
+        </member>
+        <member name="M:DataAccess.IEncodeJobDAO.UpdateJob(DataObjects.EncodeJob,DataObjects.EncodeJob)">
+            <summary>
+            Update/overwrite the data for a job
+            </summary>
+            <exception cref="T:DataAccess.Exceptions.BadConnectionStringException">
+            Throws if:
+            	- Database connection times out
+            </exception>
+        </member>
+        <member name="M:DataAccess.SceneAccessor.AnalyzeVideoInput(System.String)">
+            <summary>
+            Verifies input exists, runs input through ffmpeg scene change
+            detection, uses resulting timestamp set to analyze scenes and returns the 
+            collection of those scenes.
+            </summary>
+        </member>
+        <member name="T:DataAccess.SvtEncAppAccessor">
+            <summary>
+            For use in parsing files output by the SVT-AV1 sample application.
+            </summary>
+        </member>
+        <member name="M:DataAccess.TestSuite.CsvSvtTestDao.AddSuccessfulTests(System.Collections.Generic.IEnumerable{DataObjects.TestSuite.SvtTestSuccess})">
+            <summary>
+            Writes a list of tests to the local csvFilePath, does not append. Returns false if there is an issue with the
+            path. Tests are written in blocks based on their ParamsInCmmd property
+            </summary>
+        </member>
+        <member name="M:DataAccess.Vmaf.VmafAccessor.GetVmaf(System.String,System.String)">
+            <summary>
+            Gets vmaf using ffmpeg from a source and path
+            </summary>
+            <exception cref="T:System.ArgumentException">
+            Throws if:
+                - Either path does not exist
+            </exception>
+        </member>
+        <member name="M:DataAccess.Vmaf.VmafAccessor.GetVmafScene(System.String,System.String,System.Double,System.Double)">
+            <summary>
+            Gets vmaf using ffmpeg piping to ffmpeg from a source and path
+            </summary>
+            <exception cref="T:System.ArgumentException">
+            Throws if:
+                - Either path does not exist
+            </exception>
+        </member>
+    </members>
+</doc>

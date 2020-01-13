@@ -6,6 +6,9 @@ using System.IO;
 
 namespace AppLogic
 {
+    /// <summary>
+    /// Encoding related logic operations
+    /// </summary>
     public static class EncoderManager
     {
         /// <summary>

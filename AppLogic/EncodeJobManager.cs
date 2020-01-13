@@ -10,10 +10,18 @@ using Microsoft.Extensions.Logging;
 
 namespace AppLogic
 {
+    /// <summary>
+    /// Logical encode job operations
+    /// </summary>
     public abstract class EncodeJobManager
     {
+        /// <summary>
+        /// For logging purposes
+        /// </summary>
         protected static ILogger? _logger;
         private static EncodeJobManager? _instance;
+        
+        /// <summary>Pointer for manager operations</summary>
         public static EncodeJobManager Instance
         {
             get
@@ -32,7 +40,10 @@ namespace AppLogic
             _instance = null;
         }
 
-        //Encoder based method TODO
+        /// <summary>
+        /// Improves the quality of a job by altering command line arguments
+        /// </summary>
+        /// <todo>This isn't even close to being done</todo>
         public static void ImproveQuality(EncodeJob job)
         {
             string[] oldCommandSplit = job.AdditionalCommandArguments.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -66,14 +77,16 @@ namespace AppLogic
             }
         }
         
-        //Encoder based method TODO
+        /// <summary>
+        /// Determines if an output file meets the requirements of a jobs specs.
+        /// </summary>
+        /// <todo>Move to EncoderManager</todo>
         public static bool EncodeMeetsRequirements(EncodeJob activeJob, string outputFileName)
         {
             string inputPath = Path.Combine(activeJob.VideoDirectoryPath, activeJob.VideoFileName);
             string outputPath = Path.Combine(activeJob.VideoDirectoryPath, outputFileName);
 
             //TODO if files don't exist
-
 
             double vmaf = 0;
 
@@ -95,6 +108,7 @@ namespace AppLogic
         /// Gets the guid from a designated working directory, passing back an empty if the directory 
         /// is found/exists but does not translate to a guid.
         /// </summary>
+        /// <todo>Move to accessor of some kind</todo>
         public static Guid GetGuidFromWorkingDirectory(string directory)
         {
             string guid = new DirectoryInfo(directory).Name;
@@ -108,6 +122,9 @@ namespace AppLogic
             }
         }
 
+        /// <summary>
+        /// Passes a logger into the manager for logging purposes
+        /// </summary>
         public static bool SetLogger(ILogger logger)
         {
             try
@@ -124,14 +141,14 @@ namespace AppLogic
         //Manager abstraction
 
         /// <summary>
-        /// 
+        /// Adds an encode job to the database queue to await encoding.
         /// </summary>
-        /// <returns>
-        /// </returns>
+        /// <param name="job">The job to be added to the database queue.</param>
+        /// <returns>If the operation was a success.</returns>
         /// <remarks>Should this generate and return a guid for guidless jobs?</remarks>
         /// <exception cref="System.ApplicationException">
         /// Thrown if:
-        ///     - database becomes unreachable
+        ///     - Database becomes unreachable
         /// </exception>
         /// <exception cref="System.ArgumentException">
         /// Thrown if:
@@ -140,17 +157,25 @@ namespace AppLogic
         abstract public bool AddEncodeJobToQueue(EncodeJob job);
         
         /// <summary>
-        /// 
+        /// Searches the database for a job with the matching GUID, and if its unable to find
+        /// it, returns null instead.
         /// </summary>
+        /// <param name="id">The GUID to search the database for.</param>
+        /// <returns>The encode job pulled from the database queue that matches the GUID, or 
+        /// null if no matching jobs are found.</returns>
         /// <exception cref="System.ApplicationException">
         /// Thrown if:
-        ///     - database becomes unreachable
+        ///     - Database becomes unreachable
         /// </exception>
         abstract public EncodeJob? FindEncodeJob(Guid id);
         
         /// <summary>
-        /// 
+        /// Changes the completion state of a job in the database.
         /// </summary>
+        /// <todo>Ensure that CompletedTime property is properly implemented.</todo>
+        /// <param name="job">The job that should be marked as completed or not.</param>
+        /// <param name="completedStatus">The new status of the job.</param>
+        /// <returns>If the operation was a success.</returns>
         /// <exception cref="System.ApplicationException">
         /// Thrown if:
         ///     - database becomes unreachable
@@ -158,8 +183,12 @@ namespace AppLogic
         abstract public bool MarkJobComplete(EncodeJob job, bool completedStatus);
         
         /// <summary>
-        /// 
+        /// Changes the completion state of a job in the database.
         /// </summary>
+        /// <todo>Ensure that CompletedTime property is properly implemented.</todo>
+        /// <param name="id">The Id of the job to mark completion for.</param>
+        /// <param name="completedStatus">The new status of the job.</param>
+        /// <returns>If the operation was a success.</returns>
         /// <exception cref="System.ApplicationException">
         /// Thrown if:
         ///     - database becomes unreachable
@@ -167,8 +196,10 @@ namespace AppLogic
         abstract public bool MarkJobComplete(Guid id, bool completedStatus);
         
         /// <summary>
-        /// 
+        /// Marks a jobs checked out state in the database.
         /// </summary>
+        /// <param name="job">The job object that needs its status changed</param>
+        /// <param name="checkedOutStatus">The new checked out status of the job</param>
         /// <exception cref="System.ApplicationException">
         /// Thrown if:
         ///     - database becomes unreachable
@@ -176,8 +207,11 @@ namespace AppLogic
         abstract public bool MarkJobCheckedOut(EncodeJob job, bool checkedOutStatus);
         
         /// <summary>
-        /// 
+        /// Marks a jobs checked out state in the database.
         /// </summary>
+        /// <param name="id">The Id of the job to mark completion for.</param>
+        /// <param name="checkedOutStatus">The new checked out status of the job</param>
+        /// <returns>If the operation was a success.</returns>
         /// <exception cref="System.ApplicationException">
         /// Thrown if:
         ///     - database becomes unreachable
@@ -185,8 +219,11 @@ namespace AppLogic
         abstract public bool MarkJobCheckedOut(Guid id, bool checkedOutStatus);
         
         /// <summary>
-        /// 
+        /// Updates a job's information in the database.
         /// </summary>
+        /// <param name="oldJob">The old job information, current in the database.</param>
+        /// <param name="job">The new information to use for the job</param>
+        /// <returns>If the operation was a success.</returns>
         /// <exception cref="System.ApplicationException">
         /// Thrown if:
         ///     - database becomes unreachable
@@ -194,17 +231,23 @@ namespace AppLogic
         abstract public bool UpdateJob(EncodeJob oldJob, EncodeJob job);
         
         /// <summary>
-        /// 
+        /// Gets all jobs that are not completed and not checked out residing in the database.
         /// </summary>
+        /// <returns>Generic collection of jobs, or an empty colletion if there are none.</returns>
         /// <exception cref="System.ApplicationException">
         /// Thrown if:
-        ///     - database becomes unreachable
+        ///     - Database becomes unreachable
+        /// </exception>
+        /// <exception cref="System.ArgumentException">
+        /// Thrown if:
+        ///     - If the priority is out of range.
         /// </exception>
         abstract public IEnumerable<EncodeJob> GetIncompleteUncheckedOutEncodeJobs(int priority);
         
         /// <summary>
-        /// 
+        /// Gets all jobs that are not completed and not checked out residing in the database.
         /// </summary>
+        /// <returns>Generic collection of jobs, or an empty colletion if there are none.</returns>
         /// <exception cref="System.ApplicationException">
         /// Thrown if:
         ///     - database becomes unreachable
@@ -212,17 +255,23 @@ namespace AppLogic
         abstract public IEnumerable<EncodeJob> GetIncompleteUncheckedOutEncodeJobs();
         
         /// <summary>
-        /// 
+        /// Gets all jobs that are not completed residing in the database.
         /// </summary>
+        /// <returns>Generic collection of jobs, or an empty colletion if there are none.</returns>
         /// <exception cref="System.ApplicationException">
         /// Thrown if:
         ///     - database becomes unreachable
         /// </exception>
+        /// <exception cref="System.ArgumentException">
+        /// Thrown if:
+        ///     - If the priority is out of range.
+        /// </exception>
         abstract public IEnumerable<EncodeJob> GetIncompleteEncodeJobs(int priority);
 
         /// <summary>
-        /// 
+        /// Gets all jobs that are not completed residing in the database.
         /// </summary>
+        /// <returns>Generic collection of jobs, or an empty colletion if there are none.</returns>
         /// <exception cref="System.ApplicationException">
         /// Thrown if:
         ///     - database becomes unreachable
