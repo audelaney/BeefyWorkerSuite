@@ -16,5 +16,5 @@ sudo cp bin/Release/netcoreapp3.0/ubuntu.18.04-x64/publish/InputSplitter /usr/lo
 cd ../EncodeJobIngester && dotnet publish -c Release && \
 sudo cp bin/Release/netcoreapp3.0/ubuntu.18.04-x64/publish/EncodeJobIngester /usr/local/bin/
 
-cd ../EncodeJobOverseer && dotnet public -c Release && \
+cd ../EncodeJobOverseer && dotnet publish -c Release && \
 sudo cp bin/Release/netcoreapp3.0/ubuntu.18.04-x64/publish/EncodeJobOverseer /usr/local/bin/
