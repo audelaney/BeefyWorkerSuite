@@ -287,5 +287,11 @@ namespace AppLogic
         ///     - database becomes unreachable
         /// </exception>
         abstract public IEnumerable<EncodeJob> GetIncompleteEncodeJobs();
+
+        /// <summary>
+        /// Gets all jobs that have a mtching video name in the database
+        /// </summary>
+        /// <returns>Collection of jobs, or an empty collection if there are none</returns>
+        abstract public IEnumerable<EncodeJob> GetJobsByVideoName(string videoName);
     }
 }

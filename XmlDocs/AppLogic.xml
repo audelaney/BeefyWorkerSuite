@@ -194,11 +194,22 @@
                 - database becomes unreachable
             </exception>
         </member>
+        <member name="M:AppLogic.EncodeJobManager.GetJobsByVideoName(System.String)">
+            <summary>
+            Gets all jobs that have a mtching video name in the database
+            </summary>
+            <returns>Collection of jobs, or an empty collection if there are none</returns>
+        </member>
         <member name="M:AppLogic.Encoders.EncoderFfmpegVp9Tester.Encode(DataObjects.EncodeJob,System.String)">
             <summary>
             Job info is mostly irrelevant, just use the input file and
             toss everything else. Otherwise a good demonstration of how
             to make your own implementation.
+            </summary>
+        </member>
+        <member name="T:AppLogic.Encoders.IEncoder">
+            <summary>
+            Interface that an encoder is required to implement
             </summary>
         </member>
         <member name="M:AppLogic.Encoders.IEncoder.Encode(DataObjects.EncodeJob,System.String)">
@@ -211,6 +222,17 @@
             <summary>
             Encoding related logic operations
             </summary>
+        </member>
+        <member name="M:AppLogic.EncoderManager.Combine(DataObjects.EncodeJob[],System.String)">
+            <summary>
+            Combines the resulting output from 
+            </summary>
+            <exception cref="T:System.ArgumentException">
+            Thrown if:
+                - Any of the jobs are not marked as completed
+                - Jobs don't have an InputInterval
+                - Jobs that have a video source that doesn't match the first video
+            </exception>
         </member>
         <member name="M:AppLogic.EncoderManager.StartJob(DataObjects.EncodeJob,System.String)">
             <summary>

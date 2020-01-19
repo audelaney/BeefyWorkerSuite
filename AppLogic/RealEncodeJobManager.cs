@@ -394,6 +394,7 @@ namespace AppLogic
             return output;
         }
 
+
         public override IEnumerable<EncodeJob> GetIncompleteEncodeJobs(int priority)
         {
             IEnumerable<EncodeJob> output = new EncodeJob[0];
@@ -464,6 +465,39 @@ namespace AppLogic
                 {
                     throw ex;
                 }
+            }
+
+            return output;
+        }
+
+        public override IEnumerable<EncodeJob> GetJobsByVideoName(string videoName)
+        {
+            IEnumerable<EncodeJob> output = new EncodeJob[0];
+            string message = "Exception encountered while pulling jobs with video name: " + videoName;
+            message += PrintDB();
+
+            try
+            {
+                var result = _dao.RetrieveCompleteEncodeJobsByVideoName(videoName);
+                if (result.Count() != 0)
+                { output = result; }
+                else
+                {
+                    _logger?.LogInformation("No jobs found with video name: " + videoName);
+                }
+            }
+            catch (DatabaseConnectionException dce)
+            {
+                //TODO cache logic
+                var up = new ApplicationException(message, dce);
+                throw up;
+            }
+            catch (Exception ex)
+            {
+                if (null != _logger)
+                { _logger.LogError(ex, message); }
+                else
+                { throw ex; }
             }
 
             return output;

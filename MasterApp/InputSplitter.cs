@@ -1,33 +1,30 @@
 #nullable enable
-using AppLogic;
 using System;
-using System.Threading;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using DataObjects;
+using AppLogic;
+using System.Linq;
+using System.Collections.Generic;
 
-namespace InputSplitter
+namespace MasterApp
 {
-    class Program
+    public class InputSplitter
     {
-        static void Main(string[] args)
+        public static void Run()
         {
-            if (args.Length != 2)
+            string? videoInputPathInput = AppHelpers.GetFileInput("Input video file to be split: ");
+            string? videoOutputDirectoryInput = AppHelpers.GetDirectoryInput("Output directory for video jobs: ");
+
+            if (null == videoInputPathInput || null == videoOutputDirectoryInput)
             {
-                HelpStatement();
+                System.Console.WriteLine("One or both paths do not exist... exiting input splitter.");
                 return;
             }
 
-            string videoInputPath = args[0];
-            string videoOutputDirectory = args[1];
-            string videoName = Path.GetFileNameWithoutExtension(videoInputPath);
+            string videoInputPath = videoInputPathInput;
+            string videoOutputDirectory = videoOutputDirectoryInput;
 
-            System.Console.Write(string.Format("Checking file {0} exists... ", videoInputPath));
-            System.Console.WriteLine(File.Exists(videoInputPath));
-            System.Console.Write(string.Format("Checking dir {0} exists... ", videoOutputDirectory));
-            System.Console.WriteLine(Directory.Exists(videoOutputDirectory));
+            string videoName = Path.GetFileNameWithoutExtension(videoInputPath);
 
             System.Console.WriteLine("Using ffmepg to search for ideal points of scene change...");
             //Analyze the video and find scene changes
@@ -37,18 +34,14 @@ namespace InputSplitter
             List<EncodeJob> jobs = new List<EncodeJob>();
 
             try
-            {
-                jobs = ConvertToUnNumberedJobs(scenes, Path.GetFileName(videoInputPath));
-            }
+            { jobs = ConvertToUnNumberedJobs(scenes, Path.GetFileName(videoInputPath)); }
             catch (ApplicationException)
             {
                 System.Console.WriteLine("User has quit manually, exiting without writing....");
                 return;
             }
             catch (Exception up)
-            {
-                throw up;
-            }
+            { throw up; }
 
             System.Console.WriteLine(jobs.Count + " jobs successfully built. Writing out to files...");
 
@@ -73,12 +66,8 @@ namespace InputSplitter
             System.Console.WriteLine("All done, have a good day.");
         }
 
-        private static void HelpStatement()
-        {
-            System.Console.WriteLine("Argument 1: Input file");
-            System.Console.WriteLine("Argument 2: Output directory");
-        }
-
+        /// <todo>Move to an EncodeJob class static method that takes a valid EncodeJob and
+        /// an IEnumerable Scene and outputs an IEnumberalbe EncodeJob</todo>
         private static List<EncodeJob> ConvertToUnNumberedJobs(Scene[] chunks, string filename)
         {
             System.Console.WriteLine("Job requirements will now be prompted. Leave prompt empty to use default, and enter 'quit' at any time to quit and exit.");
@@ -200,14 +189,10 @@ namespace InputSplitter
                 if (commands.Trim().ToLower() == "quit")
                 { throw new ApplicationException("User has quit."); }
                 else if (!string.IsNullOrWhiteSpace(commands))
-                {
-                    userAddtlCommands = commands;
-                }
+                { userAddtlCommands = commands; }
             }
             catch (Exception ex)
-            {
-                throw ex;
-            }
+            { throw ex; }
 
             EncodeJob masterJob = new EncodeJob
             {

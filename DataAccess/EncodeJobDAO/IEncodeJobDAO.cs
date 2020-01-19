@@ -7,6 +7,9 @@ using System.Text;
 
 namespace DataAccess
 {
+	/// <summary>
+	/// Entry point for EncodeJob related database operations
+	/// </summary>
 	public interface IEncodeJobDAO
 	{
 		/// <summary>
@@ -96,10 +99,14 @@ namespace DataAccess
 		/// <summary>
 		/// Update/overwrite the data for a job
 		/// </summary>
+		bool UpdateJob(EncodeJob oldData, EncodeJob newData);
+		/// <summary>
+		/// Gets a list of completed jobs with a certain video name
+		/// </summary>
 		/// <exception cref="DataAccess.Exceptions.BadConnectionStringException">
 		/// Throws if:
 		/// 	- Database connection times out
 		/// </exception>
-		bool UpdateJob(EncodeJob oldData, EncodeJob newData);
-	}
+        IEnumerable<EncodeJob> RetrieveCompleteEncodeJobsByVideoName(string videoName) { throw new NotImplementedException(); }
+    }
 }

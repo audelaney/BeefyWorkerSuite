@@ -184,7 +184,7 @@ namespace DataAccess
             }
             else
             {
-                result = MarkJobCompletedStatus(job.Id,completed);
+                result = MarkJobCompletedStatus(job.Id, completed);
             }
             return result;
         }
@@ -318,6 +318,24 @@ namespace DataAccess
             {
                 throw ex;
             }
+            return result;
+        }
+
+        /// <summary></summary>
+        public IEnumerable<EncodeJob> RetrieveCompleteEncodeJobsByVideoName(string videoName)
+        {
+            IEnumerable<EncodeJob> result = new List<EncodeJob>();
+
+            try
+            {
+                var collection = database.GetCollection<EncodeJob>(encodeJobCollectionName);
+                var filter = Builders<EncodeJob>.Filter.Eq("Completed", bool.TrueString) &
+                             Builders<EncodeJob>.Filter.Eq("VideoFileName", videoName);
+                result = collection.Find<EncodeJob>(filter).ToList();
+            }
+            catch (Exception ex)
+            { throw ex; }
+
             return result;
         }
     }

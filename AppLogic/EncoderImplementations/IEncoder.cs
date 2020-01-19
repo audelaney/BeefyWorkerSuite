@@ -4,6 +4,9 @@ using DataObjects;
 
 namespace AppLogic.Encoders
 {
+    /// <summary>
+    /// Interface that an encoder is required to implement
+    /// </summary>
     public interface IEncoder
     {
         /// <summary>

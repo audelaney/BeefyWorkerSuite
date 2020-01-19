@@ -7,6 +7,9 @@ using DataObjects;
 
 namespace DataAccess
 {
+	/// <summary>
+	/// Accessor class for scene related operations
+	/// </summary>
     public class SceneAccessor
     {
         /// <summary>

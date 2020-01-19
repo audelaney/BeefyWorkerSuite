@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace DataAccess.Vmaf
 {
+	/// <summary>
+	/// Class for pulling VMAF from videos
+	/// </summary>
     public static class VmafAccessor
     {
         /// <summary>

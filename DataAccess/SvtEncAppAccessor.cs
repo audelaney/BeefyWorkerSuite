@@ -18,6 +18,11 @@ namespace DataAccess
         private static readonly Regex FirstLineNewEncode = new Regex("Input #0,.*, from '.*':|Starting\\.\\.\\..*$");
         private static readonly Regex InputLineFfmpeg = new Regex("Input #0,.*clip-");
 
+		/// <summary>
+		/// Gets all successful runs from an output file composed of a capture of SVT encoder output
+		/// </summary>
+		/// <param name="file"></param>
+		/// <returns></returns>
         public static IEnumerable<SvtTestSuccess> GetSuccessulTestsFromOutputFile(string file)
         {
             if (!File.Exists(file))
@@ -206,6 +211,11 @@ namespace DataAccess
             return output;
         }
 
+		/// <summary>
+		/// Gets the stats for each encoded frame in a video output by the SVT logger
+		/// </summary>
+		/// <param name="statFilePath">Path to the file</param>
+		/// <returns>Collection of stats for each frame, or empty if none are found.</returns>
         public static EncodedPictureStat[] GetPictureStatsFromStatFile(string statFilePath)
         {
             if (string.IsNullOrWhiteSpace(statFilePath))

@@ -117,6 +117,9 @@
         <member name="M:DataAccess.EncodeJobDAOMongo.UpdateJob(DataObjects.EncodeJob,DataObjects.EncodeJob)">
             <summary></summary>
         </member>
+        <member name="M:DataAccess.EncodeJobDAOMongo.RetrieveCompleteEncodeJobsByVideoName(System.String)">
+            <summary></summary>
+        </member>
         <member name="T:DataAccess.EncodeJobDAOmssql">
             <summary></summary>
         </member>
@@ -155,6 +158,11 @@
         </member>
         <member name="M:DataAccess.EncodeJobDAOmssql.UpdateJob(DataObjects.EncodeJob,DataObjects.EncodeJob)">
             <summary></summary>
+        </member>
+        <member name="T:DataAccess.IEncodeJobDAO">
+            <summary>
+            Entry point for EncodeJob related database operations
+            </summary>
         </member>
         <member name="M:DataAccess.IEncodeJobDAO.AddEncodeJobToQueue(DataObjects.EncodeJob)">
             <summary>
@@ -254,6 +262,11 @@
             <summary>
             Update/overwrite the data for a job
             </summary>
+        </member>
+        <member name="M:DataAccess.IEncodeJobDAO.RetrieveCompleteEncodeJobsByVideoName(System.String)">
+            <summary>
+            Gets a list of completed jobs with a certain video name
+            </summary>
             <exception cref="T:DataAccess.Exceptions.BadConnectionStringException">
             Throws if:
             	- Database connection times out
@@ -275,6 +288,16 @@
             <summary>
             Writes a list of tests to the local csvFilePath, does not append. Returns false if there is an issue with the
             path. Tests are written in blocks based on their ParamsInCmmd property
+            </summary>
+        </member>
+        <member name="T:DataAccess.VideoAccessor">
+            <summary>
+            Static accessor for generic video functions
+            </summary>
+        </member>
+        <member name="M:DataAccess.VideoAccessor.ConcatVideosIntoOneOutput(System.Collections.Generic.List{System.String},System.String)">
+            <summary>
+            Combines multiple videos into a single video in order
             </summary>
         </member>
         <member name="M:DataAccess.Vmaf.VmafAccessor.GetVmaf(System.String,System.String)">
