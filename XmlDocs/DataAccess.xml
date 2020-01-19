@@ -12,10 +12,10 @@
         <member name="M:DataAccess.EncodeJobDAOMockAlive.AddEncodeJobToQueue(DataObjects.EncodeJob)">
             <summary></summary>
         </member>
-        <member name="M:DataAccess.EncodeJobDAOMockAlive.MarkEncodeJobCheckedOut(System.Guid,System.Boolean)">
+        <member name="M:DataAccess.EncodeJobDAOMockAlive.MarkEncodeJobCheckedOut(System.Guid,System.Nullable{System.DateTime})">
             <summary></summary>
         </member>
-        <member name="M:DataAccess.EncodeJobDAOMockAlive.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Boolean)">
+        <member name="M:DataAccess.EncodeJobDAOMockAlive.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Nullable{System.DateTime})">
             <summary></summary>
         </member>
         <member name="M:DataAccess.EncodeJobDAOMockAlive.MarkJobCompletedStatus(System.Guid,System.Boolean)">
@@ -48,10 +48,10 @@
         <member name="M:DataAccess.EncodeJobDAOMockBadDb.AddEncodeJobToQueue(DataObjects.EncodeJob)">
             <summary></summary>
         </member>
-        <member name="M:DataAccess.EncodeJobDAOMockBadDb.MarkEncodeJobCheckedOut(System.Guid,System.Boolean)">
+        <member name="M:DataAccess.EncodeJobDAOMockBadDb.MarkEncodeJobCheckedOut(System.Guid,System.Nullable{System.DateTime})">
             <summary></summary>
         </member>
-        <member name="M:DataAccess.EncodeJobDAOMockBadDb.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Boolean)">
+        <member name="M:DataAccess.EncodeJobDAOMockBadDb.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Nullable{System.DateTime})">
             <summary></summary>
         </member>
         <member name="M:DataAccess.EncodeJobDAOMockBadDb.MarkJobCompletedStatus(System.Guid,System.Boolean)">
@@ -87,10 +87,10 @@
         <member name="M:DataAccess.EncodeJobDAOMongo.AddEncodeJobToQueue(DataObjects.EncodeJob)">
             <summary></summary>
         </member>
-        <member name="M:DataAccess.EncodeJobDAOMongo.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Boolean)">
+        <member name="M:DataAccess.EncodeJobDAOMongo.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Nullable{System.DateTime})">
             <summary></summary>
         </member>
-        <member name="M:DataAccess.EncodeJobDAOMongo.MarkEncodeJobCheckedOut(System.Guid,System.Boolean)">
+        <member name="M:DataAccess.EncodeJobDAOMongo.MarkEncodeJobCheckedOut(System.Guid,System.Nullable{System.DateTime})">
             <summary></summary>
         </member>
         <member name="M:DataAccess.EncodeJobDAOMongo.MarkJobCompletedStatus(System.Guid,System.Boolean)">
@@ -138,10 +138,10 @@
         <member name="M:DataAccess.EncodeJobDAOmssql.RetrieveIncompleteEncodeJobs(System.Int32)">
             <summary></summary>
         </member>
-        <member name="M:DataAccess.EncodeJobDAOmssql.MarkEncodeJobCheckedOut(System.Guid,System.Boolean)">
+        <member name="M:DataAccess.EncodeJobDAOmssql.MarkEncodeJobCheckedOut(System.Guid,System.Nullable{System.DateTime})">
             <summary></summary>
         </member>
-        <member name="M:DataAccess.EncodeJobDAOmssql.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Boolean)">
+        <member name="M:DataAccess.EncodeJobDAOmssql.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Nullable{System.DateTime})">
             <summary></summary>
         </member>
         <member name="M:DataAccess.EncodeJobDAOmssql.MarkJobCompletedStatus(System.Guid,System.Boolean)">
@@ -202,7 +202,7 @@
             	- Database connection times out
             </exception>
         </member>
-        <member name="M:DataAccess.IEncodeJobDAO.MarkEncodeJobCheckedOut(System.Guid,System.Boolean)">
+        <member name="M:DataAccess.IEncodeJobDAO.MarkEncodeJobCheckedOut(System.Guid,System.Nullable{System.DateTime})">
             <summary>
             Changes the passed in jobs status to "Checked out", implying that
             the job is currently in progress or undergoing interrim evaluation.
@@ -212,9 +212,9 @@
             	- Database connection times out
             </exception>
         </member>
-        <member name="M:DataAccess.IEncodeJobDAO.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Boolean)">
+        <member name="M:DataAccess.IEncodeJobDAO.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Nullable{System.DateTime})">
             <summary>
-            Changes the passed in jobs status to "Checked out", implying that
+            Changes the passed in jobs status to "Checked out at X time", implying that
             the job is currently in progress or undergoing interrim evaluation.
             </summary>
             <exception cref="T:DataAccess.Exceptions.BadConnectionStringException">
@@ -224,7 +224,8 @@
         </member>
         <member name="M:DataAccess.IEncodeJobDAO.MarkJobCompletedStatus(System.Guid,System.Boolean)">
             <summary>
-            Marks a designated encode job as completed
+            Changes the passed in jobs status to "Checked out at X time", implying that
+            the job is currently in progress or undergoing interrim evaluation.
             </summary>
             <exception cref="T:DataAccess.Exceptions.BadConnectionStringException">
             Throws if:

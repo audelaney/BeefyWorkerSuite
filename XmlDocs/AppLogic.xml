@@ -36,9 +36,10 @@
             </summary>
             <todo>This isn't even close to being done</todo>
         </member>
-        <member name="M:AppLogic.EncodeJobManager.EncodeMeetsRequirements(DataObjects.EncodeJob,System.String)">
+        <member name="M:AppLogic.EncodeJobManager.AttemptMeetsRequirements(DataObjects.EncodeJob,System.String)">
             <summary>
             Determines if an output file meets the requirements of a jobs specs.
+            False (obviously) if outputFileName is null or empty.
             </summary>
             <todo>Move to EncoderManager</todo>
         </member>
@@ -111,7 +112,8 @@
         </member>
         <member name="M:AppLogic.EncodeJobManager.MarkJobCheckedOut(DataObjects.EncodeJob,System.Boolean)">
             <summary>
-            Marks a jobs checked out state in the database.
+            Marks a jobs checked out time in the database, and if successful sets
+            the job objects checked out to the appropriate time.
             </summary>
             <param name="job">The job object that needs its status changed</param>
             <param name="checkedOutStatus">The new checked out status of the job</param>
@@ -134,7 +136,7 @@
         </member>
         <member name="M:AppLogic.EncodeJobManager.UpdateJob(DataObjects.EncodeJob,DataObjects.EncodeJob)">
             <summary>
-            Updates a job's information in the database.
+            Updates a job's information in the database, but not completed or checked out time.
             </summary>
             <param name="oldJob">The old job information, current in the database.</param>
             <param name="job">The new information to use for the job</param>

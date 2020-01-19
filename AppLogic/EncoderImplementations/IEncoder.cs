@@ -10,7 +10,6 @@ namespace AppLogic.Encoders
         /// Encodes the specified job, returning the new filename of the encode if successful,
         /// or null if unsuccessful.
         /// </summary>
-        public string? Encode(EncodeJob encodeJob, string? outputDirectoryPath = null);
-        public int EncodesRun { get; }
+        public string? Encode(EncodeJob encodeJob, string outputPath);
     }
 }

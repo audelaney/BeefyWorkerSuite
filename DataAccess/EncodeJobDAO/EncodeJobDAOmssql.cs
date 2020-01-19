@@ -90,13 +90,13 @@ namespace DataAccess
         }
 
 		/// <summary></summary>
-        public bool MarkEncodeJobCheckedOut(Guid id, bool completed)
+        public bool MarkEncodeJobCheckedOut(Guid id, DateTime? checkedOutTime)
         {
             throw new NotImplementedException();
         }
 
 		/// <summary></summary>
-        public bool MarkEncodeJobCheckedOut(EncodeJob job, bool completed)
+        public bool MarkEncodeJobCheckedOut(EncodeJob job, DateTime? checkedOutTime)
         {
             throw new NotImplementedException();
         }

@@ -126,7 +126,7 @@ namespace EncodeJobOverseer
 
                 string videoDir = AppConfigManager.Instance.ProcessedBucketPath;
 
-                string targetVideoDirectory = (string.IsNullOrWhiteSpace(job.InputInterval)) ?
+                string targetVideoDirectory = (string.IsNullOrWhiteSpace(job.ChunkInterval)) ?
                                                 outputDirectory : AppConfigManager.Instance.ActiveBucketPath;
 
                 if (!File.Exists(Path.Combine(targetVideoDirectory,job.VideoFileName)))

@@ -14,23 +14,19 @@ namespace AppLogic.Encoders
         /// toss everything else. Otherwise a good demonstration of how
         /// to make your own implementation.
         /// </summary>
-        public string? Encode(EncodeJob encodeJob, string? outputDirectoryPath = null)
+        public string? Encode(EncodeJob encodeJob, string outputPath)
         {
             if (!Directory.Exists(encodeJob.VideoDirectoryPath))
             { throw new ArgumentException("Video directory does not exist"); }
 
-            _encodesRun++;
-
             try
             {
                 string input = Path.Combine(encodeJob.VideoDirectoryPath, encodeJob.VideoFileName);
-                string output = Path.Combine(encodeJob.VideoDirectoryPath,
-                                            Path.GetFileNameWithoutExtension(input) + ".attempt" + _encodesRun + ".mkv");
 
                 string processArguments = "-i " + input;
                 processArguments += " -c:v libvpx-vp9 -c copy";
                 processArguments += " -crf 15 -cpu-used 5 -y";
-                processArguments += " " + output;
+                processArguments += " " + outputPath;
 
                 ProcessStartInfo testProcessInfo = new ProcessStartInfo
                 {
@@ -51,7 +47,7 @@ namespace AppLogic.Encoders
                         testProcess.Refresh();
                     }
 
-                    using (StreamWriter writer = new StreamWriter(output + ".log"))
+                    using (StreamWriter writer = new StreamWriter(outputPath + ".log"))
                     {
                         writer.Write(testProcess.StandardError.ReadToEnd());
                         writer.Close();
@@ -59,21 +55,12 @@ namespace AppLogic.Encoders
 
                     testProcess.Close();
 
-                    return output;
+                    return outputPath;
                 }
             }
             catch (Exception ex)
             {
                 throw ex;
-            }
-        }
-
-        private int _encodesRun = 0;
-        public int EncodesRun
-        {
-            get
-            {
-                return _encodesRun;
             }
         }
     }

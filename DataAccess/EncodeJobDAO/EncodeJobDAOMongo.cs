@@ -73,13 +73,10 @@ namespace DataAccess
         }
 
         /// <summary></summary>
-        public bool MarkEncodeJobCheckedOut(EncodeJob job, bool checkedOut)
+        public bool MarkEncodeJobCheckedOut(EncodeJob job, DateTime? checkedOutTime)
         {
-            if (!checkedOut)
-            {
-                throw new NotImplementedException("Haven't worked this one out yet");
-            }
-
+            throw new NotImplementedException("Haven't worked this one out yet");
+            
             if (!job.IsValid)
             {
                 var argex = new ArgumentException("Job submitted to queue is invalid");
@@ -109,13 +106,13 @@ namespace DataAccess
             }
             else
             {
-                result = MarkEncodeJobCheckedOut(job.Id, checkedOut);
+                result = MarkEncodeJobCheckedOut(job.Id, checkedOutTime);
             }
             return result;
         }
 
         /// <summary></summary>
-        public bool MarkEncodeJobCheckedOut(Guid id, bool completed)
+        public bool MarkEncodeJobCheckedOut(Guid id, DateTime? checkedOutTime)
         {
             if (id == Guid.Empty)
             { throw new ArgumentException("Empty guid in CheckoutEncodeJob method."); }

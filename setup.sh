@@ -2,7 +2,8 @@
 
 #Where the action happens
 mkdir -p ~/Videos/EncodeWorker/jobs/completed
-mkdir -p ~/Videos/EncodeWorker/active
+mkdir -p ~/Videos/EncodeWorker/jobs/active
+mkdir -p ~/Videos/EncodeWorker/jobs/failed
 mkdir -p ~/Videos/EncodeWorker/input
 
 #Config folder goodness

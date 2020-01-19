@@ -9,38 +9,23 @@ namespace AppLogic.Encoders
 {
     public class EncoderLibaomFfmpeg : IEncoder
     {
-        public int _encodesRun = 0;
-        public int EncodesRun
-        {
-            get
-            {
-                return _encodesRun;
-            }
-        }
-
-        public string? Encode(EncodeJob encodeJob, string? outputDirectoryPath = null)
+        public string? Encode(EncodeJob encodeJob, string outputPath)
         {
             if (!Directory.Exists(encodeJob.VideoDirectoryPath))
             { throw new ArgumentException("Video directory does not exist"); }
-            if (!string.IsNullOrWhiteSpace(outputDirectoryPath))
+            if (!string.IsNullOrWhiteSpace(outputPath))
             {
-                if (!Directory.Exists(outputDirectoryPath))
-                { throw new ArgumentException("Video directory does not exist"); }
+                throw new ArgumentException("File is empty");
             }
-            _encodesRun++;
 
             try
             {
                 string input = Path.Combine(encodeJob.VideoDirectoryPath, encodeJob.VideoFileName);
-                string output = Path.Combine(outputDirectoryPath ?? encodeJob.VideoDirectoryPath,
-                                            Path.GetFileNameWithoutExtension(input));
-                if (encodeJob.ChunkNumber != 0) { output += ".chunk" + encodeJob.ChunkNumber; }
-                output += ".attempt" + _encodesRun + ".mkv";
 
                 string processArguments = "";
-                if (!string.IsNullOrWhiteSpace(encodeJob.InputInterval))
+                if (!string.IsNullOrWhiteSpace(encodeJob.ChunkInterval))
                 {
-                    string[] times = encodeJob.InputInterval.Split('-');
+                    string[] times = encodeJob.ChunkInterval.Split('-');
                     if (double.TryParse(times[0], out double start) &&
                         double.TryParse(times[1], out double end))
                     {
@@ -49,17 +34,14 @@ namespace AppLogic.Encoders
                         processArguments += " -t " + (end - start);
                     }
                     else
-                    {
-
-                    }
+                    { }
                 }
                 else
-                {
-                    processArguments += "-i " + input;
-                }
+                { processArguments += "-i " + input; }
+                
                 processArguments += " -strict experimental -c:v libaom-av1";
                 processArguments += " " + encodeJob.AdditionalCommandArguments;
-                processArguments += " " + output;
+                processArguments += " " + outputPath;
 
                 ProcessStartInfo libaomProcessInfo = new ProcessStartInfo
                 {
@@ -83,7 +65,7 @@ namespace AppLogic.Encoders
                     libaomProcess.Close();
                 }
 
-                return output;
+                return outputPath;
             }
             catch (Exception ex)
             {

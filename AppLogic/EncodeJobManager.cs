@@ -76,13 +76,22 @@ namespace AppLogic
                 catch { }
             }
         }
-        
+
+        internal static string GenerateJobOutputFilename(EncodeJob job)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Determines if an output file meets the requirements of a jobs specs.
+        /// False (obviously) if outputFileName is null or empty.
         /// </summary>
         /// <todo>Move to EncoderManager</todo>
-        public static bool EncodeMeetsRequirements(EncodeJob activeJob, string outputFileName)
+        public static bool AttemptMeetsRequirements(EncodeJob activeJob, string? outputFileName)
         {
+            throw new NotImplementedException("Method WIP atm");
+            if (string.IsNullOrEmpty(outputFileName))
+                return false;
             string inputPath = Path.Combine(activeJob.VideoDirectoryPath, activeJob.VideoFileName);
             string outputPath = Path.Combine(activeJob.VideoDirectoryPath, outputFileName);
 
@@ -90,7 +99,7 @@ namespace AppLogic
 
             double vmaf = 0;
 
-            if (activeJob.InputInterval == null)
+            if (activeJob.ChunkInterval == null)
             {
                 vmaf = VmafAccessor.GetVmaf(inputPath, outputPath);
             }
@@ -196,7 +205,8 @@ namespace AppLogic
         abstract public bool MarkJobComplete(Guid id, bool completedStatus);
         
         /// <summary>
-        /// Marks a jobs checked out state in the database.
+        /// Marks a jobs checked out time in the database, and if successful sets
+        /// the job objects checked out to the appropriate time.
         /// </summary>
         /// <param name="job">The job object that needs its status changed</param>
         /// <param name="checkedOutStatus">The new checked out status of the job</param>
@@ -219,7 +229,7 @@ namespace AppLogic
         abstract public bool MarkJobCheckedOut(Guid id, bool checkedOutStatus);
         
         /// <summary>
-        /// Updates a job's information in the database.
+        /// Updates a job's information in the database, but not completed or checked out time.
         /// </summary>
         /// <param name="oldJob">The old job information, current in the database.</param>
         /// <param name="job">The new information to use for the job</param>

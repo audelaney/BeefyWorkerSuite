@@ -37,19 +37,14 @@ namespace AppLogic
             
             if (File.Exists(configFilePath))
             {
-                switch (Path.GetExtension(configFilePath))
-                {
-                    case ".config":
-                        _instance = new XMLAppConfigReader();
-                        break;
-                    case ".json":
-                        throw new InvalidOperationException("Json config not supported");
-                    case ".txt":
-                        throw new InvalidOperationException("Plain text config not supported");
-                    default:
-                        throw new InvalidOperationException("Unknown config type.");
-                }
-                _configPath = configFilePath;
+				_instance = (Path.GetExtension(configFilePath)) switch
+				{
+					".config" => new XMLAppConfigReader(),
+					".json" => throw new InvalidOperationException("Json config not supported"),
+					".txt" => throw new InvalidOperationException("Plain text config not supported"),
+					_ => throw new InvalidOperationException("Unknown config type."),
+				};
+				_configPath = configFilePath;
             }
             else if (configFilePath == "mock" ||
                      configFilePath == "mock-baddb")
@@ -71,5 +66,6 @@ namespace AppLogic
         abstract public string LogFilePath { get; }
         abstract public KeyValuePair<string, string> DBTypeAndString { get; }
         abstract public int MaxRunningLocalJobs { get; }
-    }
+		abstract public string FailedBucketPath { get; }
+	}
 }

@@ -122,7 +122,10 @@ namespace AppLogic
             message += PrintDB();
             try
             {
-                return _dao.MarkEncodeJobCheckedOut(id, checkedOutStatus);
+                var result = false;
+                DateTime? time = (checkedOutStatus) ?DateTime.Now : (DateTime?) null;
+                result = _dao.MarkEncodeJobCheckedOut(id, time);
+                return result;
             }
             catch (DatabaseConnectionException dce)
             {
@@ -155,7 +158,19 @@ namespace AppLogic
             message += PrintDB();
             try
             {
-                return _dao.MarkEncodeJobCheckedOut(job, checkedOutStatus);
+                var result = false;
+                if (checkedOutStatus)
+                {
+                    DateTime time = DateTime.Now;
+                    result = _dao.MarkEncodeJobCheckedOut(job, time);
+                    if (result) { job.CheckedOutTime = time; }
+                }
+                else
+                {
+                    result = _dao.MarkEncodeJobCheckedOut(job, null);
+                    if (result) { job.CheckedOutTime = null; }
+                }
+                return result;
             }
             catch (DatabaseConnectionException dce)
             {
@@ -171,9 +186,7 @@ namespace AppLogic
                     return false;
                 }
                 else
-                {
-                    throw ex;
-                }
+                { throw ex; }
             }
         }
 
@@ -238,7 +251,7 @@ namespace AppLogic
                     return false;
                 }
                 else
-                { throw ex;  }
+                { throw ex; }
             }
         }
 
@@ -276,17 +289,12 @@ namespace AppLogic
         public override bool UpdateJob(EncodeJob oldJob, EncodeJob job)
         {
             if (!oldJob.IsValid)
-            {
-                throw new ArgumentException("Old job is invalid: " + oldJob.ToString());
-            }
+            { throw new ArgumentException("Old job is invalid: " + oldJob.ToString()); }
             if (!job.IsValid)
-            {
-                throw new ArgumentException("New job is invalid: " + job.ToString());
-            }
-            
+            { throw new ArgumentException("New job is invalid: " + job.ToString()); }
+
             string message = "Exception encountered while updating job " + oldJob.ToString();
-            message += " to new job " + job.ToString();
-            message += PrintDB();
+            message += " to new job " + job.ToString() + PrintDB();
             try
             {
                 return _dao.UpdateJob(oldJob, job);

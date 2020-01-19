@@ -3,6 +3,7 @@ using AppLogic.Encoders;
 using System;
 using DataObjects;
 using System.IO;
+using DataAccess.Vmaf;
 
 namespace AppLogic
 {
@@ -24,44 +25,43 @@ namespace AppLogic
                 _ => throw new InvalidOperationException()
             };
 
-            string? outputDirectoryPath = null;
-            if (null != job.InputInterval)
+			EncodeAttempt? attempt;
+			do
             {
-                outputDirectoryPath = Path.Combine(AppConfigManager.Instance.ActiveBucketPath,
-                                                    job.Id.ToString());
-            }
-            string? output = null;
-            do
-            {
-                if (0 != encoder.EncodesRun)
+                if (0 != job.Attempts.Count)
+                { EncodeJobManager.ImproveQuality(job); }
+                try
                 {
-                    EncodeJobManager.ImproveQuality(job);
-                }
-                output = encoder.Encode(job, outputDirectoryPath);
-            } while (RunAgain(job, output, encoder.EncodesRun));
+                    var outputPath = EncodeJobManager.GenerateJobOutputFilename(job);
 
-            //TODO requirement check and logic
-            if (!EncodeJobManager.Instance.MarkJobComplete(job, true))
-            {
-                var tryAgainJob = job.Clone() as EncodeJob;
-                tryAgainJob!.Completed = true;
-                tryAgainJob!.Id = job.Id;
-                EncodeJobManager.Instance.UpdateJob(job, tryAgainJob);
-            }
+					//Start the encode
+					DateTime startTime = DateTime.Now;
+					encoder.Encode(job, outputPath);
+
+					//Save the attempt
+					attempt = new EncodeAttempt(outputPath)
+					{
+						CommandLineArgs = (string)job.AdditionalCommandArguments.Clone(),
+						StartTime = startTime,
+						EndTime = DateTime.Now,
+						VmafResult = VmafAccessor.GetVmaf(Path.Combine(job.VideoDirectoryPath,
+										job.VideoFileName), outputPath),
+						FileSize = (ulong) new FileInfo(outputPath).Length
+					};
+                    job.Attempts.Add(attempt);
+                }
+                catch { attempt = null; }
+            } while (RunAgain(job, attempt?.OriginalOutputPath));
         }
 
-        private static bool RunAgain(EncodeJob job, string? result, int runs)
+        private static bool RunAgain(EncodeJob job, string? result)
         {
             if (result == null)
             { return true; }
-            if (runs >= job.MaxAttempts)
-            {
-                return false;
-            }
-            if (EncodeJobManager.EncodeMeetsRequirements(job, result))
-            {
-                return false;
-            }
+            if (job.Attempts.Count >= job.MaxAttempts)
+            { return false; }
+            if (EncodeJobManager.AttemptMeetsRequirements(job, result))
+            { return false; }
 
             return true;
         }

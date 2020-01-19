@@ -224,7 +224,7 @@ namespace InputSplitter
             var output = chunks.Select(c =>
             {
                 var job = (EncodeJob)masterJob.Clone();
-                job.InputInterval = string.Format("{0}-{1}", c.StartTime, c.EndTime);
+                job.ChunkInterval = string.Format("{0}-{1}", c.StartTime, c.EndTime);
                 return job;
             }).ToList();
 
