@@ -20,7 +20,7 @@ namespace AppLogic
         /// </summary>
         protected static ILogger? _logger;
         private static EncodeJobManager? _instance;
-        
+
         /// <summary>Pointer for manager operations</summary>
         public static EncodeJobManager Instance
         {
@@ -57,7 +57,8 @@ namespace AppLogic
                         if (oldCommandSplit[i] == "-crf" && int.TryParse(oldCommandSplit[i + 1], out int currentCrf))
                         {
                             int newCrf = currentCrf - 2;
-                            job.AdditionalCommandArguments.Replace("-crf " + currentCrf, "-crf " + newCrf);
+                            job.AdditionalCommandArguments = job.AdditionalCommandArguments
+                                                                .Replace("-crf " + currentCrf, "-crf " + newCrf);
                         }
                     }
                 }
@@ -79,38 +80,12 @@ namespace AppLogic
 
         internal static string GenerateJobOutputFilename(EncodeJob job)
         {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Determines if an output file meets the requirements of a jobs specs.
-        /// False (obviously) if outputFileName is null or empty.
-        /// </summary>
-        /// <todo>Move to EncoderManager</todo>
-        public static bool AttemptMeetsRequirements(EncodeJob activeJob, string? outputFileName)
-        {
-            throw new NotImplementedException("Method WIP atm");
-            if (string.IsNullOrEmpty(outputFileName))
-                return false;
-            string inputPath = Path.Combine(activeJob.VideoDirectoryPath, activeJob.VideoFileName);
-            string outputPath = Path.Combine(activeJob.VideoDirectoryPath, outputFileName);
-
-            //TODO if files don't exist
-
-            double vmaf = 0;
-
-            if (activeJob.ChunkInterval == null)
-            {
-                vmaf = VmafAccessor.GetVmaf(inputPath, outputPath);
-            }
-            else
-            {
-                double sceneStartTime = 0;
-                double sceneEndTime = 10;
-                vmaf = VmafAccessor.GetVmafScene(inputPath, outputPath, sceneStartTime, sceneEndTime);
-            }
-
-            return (vmaf >= activeJob.MinVmaf);
+            string result = "";
+            result += Path.GetFileNameWithoutExtension(job.VideoFileName);
+            result += (job.IsChunk) ? ".chunk" + job.ChunkNumber : string.Empty;
+            result += ".attempt" + (job.Attempts.Count + 1);
+            result += ".mkv";
+            return result;
         }
 
         /// <summary>
@@ -164,7 +139,7 @@ namespace AppLogic
         ///     - Job to add to the database is invalid
         /// </exception>
         abstract public bool AddEncodeJobToQueue(EncodeJob job);
-        
+
         /// <summary>
         /// Searches the database for a job with the matching GUID, and if its unable to find
         /// it, returns null instead.
@@ -177,7 +152,7 @@ namespace AppLogic
         ///     - Database becomes unreachable
         /// </exception>
         abstract public EncodeJob? FindEncodeJob(Guid id);
-        
+
         /// <summary>
         /// Changes the completion state of a job in the database.
         /// </summary>
@@ -190,7 +165,7 @@ namespace AppLogic
         ///     - database becomes unreachable
         /// </exception>
         abstract public bool MarkJobComplete(EncodeJob job, bool completedStatus);
-        
+
         /// <summary>
         /// Changes the completion state of a job in the database.
         /// </summary>
@@ -203,7 +178,7 @@ namespace AppLogic
         ///     - database becomes unreachable
         /// </exception>
         abstract public bool MarkJobComplete(Guid id, bool completedStatus);
-        
+
         /// <summary>
         /// Marks a jobs checked out time in the database, and if successful sets
         /// the job objects checked out to the appropriate time.
@@ -215,7 +190,7 @@ namespace AppLogic
         ///     - database becomes unreachable
         /// </exception>
         abstract public bool MarkJobCheckedOut(EncodeJob job, bool checkedOutStatus);
-        
+
         /// <summary>
         /// Marks a jobs checked out state in the database.
         /// </summary>
@@ -227,7 +202,7 @@ namespace AppLogic
         ///     - database becomes unreachable
         /// </exception>
         abstract public bool MarkJobCheckedOut(Guid id, bool checkedOutStatus);
-        
+
         /// <summary>
         /// Updates a job's information in the database, but not completed or checked out time.
         /// </summary>
@@ -239,7 +214,7 @@ namespace AppLogic
         ///     - database becomes unreachable
         /// </exception>
         abstract public bool UpdateJob(EncodeJob oldJob, EncodeJob job);
-        
+
         /// <summary>
         /// Gets all jobs that are not completed and not checked out residing in the database.
         /// </summary>
@@ -253,7 +228,7 @@ namespace AppLogic
         ///     - If the priority is out of range.
         /// </exception>
         abstract public IEnumerable<EncodeJob> GetIncompleteUncheckedOutEncodeJobs(int priority);
-        
+
         /// <summary>
         /// Gets all jobs that are not completed and not checked out residing in the database.
         /// </summary>
@@ -263,7 +238,7 @@ namespace AppLogic
         ///     - database becomes unreachable
         /// </exception>
         abstract public IEnumerable<EncodeJob> GetIncompleteUncheckedOutEncodeJobs();
-        
+
         /// <summary>
         /// Gets all jobs that are not completed residing in the database.
         /// </summary>

@@ -10,7 +10,7 @@ namespace AppLogic.Encoders
     /// <summary>
     /// Single pass ffmpeg based libaom encoder implementation
     /// </summary>
-    public class EncoderLibaomFfmpeg : IEncoder
+    public class EncoderFfmpegHevc : IEncoder
     {
         /// <summary></summary>
         public string? Encode(EncodeJob encodeJob, string outputPath)
@@ -43,7 +43,7 @@ namespace AppLogic.Encoders
                 else
                 { processArguments += "-i " + input; }
 
-                processArguments += " -strict experimental -c:v libaom-av1 -threads 2";
+                processArguments += " -c:v libx265 -threads 2";
                 processArguments += " " + encodeJob.AdditionalCommandArguments;
                 processArguments += " " + outputPath;
 
@@ -56,18 +56,20 @@ namespace AppLogic.Encoders
                     CreateNoWindow = true
                 };
 
-                using (Process libaomProcess = new Process { StartInfo = libaomProcessInfo })
+                using (Process hevcProcess = new Process { StartInfo = libaomProcessInfo })
                 {
-                    libaomProcess.Start();
-                    libaomProcess.Refresh();
-                    libaomProcess.WaitForExit();
-                    libaomProcess.Close();
+                    hevcProcess.Start();
+                    hevcProcess.Refresh();
+                    hevcProcess.WaitForExit();
+                    hevcProcess.Close();
                 }
 
                 return outputPath;
             }
             catch (Exception ex)
-            { throw ex; }
+            {
+                throw ex;
+            }
         }
     }
 }

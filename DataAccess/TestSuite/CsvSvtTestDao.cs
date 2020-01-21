@@ -9,14 +9,19 @@ using System.Text;
 
 namespace DataAccess.TestSuite
 {
+    /// <summary>
+    /// Mostly for writing test cases to a csv file.
+    /// </summary>
     public class CsvSvtTestDao : ISvtTestDao
     {
         private readonly string _csvFilePath;
+        /// <summary></summary>
         public CsvSvtTestDao(string filePath)
         {
             if (!Path.IsPathFullyQualified(filePath)) { throw new ArgumentException("Invalid path for CSV."); }
             _csvFilePath = filePath;
         }
+        /// <summary></summary>
         public bool AddSuccessfulTest(SvtTestSuccess test)
         {
             throw new NotImplementedException();
@@ -85,7 +90,7 @@ namespace DataAccess.TestSuite
 
         private void WriteDataToFile(string data, bool append = false)
         {
-            using (StreamWriter sw = new StreamWriter(_csvFilePath,append))
+            using (StreamWriter sw = new StreamWriter(_csvFilePath, append))
             {
                 sw.Write(data);
                 sw.Close();

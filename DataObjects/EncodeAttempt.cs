@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Text;
 
 namespace DataObjects
 {
@@ -11,6 +12,7 @@ namespace DataObjects
     /// </todo>
     public class EncodeAttempt
     {
+        #region Props
         /// <summary>
         /// The command line that was used for that attempt
         /// </summary>
@@ -35,6 +37,20 @@ namespace DataObjects
         /// The output path that the file was originally pointed towards
         /// </summary>
         public string OriginalOutputPath { get; set; }
+        /// <summary>
+        /// If the object qualifies as valid or not
+        /// </summary>
+        public bool IsValid
+        {
+            get
+            {
+                return (VmafResult > 0 && VmafResult <= 100 &&
+                        DateTime.Compare(EndTime, DateTime.Now) <= 0 &&
+                        FileSize != 0 && 
+                        !string.IsNullOrWhiteSpace(OriginalOutputPath));
+            }
+        }
+        #endregion
 
         /// <summary>
         /// Default constructor, initializes all values but is in an invalid state
@@ -55,18 +71,35 @@ namespace DataObjects
             FileSize = 0;
         }
 
-        /// <summary>
-        /// If the object qualifies as valid or not
-        /// </summary>
-        public bool IsValid
+        public override string ToString()
         {
-            get
-            {
-                return (VmafResult > 0 && VmafResult <= 100 &&
-                        DateTime.Compare(EndTime, DateTime.Now) <= 0 &&
-                        FileSize != 0 && 
-                        !string.IsNullOrWhiteSpace(OriginalOutputPath));
-            }
+            StringBuilder sb= new StringBuilder();
+
+            sb.Append("CLI args: ");
+            sb.Append(CommandLineArgs);
+            sb.Append(", ");
+
+            sb.Append("Start time: ");
+            sb.Append(StartTime);
+            sb.Append(", ");
+
+            sb.Append("End time: ");
+            sb.Append(EndTime);
+            sb.Append(", ");
+
+            sb.Append("VMAF result: ");
+            sb.Append(VmafResult);
+            sb.Append(", ");
+
+            sb.Append("File size: ");
+            sb.Append(FileSize.ToString());
+            sb.Append(", ");
+
+            sb.Append("Original path: ");
+            sb.Append(OriginalOutputPath);
+            sb.Append(", ");
+
+            return sb.ToString();
         }
     }
 }

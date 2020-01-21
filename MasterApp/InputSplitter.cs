@@ -10,10 +10,10 @@ namespace MasterApp
 {
     public class InputSplitter
     {
-        public static void Run()
+        public static void Run(string? videoInputPathInput = null, string? videoOutputDirectoryInput = null)
         {
-            string? videoInputPathInput = AppHelpers.GetFileInput("Input video file to be split: ");
-            string? videoOutputDirectoryInput = AppHelpers.GetDirectoryInput("Output directory for video jobs: ");
+            videoInputPathInput = AppHelpers.GetFileInput("Input video file to be split: ", videoInputPathInput);
+            videoOutputDirectoryInput = AppHelpers.GetDirectoryInput("Output directory for video jobs: ", videoOutputDirectoryInput);
 
             if (null == videoInputPathInput || null == videoOutputDirectoryInput)
             {

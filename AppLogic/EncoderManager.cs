@@ -31,13 +31,13 @@ namespace AppLogic
             if (jobs.Where(j => null == GetJobSceneStartTime(j)).Count() != 0)
             { throw new ArgumentException("Some jobs have invalid or no InputInterval."); }
             var unmantchedJobs = jobs.Where(j => j.VideoFileName != jobs.First().VideoFileName).Count();
-            if ( unmantchedJobs != 0)
+            if (unmantchedJobs != 0)
             { throw new ArgumentException(unmantchedJobs + " jobs don't match videos"); }
 
             //Sort the jobs and verify their expected output video actually exist
             var sortedJobs = jobs.OrderBy(j => GetJobSceneStartTime(j));
-            var sortedJobOutputFiles = sortedJobs.Select(j => 
-                { 
+            var sortedJobOutputFiles = sortedJobs.Select(j =>
+                {
                     // The output file should be the only file in the job directory in the completed bucket
                     var outDir = Path.Combine(AppConfigManager.Instance.CompletedBucketPath, j.Id.ToString());
                     if (!Directory.Exists(outDir) && Directory.GetFiles(outDir).Count() == 1)
@@ -53,7 +53,7 @@ namespace AppLogic
 
             //Concat the video files
             VideoAccessor.ConcatVideosIntoOneOutput(sortedJobOutputFiles.ToList()
-                                                    ,Path.Combine(AppConfigManager.Instance.CompletedBucketPath));
+                                                    , Path.Combine(AppConfigManager.Instance.CompletedBucketPath));
         }
 
         private static double? GetJobSceneStartTime(EncodeJob job)
@@ -65,10 +65,10 @@ namespace AppLogic
             }
             catch
             { }
-            
+
             return null;
         }
-        
+
         /// <summary>
         /// Opens an encoder and starts encoding a specified job
         /// </summary>
@@ -77,37 +77,46 @@ namespace AppLogic
             //make the encoder
             IEncoder encoder = encoderType.ToLower() switch
             {
-                "vp9test" => new EncoderFfmpegVp9Tester(),
                 "libaomffmpeg" => new EncoderLibaomFfmpeg(),
+                "ffmpeghevc" => new EncoderFfmpegHevc(),
                 _ => throw new InvalidOperationException()
             };
 
-			EncodeAttempt? attempt;
-			do
+            EncodeAttempt? attempt;
+            do
             {
                 if (0 != job.Attempts.Count)
                 { EncodeJobManager.ImproveQuality(job); }
                 try
                 {
-                    var outputPath = EncodeJobManager.GenerateJobOutputFilename(job);
+                    var outputPath = Path.Combine(AppConfigManager.Instance.ActiveBucketPath,
+                                                    job.Id.ToString(),
+                                                    EncodeJobManager.GenerateJobOutputFilename(job));
 
-					//Start the encode
-					DateTime startTime = DateTime.Now;
-					encoder.Encode(job, outputPath);
+                    //Start the encode
+                    DateTime startTime = DateTime.Now;
+                    encoder.Encode(job, outputPath);
 
-					//Save the attempt
-					attempt = new EncodeAttempt(outputPath)
-					{
-						CommandLineArgs = (string)job.AdditionalCommandArguments.Clone(),
-						StartTime = startTime,
-						EndTime = DateTime.Now,
-						VmafResult = VmafAccessor.GetVmaf(Path.Combine(job.VideoDirectoryPath,
-										job.VideoFileName), outputPath),
-						FileSize = (ulong) new FileInfo(outputPath).Length
-					};
+                    //Save the attempt
+                    attempt = new EncodeAttempt(outputPath)
+                    {
+                        CommandLineArgs = (string)job.AdditionalCommandArguments.Clone(),
+                        StartTime = startTime,
+                        EndTime = DateTime.Now,
+                        VmafResult = (job.IsChunk) ?
+                            VmafAccessor.GetVmafScene(Path.Combine(job.VideoDirectoryPath, job.VideoFileName),
+                                                        outputPath,
+                                                        double.Parse(job.ChunkInterval!.Split('-').First()),
+                                                        double.Parse(job.ChunkInterval!.Split('-').Last())) :
+                            VmafAccessor.GetVmaf(Path.Combine(job.VideoDirectoryPath, job.VideoFileName), outputPath),
+                        FileSize = (ulong)new FileInfo(outputPath).Length
+                    };
                     job.Attempts.Add(attempt);
                 }
-                catch { attempt = null; }
+                catch
+                {
+                    attempt = null;
+                }
             } while (RunAgain(job, attempt?.OriginalOutputPath));
         }
 
@@ -117,7 +126,7 @@ namespace AppLogic
             { return true; }
             if (job.Attempts.Count >= job.MaxAttempts)
             { return false; }
-            if (EncodeJobManager.AttemptMeetsRequirements(job, result))
+            if (job.DoesMostRecentAttemptMeetRequirements())
             { return false; }
 
             return true;

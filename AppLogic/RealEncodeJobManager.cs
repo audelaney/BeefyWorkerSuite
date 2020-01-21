@@ -102,9 +102,7 @@ namespace AppLogic
             catch (Exception ex)
             {
                 if (null != _logger)
-                {
-                    _logger.LogError(ex, message);
-                }
+                { _logger.LogError(ex, message); }
 
                 result = false;
             }
@@ -123,7 +121,7 @@ namespace AppLogic
             try
             {
                 var result = false;
-                DateTime? time = (checkedOutStatus) ?DateTime.Now : (DateTime?) null;
+                DateTime? time = (checkedOutStatus) ? DateTime.Now : (DateTime?)null;
                 result = _dao.MarkEncodeJobCheckedOut(id, time);
                 return result;
             }
@@ -199,13 +197,9 @@ namespace AppLogic
             message += id;
             message += PrintDB();
             try
-            {
-                return _dao.RetrieveEncodeJob(id);
-            }
+            { return _dao.RetrieveEncodeJob(id); }
             catch (ApplicationException)
-            {
-                return null;
-            }
+            { return null; }
             catch (DatabaseConnectionException dce)
             {
                 //TODO cache logic
@@ -220,9 +214,7 @@ namespace AppLogic
                     return null;
                 }
                 else
-                {
-                    throw ex;
-                }
+                { throw ex; }
             }
         }
 
@@ -263,9 +255,7 @@ namespace AppLogic
             string message = "Exception encountered while completing job " + id;
             message += PrintDB();
             try
-            {
-                return _dao.MarkJobCompletedStatus(id, completedStatus);
-            }
+            { return _dao.MarkJobCompletedStatus(id, completedStatus); }
             catch (DatabaseConnectionException dce)
             {
                 //TODO cache logic
@@ -280,9 +270,7 @@ namespace AppLogic
                     return false;
                 }
                 else
-                {
-                    throw ex;
-                }
+                { throw ex; }
             }
         }
 
@@ -296,9 +284,7 @@ namespace AppLogic
             string message = "Exception encountered while updating job " + oldJob.ToString();
             message += " to new job " + job.ToString() + PrintDB();
             try
-            {
-                return _dao.UpdateJob(oldJob, job);
-            }
+            { return _dao.UpdateJob(oldJob, job); }
             catch (DatabaseConnectionException dce)
             {
                 //TODO cache logic
@@ -313,9 +299,7 @@ namespace AppLogic
                     return false;
                 }
                 else
-                {
-                    throw ex;
-                }
+                { throw ex; }
             }
         }
 
@@ -332,9 +316,7 @@ namespace AppLogic
                 if (result.Count() != 0)
                 { output = result; }
                 else
-                {
-                    _logger?.LogInformation("No incomplete jobs found for priority " + priority);
-                }
+                { _logger?.LogInformation("No incomplete jobs found for priority " + priority); }
             }
             catch (DatabaseConnectionException dce)
             {
@@ -345,13 +327,9 @@ namespace AppLogic
             catch (Exception ex)
             {
                 if (null != _logger)
-                {
-                    _logger.LogError(ex, message);
-                }
+                { _logger.LogError(ex, message); }
                 else
-                {
-                    throw ex;
-                }
+                { throw ex; }
             }
 
             return output;
@@ -382,13 +360,9 @@ namespace AppLogic
             catch (Exception ex)
             {
                 if (null != _logger)
-                {
-                    _logger.LogError(ex, message);
-                }
+                { _logger.LogError(ex, message); }
                 else
-                {
-                    throw ex;
-                }
+                { throw ex; }
             }
 
             return output;
@@ -421,13 +395,9 @@ namespace AppLogic
             catch (Exception ex)
             {
                 if (null != _logger)
-                {
-                    _logger.LogError(ex, message);
-                }
+                { _logger.LogError(ex, message); }
                 else
-                {
-                    throw ex;
-                }
+                { throw ex; }
             }
 
             return output;
@@ -458,13 +428,9 @@ namespace AppLogic
             catch (Exception ex)
             {
                 if (null != _logger)
-                {
-                    _logger.LogError(ex, message);
-                }
+                { _logger.LogError(ex, message); }
                 else
-                {
-                    throw ex;
-                }
+                { throw ex; }
             }
 
             return output;

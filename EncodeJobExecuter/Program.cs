@@ -54,8 +54,7 @@ namespace EncodeJobExecuter
 
 			// Update job doesn't update the completed status or checked out time.
 			EncodeJobManager.Instance.UpdateJob(oldJob, activeJob);
-			var jobComplete = EncodeJobManager.AttemptMeetsRequirements(activeJob,
-							activeJob.Attempts.OrderBy(j => j.EndTime).First().OriginalOutputPath);
+			var jobComplete = activeJob.DoesMostRecentAttemptMeetRequirements();
 			EncodeJobManager.Instance.MarkJobComplete(activeJob, jobComplete);
 			string oldWorkingDir = Path.Combine(AppConfigManager.Instance.ActiveBucketPath,
 										activeJob.Id.ToString());
