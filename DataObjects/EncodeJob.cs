@@ -3,23 +3,31 @@ using Newtonsoft.Json;
 using System;
 using MongoDB.Bson.Serialization.Attributes;
 using System.Text;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DataObjects
 {
     public class EncodeJob : ICloneable
     {
+        #region Static Fields
         private static readonly string _configFilePathDefault = "/var/local/svt-config/hi.cfg";
+        #endregion
 
+        #region Props
         [BsonId]
         [JsonIgnore]
         public Guid Id { get; set; }
+        /// <summary>
+        /// The chunk number of the video that it is being sliced from. Default 0 for no chunk.
+        /// </summary>
         public int ChunkNumber { get; set; }
         /// <summary>
         /// A very lazy way of designating a timespan from a video input that is being used for
         /// multiple encode jobs...
         /// </summary>
         /// <example>23.4-57.9001</example>
-        public string? InputInterval { get; set; }
+        public string? ChunkInterval { get; set; }
         /// <summary>
         /// The no path, file name with extension of the associated video.
         /// </summary>
@@ -40,6 +48,10 @@ namespace DataObjects
         /// </summary>
         public string AdditionalCommandArguments { get; set; }
         public int Priority { get; set; }
+        /// <summary>
+        /// How many times the encoder should attempt to change the arguments
+        /// used to run the job, per execution pass.
+        /// </summary>
         public int MaxAttempts { get; set; }
         /// <summary>
         /// When performing a re-encode, favoring accuracy entails more settings changing
@@ -66,14 +78,46 @@ namespace DataObjects
         /// </summary>
         public DateTime? CheckedOutTime { get; set; }
         /// <summary>
-        /// Date-time that this job was marked as finished
-        /// </summary>
-        public DateTime? CompletedTime { get; set; }
-        /// <summary>
         /// If the job has been completed currently.
         /// </summary>
         public bool Completed { get; set; }
+        /// <summary>
+        /// Record of the attempts made to perform the encode
+        /// </summary>
+        public List<EncodeAttempt> Attempts { get; set; }
+        [JsonIgnore]
+        [BsonIgnore]
+        public bool IsChunk
+        {
+            get
+            { return ChunkNumber != 0 && ChunkInterval != null; }
+        }
+        /// <summary>
+        /// If this particular object is considered a "valid" object. Currently
+        /// does not check for guid, so pre-database loaded objects can be
+        /// validated.
+        /// </summary>
+        [JsonIgnore]
+        [BsonIgnore]
+        public bool IsValid
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(VideoFileName) ||
+                    string.IsNullOrWhiteSpace(ConfigFilePath) ||
+                    0 > Priority || 5 < Priority || 0 > ChunkNumber ||
+                    0 > MaxAttempts || 0 > MinPsnr || 0 > MinVmaf ||
+                    (Attempts.Where(a => !a.IsValid).Count() != 0))
+                { return false; }
+                else
+                {
+                    return true;
+                }
+            }
+        }
+        #endregion
 
+        #region Instance methods
         /// <summary>
         /// Default constructor
         /// </summary>
@@ -91,52 +135,26 @@ namespace DataObjects
             Priority = 3;
             IngestDateTime = DateTime.Now;
             Completed = false;
-            CompletedTime = null;
             CheckedOutTime = null;
-            InputInterval = null;
+            ChunkInterval = null;
             ChunkNumber = 0;
+            Attempts = new List<EncodeAttempt>();
         }
 
         /// <summary>
-        /// If this particular object is considered a "valid" object. Currently
-        /// does not check for guid, so pre-database loaded objects can be
-        /// validated.
-        /// </summary>
-        [JsonIgnore]
-        public bool IsValid
-        {
-            get
-            {
-                if (string.IsNullOrWhiteSpace(VideoFileName) ||
-                    string.IsNullOrWhiteSpace(ConfigFilePath) ||
-                    0 > Priority || 5 < Priority || 0 > ChunkNumber ||
-                    0 > MaxAttempts || 0 > MinPsnr || 0 > MinVmaf)
-                {
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Does not evaluate Id, completed, or any time fields.
+        /// Does not evaluate Id, completed, time fields, or attempts.
         /// </summary>
         public override bool Equals(object? obj)
         {
             EncodeJob? otherJob = obj as EncodeJob;
 
             if (null == otherJob)
-            {
-                return false;
-            }
+            { return false; }
 
             return (otherJob.AdditionalCommandArguments == AdditionalCommandArguments &&
                 otherJob.AdjustmentFactor == AdjustmentFactor &&
                 otherJob.ConfigFilePath == ConfigFilePath &&
-                otherJob.InputInterval == InputInterval &&
+                otherJob.ChunkInterval == ChunkInterval &&
                 otherJob.MaxAttempts == MaxAttempts &&
                 otherJob.MinPsnr == MinPsnr &&
                 otherJob.MinVmaf == MinVmaf &&
@@ -147,7 +165,7 @@ namespace DataObjects
         }
 
         /// <summary>
-        /// New object clone, empty ID
+        /// New object clone, empty ID, without attempts.
         /// </summary>
         public object Clone()
         {
@@ -160,48 +178,21 @@ namespace DataObjects
                 MinPsnr = this.MinPsnr,
                 MinVmaf = this.MinVmaf,
                 ConfigFilePath = (string)this.ConfigFilePath.Clone(),
-                InputInterval = (string?)this.InputInterval?.Clone(),
+                ChunkInterval = (string?)this.ChunkInterval?.Clone(),
                 MaxAttempts = this.MaxAttempts,
                 Priority = this.Priority,
-                Id = this.Id,
                 Completed = this.Completed,
-                CompletedTime = this.CompletedTime,
                 CheckedOutTime = this.CheckedOutTime,
-                IngestDateTime = this.IngestDateTime
+                IngestDateTime = this.IngestDateTime,
+                ChunkNumber = this.ChunkNumber
             };
-        }
-
-        public static EncodeJob? FromJson(string json)
-        {
-            try
-            {
-                return JsonConvert.DeserializeObject<EncodeJob>(json);
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        public static string? ToJson(EncodeJob? job)
-        {
-            if (null == job) { return ""; }
-
-            try
-            {
-                return JsonConvert.SerializeObject(job, Formatting.Indented);
-            }
-            catch (System.Exception)
-            {
-                return null;
-            }
         }
 
         public override int GetHashCode()
         {
             HashCode hash = new HashCode();
             hash.Add(Id);
-            hash.Add(InputInterval);
+            hash.Add(ChunkInterval);
             hash.Add(VideoFileName);
             hash.Add(VideoDirectoryPath);
             hash.Add(ConfigFilePath);
@@ -213,7 +204,6 @@ namespace DataObjects
             hash.Add(AdjustmentFactor);
             hash.Add(IngestDateTime);
             hash.Add(CheckedOutTime);
-            hash.Add(CompletedTime);
             hash.Add(Completed);
             hash.Add(IsValid);
             return hash.ToHashCode();
@@ -233,10 +223,10 @@ namespace DataObjects
                 output.AppendLine();
             }
 
-            if (!string.IsNullOrWhiteSpace(InputInterval))
+            if (!string.IsNullOrWhiteSpace(ChunkInterval))
             {
                 output.Append("Input interval: ");
-                output.Append(InputInterval);
+                output.Append(ChunkInterval);
                 output.AppendLine();
             }
 
@@ -272,7 +262,67 @@ namespace DataObjects
             output.Append(MinVmaf);
             output.AppendLine();
 
+            for (int i = 0; i < Attempts.Count; i++)
+            {
+                output.Append("Attempt #" + (i + 1) + ": ");
+                output.Append(Attempts[i].ToString());
+                output.AppendLine();
+            }
+
             return output.ToString();
         }
+
+        /// <summary>
+        /// Returns true if the most recent attempt attached to the obj meets the
+        /// required vmaf of the object, and returns false otherwise.
+        /// </summary>
+        public bool DoesMostRecentAttemptMeetRequirements()
+        {
+            var attempt = GetMostRecentAttempt();
+            if (attempt == null)
+            { return false; }
+            else
+            {return attempt.VmafResult > MinVmaf;}
+        }
+
+        /// <summary>
+        /// Gets the most recent encode attempt for this job.
+        /// </summary>
+        public EncodeAttempt? GetMostRecentAttempt()
+        {
+            if (Attempts.Count == 0)
+            { return null; }
+            else
+            { return Attempts.OrderBy(j => j.EndTime).First(); }
+        }
+
+        /// <summary>
+        /// This needs to be coded out for more logic.
+        /// </summary>
+        public EncodeAttempt? GetBestAttempt()
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
+
+        #region Static methods
+        public static EncodeJob? FromJson(string json)
+        {
+            try
+            { return JsonConvert.DeserializeObject<EncodeJob>(json); }
+            catch
+            { return null; }
+        }
+
+        public static string? ToJson(EncodeJob? job)
+        {
+            if (null == job) { return ""; }
+
+            try
+            { return JsonConvert.SerializeObject(job, Formatting.Indented); }
+            catch (System.Exception)
+            { return null; }
+        }
+        #endregion
     }
 }

@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace DataAccess.Vmaf
 {
+    /// <summary>
+    /// Class for pulling VMAF from videos
+    /// </summary>
     public static class VmafAccessor
     {
         /// <summary>
@@ -18,32 +21,39 @@ namespace DataAccess.Vmaf
         {
             if (!File.Exists(sourcePath) || !File.Exists(encodedPath))
             { throw new ArgumentException("Either path is invalid"); }
-            
+
             double output = 0;
 
             ProcessStartInfo vmafFfmpegStartInfo = new ProcessStartInfo
             {
                 Arguments = string.Format("-r 23.976 -i {0} -r 23.976 -i {1} -lavfi libvmaf -f null -", encodedPath, sourcePath),
                 RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
                 FileName = "ffmpeg"
             };
 
             using (Process vmafFfmpegProcess = new Process { StartInfo = vmafFfmpegStartInfo })
             {
-                vmafFfmpegProcess.Start();
-                vmafFfmpegProcess.Refresh();
-                vmafFfmpegProcess.WaitForExit();
-                while (!vmafFfmpegProcess.StandardError.EndOfStream)
+                try
                 {
-                    string? line = vmafFfmpegProcess.StandardError.ReadLine();
-                    var maybeVmaf = ParseVmafFromLine(line);
-
-                    if (null != maybeVmaf)
+                    vmafFfmpegProcess.Start();
+                    vmafFfmpegProcess.Refresh();
+                    vmafFfmpegProcess.WaitForExit();
+                    while (!vmafFfmpegProcess.StandardError.EndOfStream)
                     {
-                        output = maybeVmaf.Value;
-                        break;
+                        string? line = vmafFfmpegProcess.StandardError.ReadLine();
+                        var maybeVmaf = ParseVmafFromLine(line);
+
+                        if (null != maybeVmaf)
+                        {
+                            output = maybeVmaf.Value;
+                            break;
+                        }
                     }
                 }
+                catch (Exception ex)
+                { }
             }
 
             return output;
@@ -63,21 +73,21 @@ namespace DataAccess.Vmaf
 
             double output = 0;
 
-            string processArgs = "ffmepg";
+            string processArgs = "-c \"ffmpeg -hide_banner";
             processArgs += " -ss " + sceneStartTime;
             processArgs += " -to " + sceneEndTime;
             processArgs += " -i " + sourcePath;
             processArgs += " -an -sn -f yuv4mpegpipe";
             processArgs += " -pix_fmt yuv420p - | ";
-            processArgs += "ffmpeg -r 23.976 -i " + sourcePath;
+            processArgs += "ffmpeg -r 23.976 -i " + scenePath;
             processArgs += " -r 23.976 -i pipe:";
-            processArgs += " -lavfi libvmaf -f null -";
+            processArgs += " -lavfi libvmaf -f null -\"";
 
             ProcessStartInfo vmafFfmpegStartInfo = new ProcessStartInfo
             {
                 Arguments = processArgs,
                 RedirectStandardError = true,
-                FileName = "bash"
+                FileName = "sh"
             };
 
             using (Process vmafBashProcess = new Process { StartInfo = vmafFfmpegStartInfo })

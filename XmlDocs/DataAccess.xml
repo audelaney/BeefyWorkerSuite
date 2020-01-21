@@ -12,10 +12,10 @@
         <member name="M:DataAccess.EncodeJobDAOMockAlive.AddEncodeJobToQueue(DataObjects.EncodeJob)">
             <summary></summary>
         </member>
-        <member name="M:DataAccess.EncodeJobDAOMockAlive.MarkEncodeJobCheckedOut(System.Guid,System.Boolean)">
+        <member name="M:DataAccess.EncodeJobDAOMockAlive.MarkEncodeJobCheckedOut(System.Guid,System.Nullable{System.DateTime})">
             <summary></summary>
         </member>
-        <member name="M:DataAccess.EncodeJobDAOMockAlive.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Boolean)">
+        <member name="M:DataAccess.EncodeJobDAOMockAlive.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Nullable{System.DateTime})">
             <summary></summary>
         </member>
         <member name="M:DataAccess.EncodeJobDAOMockAlive.MarkJobCompletedStatus(System.Guid,System.Boolean)">
@@ -48,10 +48,10 @@
         <member name="M:DataAccess.EncodeJobDAOMockBadDb.AddEncodeJobToQueue(DataObjects.EncodeJob)">
             <summary></summary>
         </member>
-        <member name="M:DataAccess.EncodeJobDAOMockBadDb.MarkEncodeJobCheckedOut(System.Guid,System.Boolean)">
+        <member name="M:DataAccess.EncodeJobDAOMockBadDb.MarkEncodeJobCheckedOut(System.Guid,System.Nullable{System.DateTime})">
             <summary></summary>
         </member>
-        <member name="M:DataAccess.EncodeJobDAOMockBadDb.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Boolean)">
+        <member name="M:DataAccess.EncodeJobDAOMockBadDb.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Nullable{System.DateTime})">
             <summary></summary>
         </member>
         <member name="M:DataAccess.EncodeJobDAOMockBadDb.MarkJobCompletedStatus(System.Guid,System.Boolean)">
@@ -87,10 +87,10 @@
         <member name="M:DataAccess.EncodeJobDAOMongo.AddEncodeJobToQueue(DataObjects.EncodeJob)">
             <summary></summary>
         </member>
-        <member name="M:DataAccess.EncodeJobDAOMongo.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Boolean)">
+        <member name="M:DataAccess.EncodeJobDAOMongo.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Nullable{System.DateTime})">
             <summary></summary>
         </member>
-        <member name="M:DataAccess.EncodeJobDAOMongo.MarkEncodeJobCheckedOut(System.Guid,System.Boolean)">
+        <member name="M:DataAccess.EncodeJobDAOMongo.MarkEncodeJobCheckedOut(System.Guid,System.Nullable{System.DateTime})">
             <summary></summary>
         </member>
         <member name="M:DataAccess.EncodeJobDAOMongo.MarkJobCompletedStatus(System.Guid,System.Boolean)">
@@ -117,6 +117,9 @@
         <member name="M:DataAccess.EncodeJobDAOMongo.UpdateJob(DataObjects.EncodeJob,DataObjects.EncodeJob)">
             <summary></summary>
         </member>
+        <member name="M:DataAccess.EncodeJobDAOMongo.RetrieveCompleteEncodeJobsByVideoName(System.String)">
+            <summary></summary>
+        </member>
         <member name="T:DataAccess.EncodeJobDAOmssql">
             <summary></summary>
         </member>
@@ -138,10 +141,10 @@
         <member name="M:DataAccess.EncodeJobDAOmssql.RetrieveIncompleteEncodeJobs(System.Int32)">
             <summary></summary>
         </member>
-        <member name="M:DataAccess.EncodeJobDAOmssql.MarkEncodeJobCheckedOut(System.Guid,System.Boolean)">
+        <member name="M:DataAccess.EncodeJobDAOmssql.MarkEncodeJobCheckedOut(System.Guid,System.Nullable{System.DateTime})">
             <summary></summary>
         </member>
-        <member name="M:DataAccess.EncodeJobDAOmssql.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Boolean)">
+        <member name="M:DataAccess.EncodeJobDAOmssql.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Nullable{System.DateTime})">
             <summary></summary>
         </member>
         <member name="M:DataAccess.EncodeJobDAOmssql.MarkJobCompletedStatus(System.Guid,System.Boolean)">
@@ -155,6 +158,11 @@
         </member>
         <member name="M:DataAccess.EncodeJobDAOmssql.UpdateJob(DataObjects.EncodeJob,DataObjects.EncodeJob)">
             <summary></summary>
+        </member>
+        <member name="T:DataAccess.IEncodeJobDAO">
+            <summary>
+            Entry point for EncodeJob related database operations
+            </summary>
         </member>
         <member name="M:DataAccess.IEncodeJobDAO.AddEncodeJobToQueue(DataObjects.EncodeJob)">
             <summary>
@@ -202,7 +210,7 @@
             	- Database connection times out
             </exception>
         </member>
-        <member name="M:DataAccess.IEncodeJobDAO.MarkEncodeJobCheckedOut(System.Guid,System.Boolean)">
+        <member name="M:DataAccess.IEncodeJobDAO.MarkEncodeJobCheckedOut(System.Guid,System.Nullable{System.DateTime})">
             <summary>
             Changes the passed in jobs status to "Checked out", implying that
             the job is currently in progress or undergoing interrim evaluation.
@@ -212,9 +220,9 @@
             	- Database connection times out
             </exception>
         </member>
-        <member name="M:DataAccess.IEncodeJobDAO.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Boolean)">
+        <member name="M:DataAccess.IEncodeJobDAO.MarkEncodeJobCheckedOut(DataObjects.EncodeJob,System.Nullable{System.DateTime})">
             <summary>
-            Changes the passed in jobs status to "Checked out", implying that
+            Changes the passed in jobs status to "Checked out at X time", implying that
             the job is currently in progress or undergoing interrim evaluation.
             </summary>
             <exception cref="T:DataAccess.Exceptions.BadConnectionStringException">
@@ -224,7 +232,8 @@
         </member>
         <member name="M:DataAccess.IEncodeJobDAO.MarkJobCompletedStatus(System.Guid,System.Boolean)">
             <summary>
-            Marks a designated encode job as completed
+            Changes the passed in jobs status to "Checked out at X time", implying that
+            the job is currently in progress or undergoing interrim evaluation.
             </summary>
             <exception cref="T:DataAccess.Exceptions.BadConnectionStringException">
             Throws if:
@@ -253,10 +262,68 @@
             <summary>
             Update/overwrite the data for a job
             </summary>
+        </member>
+        <member name="M:DataAccess.IEncodeJobDAO.RetrieveCompleteEncodeJobsByVideoName(System.String)">
+            <summary>
+            Gets a list of completed jobs with a certain video name
+            </summary>
             <exception cref="T:DataAccess.Exceptions.BadConnectionStringException">
             Throws if:
             	- Database connection times out
             </exception>
+        </member>
+        <member name="T:DataAccess.Exceptions.BadConnectionStringException">
+            <summary></summary>
+        </member>
+        <member name="P:DataAccess.Exceptions.BadConnectionStringException.ConnectionString">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.BadConnectionStringException.#ctor(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.BadConnectionStringException.#ctor(System.String,System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.BadConnectionStringException.#ctor(System.String,System.String,System.Exception)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.BadConnectionStringException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary></summary>
+        </member>
+        <member name="T:DataAccess.Exceptions.DatabaseConnectionException">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.DatabaseConnectionException.#ctor">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.DatabaseConnectionException.#ctor(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.DatabaseConnectionException.#ctor(System.String,System.Exception)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.DatabaseConnectionException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary></summary>
+        </member>
+        <member name="T:DataAccess.Exceptions.JobAlreadyExistsException">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.JobAlreadyExistsException.#ctor">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.JobAlreadyExistsException.#ctor(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.JobAlreadyExistsException.#ctor(System.String,System.Exception)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.JobAlreadyExistsException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary></summary>
+        </member>
+        <member name="T:DataAccess.SceneAccessor">
+            <summary>
+            Accessor class for scene related operations
+            </summary>
         </member>
         <member name="M:DataAccess.SceneAccessor.AnalyzeVideoInput(System.String)">
             <summary>
@@ -270,10 +337,70 @@
             For use in parsing files output by the SVT-AV1 sample application.
             </summary>
         </member>
+        <member name="M:DataAccess.SvtEncAppAccessor.GetSuccessulTestsFromOutputFile(System.String)">
+            <summary>
+            Gets all successful runs from an output file composed of a capture of SVT encoder output
+            </summary>
+            <param name="file"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DataAccess.SvtEncAppAccessor.GetPictureStatsFromStatFile(System.String)">
+            <summary>
+            Gets the stats for each encoded frame in a video output by the SVT logger
+            </summary>
+            <param name="statFilePath">Path to the file</param>
+            <returns>Collection of stats for each frame, or empty if none are found.</returns>
+        </member>
+        <member name="T:DataAccess.TestSuite.CsvSvtTestDao">
+            <summary>
+            Mostly for writing test cases to a csv file.
+            </summary>
+        </member>
+        <member name="M:DataAccess.TestSuite.CsvSvtTestDao.#ctor(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.TestSuite.CsvSvtTestDao.AddSuccessfulTest(DataObjects.TestSuite.SvtTestSuccess)">
+            <summary></summary>
+        </member>
         <member name="M:DataAccess.TestSuite.CsvSvtTestDao.AddSuccessfulTests(System.Collections.Generic.IEnumerable{DataObjects.TestSuite.SvtTestSuccess})">
             <summary>
             Writes a list of tests to the local csvFilePath, does not append. Returns false if there is an issue with the
             path. Tests are written in blocks based on their ParamsInCmmd property
+            </summary>
+        </member>
+        <member name="T:DataAccess.TestSuite.ISvtTestDao">
+            <summary>Data store operations for <see cref="T:DataObjects.TestSuite.SvtTestSuccess" /></summary>
+        </member>
+        <member name="M:DataAccess.TestSuite.ISvtTestDao.AddSuccessfulTest(DataObjects.TestSuite.SvtTestSuccess)">
+            <summary>Adds a single test to in use datastore</summary>
+        </member>
+        <member name="M:DataAccess.TestSuite.ISvtTestDao.AddSuccessfulTests(System.Collections.Generic.IEnumerable{DataObjects.TestSuite.SvtTestSuccess})">
+            <summary>Adds a collection of successful tests to in use datastore</summary>
+        </member>
+        <member name="T:DataAccess.TestSuite.MockSvtTestDao">
+            <summary>
+            Mock class, dummy returns
+            </summary>
+        </member>
+        <member name="M:DataAccess.TestSuite.MockSvtTestDao.AddSuccessfulTest(DataObjects.TestSuite.SvtTestSuccess)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.TestSuite.MockSvtTestDao.AddSuccessfulTests(System.Collections.Generic.IEnumerable{DataObjects.TestSuite.SvtTestSuccess})">
+            <summary></summary>
+        </member>
+        <member name="T:DataAccess.VideoAccessor">
+            <summary>
+            Static accessor for generic video functions
+            </summary>
+        </member>
+        <member name="M:DataAccess.VideoAccessor.ConcatVideosIntoOneOutput(System.Collections.Generic.List{System.String},System.String)">
+            <summary>
+            Combines multiple videos into a single video in order
+            </summary>
+        </member>
+        <member name="T:DataAccess.Vmaf.VmafAccessor">
+            <summary>
+            Class for pulling VMAF from videos
             </summary>
         </member>
         <member name="M:DataAccess.Vmaf.VmafAccessor.GetVmaf(System.String,System.String)">

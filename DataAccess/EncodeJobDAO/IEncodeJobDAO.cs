@@ -7,6 +7,9 @@ using System.Text;
 
 namespace DataAccess
 {
+	/// <summary>
+	/// Entry point for EncodeJob related database operations
+	/// </summary>
 	public interface IEncodeJobDAO
 	{
 		/// <summary>
@@ -58,18 +61,19 @@ namespace DataAccess
 		/// Throws if:
 		/// 	- Database connection times out
 		/// </exception>
-		bool MarkEncodeJobCheckedOut(Guid id, bool completed);
+		bool MarkEncodeJobCheckedOut(Guid id, DateTime? checkedOutTime);
 		/// <summary>
-		/// Changes the passed in jobs status to "Checked out", implying that
+		/// Changes the passed in jobs status to "Checked out at X time", implying that
 		/// the job is currently in progress or undergoing interrim evaluation.
 		/// </summary>
 		/// <exception cref="DataAccess.Exceptions.BadConnectionStringException">
 		/// Throws if:
 		/// 	- Database connection times out
 		/// </exception>
-		bool MarkEncodeJobCheckedOut(EncodeJob job, bool completed);
+		bool MarkEncodeJobCheckedOut(EncodeJob job, DateTime? checkedOutTime);
 		/// <summary>
-		/// Marks a designated encode job as completed
+		/// Changes the passed in jobs status to "Checked out at X time", implying that
+		/// the job is currently in progress or undergoing interrim evaluation.
 		/// </summary>
 		/// <exception cref="DataAccess.Exceptions.BadConnectionStringException">
 		/// Throws if:
@@ -95,10 +99,14 @@ namespace DataAccess
 		/// <summary>
 		/// Update/overwrite the data for a job
 		/// </summary>
+		bool UpdateJob(EncodeJob oldData, EncodeJob newData);
+		/// <summary>
+		/// Gets a list of completed jobs with a certain video name
+		/// </summary>
 		/// <exception cref="DataAccess.Exceptions.BadConnectionStringException">
 		/// Throws if:
 		/// 	- Database connection times out
 		/// </exception>
-		bool UpdateJob(EncodeJob oldData, EncodeJob newData);
-	}
+        IEnumerable<EncodeJob> RetrieveCompleteEncodeJobsByVideoName(string videoName) { throw new NotImplementedException(); }
+    }
 }

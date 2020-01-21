@@ -35,7 +35,7 @@ namespace DataAccess
         }
 
         /// <summary></summary>
-        public bool MarkEncodeJobCheckedOut(Guid id, bool completed)
+        public bool MarkEncodeJobCheckedOut(Guid id, DateTime? checkedOutTime)
         {
             var item = _repository.FirstOrDefault(job => job.Id == id);
             if (item == null)
@@ -44,13 +44,13 @@ namespace DataAccess
             }
             else
             {
-                item.Completed = completed;
+				item.CheckedOutTime = checkedOutTime;
                 return true;
             }
         }
 
         /// <summary></summary>
-        public bool MarkEncodeJobCheckedOut(EncodeJob job, bool checkedOut)
+        public bool MarkEncodeJobCheckedOut(EncodeJob job, DateTime? checkedOutTime)
         {
             var item = _repository.FirstOrDefault(j => j.Id == job.Id);
             if (item == null)
@@ -60,8 +60,7 @@ namespace DataAccess
             else
             {
                 item.CheckedOutTime = null;
-                item.CheckedOutTime = (checkedOut) ?
-                                    DateTime.Now : item.CheckedOutTime;
+				item.CheckedOutTime = checkedOutTime;
                 return true;
             }
         }

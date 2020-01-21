@@ -74,8 +74,6 @@ namespace SvtTestSuite
                     ISvtTestDao dao = dataStoreOutput.ToLower() switch
                     {
                         "mock" => new MockSvtTestDao(),
-                        "mssql" => new SQLSvtTestDao(connString),
-                        "mongo" => new MongoSvtTestDao(),
                         "csv" => new CsvSvtTestDao(connString),
                         _ => throw new InvalidOperationException()
                     };

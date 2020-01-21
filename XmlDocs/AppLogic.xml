@@ -4,11 +4,70 @@
         <name>AppLogic</name>
     </assembly>
     <members>
+        <member name="T:AppLogic.AppConfigManager">
+            <summary>
+            Holds/gets globally used strings for the application
+            </summary>
+        </member>
+        <member name="P:AppLogic.AppConfigManager.Instance">
+            <summary>
+            Singleton instance
+            </summary>
+        </member>
         <member name="M:AppLogic.AppConfigManager.SetConfig(System.String)">
             <summary>
             Sets the config instance to whatever is found at the path, or throws
             an exception if there is nothing at the end of the path or the file
             is not compatible. Also resets the EncodeJobManager instance.
+            </summary>
+        </member>
+        <member name="P:AppLogic.AppConfigManager.InputBucketPath">
+            <summary>
+            The path/location of the directory where files will be placed 
+            for the app to ingest and then process.
+            </summary>
+        </member>
+        <member name="P:AppLogic.AppConfigManager.ProcessedBucketPath">
+            <summary>
+            The path/location of the directory where files will be placed
+            after their jobs have been ingested by the app and they are 
+            awaiting their turn to be encoded in the queue.
+            </summary>
+        </member>
+        <member name="P:AppLogic.AppConfigManager.ActiveBucketPath">
+            <summary>
+            The path/location of the directory where directories will be placed
+            jobs are being performed and they need a directory to be perforemed
+            in.
+            </summary>
+        </member>
+        <member name="P:AppLogic.AppConfigManager.CompletedBucketPath">
+            <summary>
+            The path/location of the directory where files will be placed
+            after their job is completed and the encode is ready to be exported
+            </summary>
+        </member>
+        <member name="P:AppLogic.AppConfigManager.LogFilePath">
+            <summary>
+            The path and filename of the file app logs will be placed
+            </summary>
+        </member>
+        <member name="P:AppLogic.AppConfigManager.DBTypeAndString">
+            <summary>
+            The type of datastore to use and the connection string or file
+            name of that data store.
+            </summary>
+        </member>
+        <member name="P:AppLogic.AppConfigManager.MaxRunningLocalJobs">
+            <summary>
+            The maximum number of running jobs the system can withstand.
+            </summary>
+        </member>
+        <member name="P:AppLogic.AppConfigManager.FailedBucketPath">
+            <summary>
+            The path/location of the directory where directories will be placed
+            when their job has reached its max number of attempts but the job
+            did not meet the requirements.
             </summary>
         </member>
         <member name="P:AppLogic.XMLAppConfigReader.ConfigFileChanged">
@@ -35,12 +94,6 @@
             Improves the quality of a job by altering command line arguments
             </summary>
             <todo>This isn't even close to being done</todo>
-        </member>
-        <member name="M:AppLogic.EncodeJobManager.EncodeMeetsRequirements(DataObjects.EncodeJob,System.String)">
-            <summary>
-            Determines if an output file meets the requirements of a jobs specs.
-            </summary>
-            <todo>Move to EncoderManager</todo>
         </member>
         <member name="M:AppLogic.EncodeJobManager.GetGuidFromWorkingDirectory(System.String)">
             <summary>
@@ -111,7 +164,8 @@
         </member>
         <member name="M:AppLogic.EncodeJobManager.MarkJobCheckedOut(DataObjects.EncodeJob,System.Boolean)">
             <summary>
-            Marks a jobs checked out state in the database.
+            Marks a jobs checked out time in the database, and if successful sets
+            the job objects checked out to the appropriate time.
             </summary>
             <param name="job">The job object that needs its status changed</param>
             <param name="checkedOutStatus">The new checked out status of the job</param>
@@ -134,7 +188,7 @@
         </member>
         <member name="M:AppLogic.EncodeJobManager.UpdateJob(DataObjects.EncodeJob,DataObjects.EncodeJob)">
             <summary>
-            Updates a job's information in the database.
+            Updates a job's information in the database, but not completed or checked out time.
             </summary>
             <param name="oldJob">The old job information, current in the database.</param>
             <param name="job">The new information to use for the job</param>
@@ -192,11 +246,31 @@
                 - database becomes unreachable
             </exception>
         </member>
-        <member name="M:AppLogic.Encoders.EncoderFfmpegVp9Tester.Encode(DataObjects.EncodeJob,System.String)">
+        <member name="M:AppLogic.EncodeJobManager.GetJobsByVideoName(System.String)">
             <summary>
-            Job info is mostly irrelevant, just use the input file and
-            toss everything else. Otherwise a good demonstration of how
-            to make your own implementation.
+            Gets all jobs that have a mtching video name in the database
+            </summary>
+            <returns>Collection of jobs, or an empty collection if there are none</returns>
+        </member>
+        <member name="T:AppLogic.Encoders.EncoderHevcFfmpeg">
+            <summary>
+            Single pass ffmpeg based libaom encoder implementation
+            </summary>
+        </member>
+        <member name="M:AppLogic.Encoders.EncoderHevcFfmpeg.Encode(DataObjects.EncodeJob,System.String)">
+            <summary></summary>
+        </member>
+        <member name="T:AppLogic.Encoders.EncoderLibaomFfmpeg">
+            <summary>
+            Single pass ffmpeg based libaom encoder implementation
+            </summary>
+        </member>
+        <member name="M:AppLogic.Encoders.EncoderLibaomFfmpeg.Encode(DataObjects.EncodeJob,System.String)">
+            <summary></summary>
+        </member>
+        <member name="T:AppLogic.Encoders.IEncoder">
+            <summary>
+            Interface that an encoder is required to implement
             </summary>
         </member>
         <member name="M:AppLogic.Encoders.IEncoder.Encode(DataObjects.EncodeJob,System.String)">
@@ -209,6 +283,17 @@
             <summary>
             Encoding related logic operations
             </summary>
+        </member>
+        <member name="M:AppLogic.EncoderManager.Combine(DataObjects.EncodeJob[],System.String)">
+            <summary>
+            Combines the resulting output from 
+            </summary>
+            <exception cref="T:System.ArgumentException">
+            Thrown if:
+                - Any of the jobs are not marked as completed
+                - Jobs don't have an InputInterval
+                - Jobs that have a video source that doesn't match the first video
+            </exception>
         </member>
         <member name="M:AppLogic.EncoderManager.StartJob(DataObjects.EncodeJob,System.String)">
             <summary>

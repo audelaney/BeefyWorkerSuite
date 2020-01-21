@@ -55,7 +55,28 @@ namespace AppLogic
             }
         }
 
-        private string? processedBucketPath;
+		private string? failedBucketPath;
+		public override string FailedBucketPath
+		{
+			get
+			{
+				if (ConfigFileChanged || string.IsNullOrWhiteSpace(failedBucketPath))
+				{
+					try
+					{
+						failedBucketPath = GetAttributePathValueFromRunningOrDefaultNode("FailedBucket");
+					}
+					catch (Exception ex)
+					{
+						throw ex;
+					}
+				}
+
+				return failedBucketPath;
+			}
+		}
+
+		private string? processedBucketPath;
         public override string ProcessedBucketPath
         {
             get

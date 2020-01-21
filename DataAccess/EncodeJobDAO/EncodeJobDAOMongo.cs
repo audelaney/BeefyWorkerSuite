@@ -73,13 +73,8 @@ namespace DataAccess
         }
 
         /// <summary></summary>
-        public bool MarkEncodeJobCheckedOut(EncodeJob job, bool checkedOut)
+        public bool MarkEncodeJobCheckedOut(EncodeJob job, DateTime? checkedOutTime)
         {
-            if (!checkedOut)
-            {
-                throw new NotImplementedException("Haven't worked this one out yet");
-            }
-
             if (!job.IsValid)
             {
                 var argex = new ArgumentException("Job submitted to queue is invalid");
@@ -90,15 +85,10 @@ namespace DataAccess
             bool result = true;
             if (job.Id == Guid.Empty)
             {
-                throw new NotImplementedException("Need smarter guidless interactions");
                 try
                 {
                     var collection = database.GetCollection<EncodeJob>(encodeJobCollectionName);
-                    var filter = Builders<EncodeJob>.Filter.Eq("VideoFileName", job.VideoFileName) &
-                                    Builders<EncodeJob>.Filter.Eq("VideoFilePath", job.VideoDirectoryPath) &
-                                    Builders<EncodeJob>.Filter.Eq("AdditionalCommandArguments", job.AdditionalCommandArguments) &
-                                    Builders<EncodeJob>.Filter.Eq("Completed", job.Completed) &
-                                    Builders<EncodeJob>.Filter.Eq("Priority", job.Priority);
+                    var filter = BuildersFilterFromGuidlessEncodeJob(job);
                     var update = Builders<EncodeJob>.Update.Set("CheckedOutTime", DateTime.Now);
                     collection.UpdateOne(filter, update);
                 }
@@ -109,13 +99,13 @@ namespace DataAccess
             }
             else
             {
-                result = MarkEncodeJobCheckedOut(job.Id, checkedOut);
+                result = MarkEncodeJobCheckedOut(job.Id, checkedOutTime);
             }
             return result;
         }
 
         /// <summary></summary>
-        public bool MarkEncodeJobCheckedOut(Guid id, bool completed)
+        public bool MarkEncodeJobCheckedOut(Guid id, DateTime? checkedOutTime)
         {
             if (id == Guid.Empty)
             { throw new ArgumentException("Empty guid in CheckoutEncodeJob method."); }
@@ -168,15 +158,10 @@ namespace DataAccess
             bool result = true;
             if (job.Id == Guid.Empty)
             {
-                throw new NotImplementedException("Need revised guidless operations");
                 try
                 {
                     var collection = database.GetCollection<EncodeJob>(encodeJobCollectionName);
-                    var filter = Builders<EncodeJob>.Filter.Eq("VideoFileName", job.VideoFileName) &
-                                Builders<EncodeJob>.Filter.Eq("VideoFilePath", job.VideoDirectoryPath) &
-                                Builders<EncodeJob>.Filter.Eq("AdditionalCommandArguments", job.AdditionalCommandArguments) &
-                                Builders<EncodeJob>.Filter.Eq("Completed", job.Completed) &
-                                Builders<EncodeJob>.Filter.Eq("Priority", job.Priority);
+                    var filter = BuildersFilterFromGuidlessEncodeJob(job);
                     var update = Builders<EncodeJob>.Update.Set("Completed", bool.TrueString);
                     collection.UpdateOne(filter, update);
                 }
@@ -187,7 +172,7 @@ namespace DataAccess
             }
             else
             {
-                result = MarkJobCompletedStatus(job.Id,completed);
+                result = MarkJobCompletedStatus(job.Id, completed);
             }
             return result;
         }
@@ -318,10 +303,37 @@ namespace DataAccess
                 result = replaceResult.MatchedCount == 1;
             }
             catch (Exception ex)
-            {
-                throw ex;
-            }
+            { throw ex; }
+            
             return result;
+        }
+
+        /// <summary></summary>
+        public IEnumerable<EncodeJob> RetrieveCompleteEncodeJobsByVideoName(string videoName)
+        {
+            IEnumerable<EncodeJob> result = new List<EncodeJob>();
+
+            try
+            {
+                var collection = database.GetCollection<EncodeJob>(encodeJobCollectionName);
+                var filter = Builders<EncodeJob>.Filter.Eq("Completed", bool.TrueString) &
+                             Builders<EncodeJob>.Filter.Eq("VideoFileName", videoName);
+                result = collection.Find<EncodeJob>(filter).ToList();
+            }
+            catch (Exception ex)
+            { throw ex; }
+
+            return result;
+        }
+
+        private FilterDefinition<EncodeJob> BuildersFilterFromGuidlessEncodeJob(EncodeJob job)
+        {
+            return (Builders<EncodeJob>.Filter.Eq("VideoFileName", job.VideoFileName) &
+                                    Builders<EncodeJob>.Filter.Eq("VideoFilePath", job.VideoDirectoryPath) &
+                                    Builders<EncodeJob>.Filter.Eq("AdditionalCommandArguments", job.AdditionalCommandArguments) &
+                                    Builders<EncodeJob>.Filter.Eq("ChunkNumber", job.ChunkNumber) &
+                                    Builders<EncodeJob>.Filter.Eq("ChunkInterval", job.ChunkInterval) &
+                                    Builders<EncodeJob>.Filter.Eq("Priority", job.Priority));
         }
     }
 }
