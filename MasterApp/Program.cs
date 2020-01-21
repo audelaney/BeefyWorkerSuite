@@ -22,9 +22,13 @@ namespace MasterApp
 
         static void Main(string[] args)
         {
-            WelcomePrint();
+            if (args.Length != 0)
+            {
+                HandleInput(args);
+                return;
+            }
 
-            GetConfig();
+            WelcomePrint();
 
             bool running = true;
 
@@ -51,20 +55,24 @@ namespace MasterApp
             } while (running);
         }
 
-        private static void GetConfig()
+        private static void HandleInput(string[] args)
         {
-            while (true)
+            switch (args.First())
             {
-                var input = AppHelpers.GetFileInput("Input a config file path: ");
-                if (input == null) { continue; }
-                try
-                {
-                    AppConfigManager.SetConfig(input);
-                    var testing = AppConfigManager.Instance.CompletedBucketPath;
-                    var testingAgain = AppConfigManager.Instance.DBTypeAndString;
+                case "--input-splitter":
+                    string? video = null;
+                    string? targetDir = null;
+                    try
+                    {
+                        video = args[1];
+                        targetDir = args[2];
+                    }
+                    catch
+                    { System.Console.WriteLine("--input-splitter {video-path} {output-dir}"); }
+                    InputSplitter.Run(video, targetDir);
                     break;
-                }
-                catch { }
+                default:
+                    break;
             }
         }
 

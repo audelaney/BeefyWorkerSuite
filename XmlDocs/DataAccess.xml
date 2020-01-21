@@ -272,6 +272,59 @@
             	- Database connection times out
             </exception>
         </member>
+        <member name="T:DataAccess.Exceptions.BadConnectionStringException">
+            <summary></summary>
+        </member>
+        <member name="P:DataAccess.Exceptions.BadConnectionStringException.ConnectionString">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.BadConnectionStringException.#ctor(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.BadConnectionStringException.#ctor(System.String,System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.BadConnectionStringException.#ctor(System.String,System.String,System.Exception)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.BadConnectionStringException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary></summary>
+        </member>
+        <member name="T:DataAccess.Exceptions.DatabaseConnectionException">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.DatabaseConnectionException.#ctor">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.DatabaseConnectionException.#ctor(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.DatabaseConnectionException.#ctor(System.String,System.Exception)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.DatabaseConnectionException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary></summary>
+        </member>
+        <member name="T:DataAccess.Exceptions.JobAlreadyExistsException">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.JobAlreadyExistsException.#ctor">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.JobAlreadyExistsException.#ctor(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.JobAlreadyExistsException.#ctor(System.String,System.Exception)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.Exceptions.JobAlreadyExistsException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary></summary>
+        </member>
+        <member name="T:DataAccess.SceneAccessor">
+            <summary>
+            Accessor class for scene related operations
+            </summary>
+        </member>
         <member name="M:DataAccess.SceneAccessor.AnalyzeVideoInput(System.String)">
             <summary>
             Verifies input exists, runs input through ffmpeg scene change
@@ -284,11 +337,56 @@
             For use in parsing files output by the SVT-AV1 sample application.
             </summary>
         </member>
+        <member name="M:DataAccess.SvtEncAppAccessor.GetSuccessulTestsFromOutputFile(System.String)">
+            <summary>
+            Gets all successful runs from an output file composed of a capture of SVT encoder output
+            </summary>
+            <param name="file"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DataAccess.SvtEncAppAccessor.GetPictureStatsFromStatFile(System.String)">
+            <summary>
+            Gets the stats for each encoded frame in a video output by the SVT logger
+            </summary>
+            <param name="statFilePath">Path to the file</param>
+            <returns>Collection of stats for each frame, or empty if none are found.</returns>
+        </member>
+        <member name="T:DataAccess.TestSuite.CsvSvtTestDao">
+            <summary>
+            Mostly for writing test cases to a csv file.
+            </summary>
+        </member>
+        <member name="M:DataAccess.TestSuite.CsvSvtTestDao.#ctor(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.TestSuite.CsvSvtTestDao.AddSuccessfulTest(DataObjects.TestSuite.SvtTestSuccess)">
+            <summary></summary>
+        </member>
         <member name="M:DataAccess.TestSuite.CsvSvtTestDao.AddSuccessfulTests(System.Collections.Generic.IEnumerable{DataObjects.TestSuite.SvtTestSuccess})">
             <summary>
             Writes a list of tests to the local csvFilePath, does not append. Returns false if there is an issue with the
             path. Tests are written in blocks based on their ParamsInCmmd property
             </summary>
+        </member>
+        <member name="T:DataAccess.TestSuite.ISvtTestDao">
+            <summary>Data store operations for <see cref="T:DataObjects.TestSuite.SvtTestSuccess" /></summary>
+        </member>
+        <member name="M:DataAccess.TestSuite.ISvtTestDao.AddSuccessfulTest(DataObjects.TestSuite.SvtTestSuccess)">
+            <summary>Adds a single test to in use datastore</summary>
+        </member>
+        <member name="M:DataAccess.TestSuite.ISvtTestDao.AddSuccessfulTests(System.Collections.Generic.IEnumerable{DataObjects.TestSuite.SvtTestSuccess})">
+            <summary>Adds a collection of successful tests to in use datastore</summary>
+        </member>
+        <member name="T:DataAccess.TestSuite.MockSvtTestDao">
+            <summary>
+            Mock class, dummy returns
+            </summary>
+        </member>
+        <member name="M:DataAccess.TestSuite.MockSvtTestDao.AddSuccessfulTest(DataObjects.TestSuite.SvtTestSuccess)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.TestSuite.MockSvtTestDao.AddSuccessfulTests(System.Collections.Generic.IEnumerable{DataObjects.TestSuite.SvtTestSuccess})">
+            <summary></summary>
         </member>
         <member name="T:DataAccess.VideoAccessor">
             <summary>
@@ -298,6 +396,11 @@
         <member name="M:DataAccess.VideoAccessor.ConcatVideosIntoOneOutput(System.Collections.Generic.List{System.String},System.String)">
             <summary>
             Combines multiple videos into a single video in order
+            </summary>
+        </member>
+        <member name="T:DataAccess.Vmaf.VmafAccessor">
+            <summary>
+            Class for pulling VMAF from videos
             </summary>
         </member>
         <member name="M:DataAccess.Vmaf.VmafAccessor.GetVmaf(System.String,System.String)">

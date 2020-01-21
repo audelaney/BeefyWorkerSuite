@@ -85,12 +85,20 @@ namespace DataObjects
         /// Record of the attempts made to perform the encode
         /// </summary>
         public List<EncodeAttempt> Attempts { get; set; }
+        [JsonIgnore]
+        [BsonIgnore]
+        public bool IsChunk
+        {
+            get
+            { return ChunkNumber != 0 && ChunkInterval != null; }
+        }
         /// <summary>
         /// If this particular object is considered a "valid" object. Currently
         /// does not check for guid, so pre-database loaded objects can be
         /// validated.
         /// </summary>
         [JsonIgnore]
+        [BsonIgnore]
         public bool IsValid
         {
             get
@@ -264,6 +272,37 @@ namespace DataObjects
             return output.ToString();
         }
 
+        /// <summary>
+        /// Returns true if the most recent attempt attached to the obj meets the
+        /// required vmaf of the object, and returns false otherwise.
+        /// </summary>
+        public bool DoesMostRecentAttemptMeetRequirements()
+        {
+            var attempt = GetMostRecentAttempt();
+            if (attempt == null)
+            { return false; }
+            else
+            {return attempt.VmafResult > MinVmaf;}
+        }
+
+        /// <summary>
+        /// Gets the most recent encode attempt for this job.
+        /// </summary>
+        public EncodeAttempt? GetMostRecentAttempt()
+        {
+            if (Attempts.Count == 0)
+            { return null; }
+            else
+            { return Attempts.OrderBy(j => j.EndTime).First(); }
+        }
+
+        /// <summary>
+        /// This needs to be coded out for more logic.
+        /// </summary>
+        public EncodeAttempt? GetBestAttempt()
+        {
+            throw new NotImplementedException();
+        }
         #endregion
 
         #region Static methods

@@ -19,17 +19,15 @@ namespace EncodeJobOverseer
         public bool CanStartNewJob
         {
             get
-            {
-                return runningLocalJobs.Count < _maxLocalJobs;
-            }
+            { return runningLocalJobs.Count < AppConfigManager.Instance.MaxRunningLocalJobs; }
         }
         #endregion
 
         #region Fields
-        private readonly int jobCheckIntervalMS = 60 * 1000;
-        private int _maxLocalJobs = 3;
+        private readonly int jobCheckIntervalSeconds = 60;
 
         private readonly ILogger<Worker> _logger;
+        private static ILogger? staticLogger;
 
         private List<Thread> runningLocalJobs = new List<Thread>();
         #endregion
@@ -37,14 +35,17 @@ namespace EncodeJobOverseer
         public Worker(ILogger<Worker> logger)
         {
             _logger = logger;
+            staticLogger = logger;
         }
 
         public override Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Videos for jobs being retrieved from " + AppConfigManager.Instance.ProcessedBucketPath);
             _logger.LogInformation("Local jobs setup in directory " + AppConfigManager.Instance.ActiveBucketPath);
-            _logger.LogInformation("Encoded videos output to  " + AppConfigManager.Instance.CompletedBucketPath);
-            _logger.LogInformation("Database being used: " + AppConfigManager.Instance.DBTypeAndString.Key + " @@ " 
+            _logger.LogInformation("Encoded videos output to " + AppConfigManager.Instance.CompletedBucketPath);
+            _logger.LogInformation("Failed jobs moved to " + AppConfigManager.Instance.FailedBucketPath);
+            _logger.LogInformation("Completed jobs moved to " + AppConfigManager.Instance.CompletedBucketPath);
+            _logger.LogInformation("Database being used: " + AppConfigManager.Instance.DBTypeAndString.Key + " @@ "
                                                             + AppConfigManager.Instance.DBTypeAndString.Value);
             if (!EncodeJobManager.SetLogger(_logger))
             { _logger.LogError("Unable to pass logger into logic layer."); }
@@ -56,7 +57,7 @@ namespace EncodeJobOverseer
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                _logger.LogInformation("Worker running...");
 
                 CleanRunningLocalJobs();
 
@@ -72,7 +73,7 @@ namespace EncodeJobOverseer
                     }
                 }
 
-                await Task.Delay(jobCheckIntervalMS, stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(jobCheckIntervalSeconds), stoppingToken);
             }
         }
 
@@ -92,11 +93,11 @@ namespace EncodeJobOverseer
             {
                 if (null == output)
                 {
-                    _logger.LogCritical(ex,"Fatal exception encountered while choosing next job.");
+                    _logger.LogCritical(ex, "Fatal exception encountered while choosing next job.");
                 }
                 else
                 {
-                    _logger.LogError(ex,"Exception encountered while choosing next job. Job found: "
+                    _logger.LogError(ex, "Exception encountered while choosing next job. Job found: "
                                     + output.ToString());
                 }
             }
@@ -113,26 +114,22 @@ namespace EncodeJobOverseer
                 //build output directory
                 string outputDirectory = Path.Combine(AppConfigManager.Instance.ActiveBucketPath, job.Id.ToString());
                 if (!Directory.Exists(outputDirectory))
-                {
-                    Directory.CreateDirectory(outputDirectory);
-                }
+                { Directory.CreateDirectory(outputDirectory); }
                 else
                 {
                     if (Directory.GetFiles(outputDirectory).Length != 0)
-                    {
-                        throw new ApplicationException("Directory already exists and is not empty, something is busted somewhere.");
-                    }
-                }                
+                    { throw new ApplicationException("Directory already exists and is not empty, something is busted somewhere."); }
+                }
 
                 string videoDir = AppConfigManager.Instance.ProcessedBucketPath;
 
                 string targetVideoDirectory = (string.IsNullOrWhiteSpace(job.ChunkInterval)) ?
                                                 outputDirectory : AppConfigManager.Instance.ActiveBucketPath;
 
-                if (!File.Exists(Path.Combine(targetVideoDirectory,job.VideoFileName)))
+                if (!File.Exists(Path.Combine(targetVideoDirectory, job.VideoFileName)))
                 {
                     File.Move(Path.Combine(videoDir, job.VideoFileName),
-                              Path.Combine(targetVideoDirectory,job.VideoFileName));
+                              Path.Combine(targetVideoDirectory, job.VideoFileName));
                 }
 
                 videoDir = targetVideoDirectory;
@@ -146,13 +143,11 @@ namespace EncodeJobOverseer
                     result = EncodeJobManager.Instance.UpdateJob(oldJob, job);
                 }
                 catch (Exception ex)
-                {
-                    throw ex;
-                }
+                { throw ex; }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,"Exception found while creating local job directory for job: \n"
+                _logger.LogError(ex, "Exception found while creating local job directory for job: \n"
                                 + job.ToString());
                 throw ex;
             }
@@ -166,7 +161,7 @@ namespace EncodeJobOverseer
             try
             {
                 EncodeJobManager.Instance.MarkJobCheckedOut(job.Id, true);
-                Thread t = new Thread(EncodeJobExecuter.Program.RunEncode);
+                Thread t = new Thread(RunEncode);
                 t.IsBackground = false;
                 t.Name = job.Id.ToString();
                 t.Start(job);
@@ -177,10 +172,49 @@ namespace EncodeJobOverseer
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,"An exception occured while starting an encode job" +
+                _logger.LogError(ex, "An exception occured while starting an encode job" +
                                 job.ToString());
                 return false;
             }
+        }
+
+        public static void RunEncode(object? job)
+        {
+            if (!(job is EncodeJob activeJob))
+            { return; }
+
+            EncodeJobManager.Instance.MarkJobCheckedOut(activeJob, true);
+            EncodeJob oldJob = (EncodeJob)activeJob.Clone();
+            oldJob.Id = activeJob.Id;
+
+            //Do the encode
+            string encoderConfig = "libaomffmpeg";
+            EncoderManager.StartJob(activeJob, encoderConfig);
+
+            // Update job doesn't update the completed status or checked out time.
+            EncodeJobManager.Instance.UpdateJob(oldJob, activeJob);
+            var jobComplete = activeJob.DoesMostRecentAttemptMeetRequirements();
+            EncodeJobManager.Instance.MarkJobComplete(activeJob, jobComplete);
+            string oldWorkingDir = Path.Combine(AppConfigManager.Instance.ActiveBucketPath,
+                                        activeJob.Id.ToString());
+
+            if (Directory.Exists(oldWorkingDir))
+            {
+                string newDir = (jobComplete) ?
+                    Path.Combine(AppConfigManager.Instance.CompletedBucketPath, activeJob.Id.ToString()) :
+                    Path.Combine(AppConfigManager.Instance.FailedBucketPath, activeJob.Id.ToString());
+                try
+                { Directory.Move(oldWorkingDir, newDir); }
+                catch
+                { }
+            }
+            else
+            { }
+        }
+
+        private bool StartRemoteJob(EncodeJob job, object location)
+        {
+            throw new NotImplementedException();
         }
 
         private void CleanRunningLocalJobs()
@@ -191,11 +225,6 @@ namespace EncodeJobOverseer
                 _logger.LogInformation(string.Format("Found {0} finished jobs", doneJobs.Count));
                 doneJobs.ForEach(j => runningLocalJobs.Remove(j));
             }
-        }
-
-        private bool StartRemoteJob(EncodeJob job, object location)
-        {
-            throw new NotImplementedException();
         }
     }
 }
