@@ -78,11 +78,7 @@ namespace AppLogic
             IEncoder encoder = encoderType.ToLower() switch
             {
                 "libaomffmpeg" => new EncoderLibaomFfmpeg(),
-<<<<<<< HEAD
                 "hevcffmpeg" => new EncoderHevcFfmpeg(),
-=======
-                "ffmpeghevc" => new EncoderFfmpegHevc(),
->>>>>>> c827f3250ae5248e856255ed128f9755ec6b000e
                 _ => throw new InvalidOperationException()
             };
 
