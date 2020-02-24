@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 using Newtonsoft.Json;
 using System;
 using MongoDB.Bson.Serialization.Attributes;
@@ -10,10 +10,6 @@ namespace DataObjects
 {
     public class EncodeJob : ICloneable
     {
-        #region Static Fields
-        private static readonly string _configFilePathDefault = "/var/local/svt-config/hi.cfg";
-        #endregion
-
         #region Props
         [BsonId]
         [JsonIgnore]
@@ -37,11 +33,6 @@ namespace DataObjects
         /// changed for jobs where one video is used as a source for multiple jobs.
         /// </summary>
         public string VideoDirectoryPath { get; set; }
-        /// <summary>
-		/// Absolute path of the config file to be used. Can be used in generating command line
-		/// arguments.
-		/// </summary>
-        public string ConfigFilePath { get; set; }
         /// <summary>
         /// Additional arguments to be provided to the encoder. Will probably eventually change
         /// to a config object of some kind. If null, returns empty string.
@@ -103,9 +94,7 @@ namespace DataObjects
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(VideoFileName) ||
-                    string.IsNullOrWhiteSpace(ConfigFilePath) ||
-                    0 > Priority || 5 < Priority || 0 > ChunkNumber ||
+                if (0 > Priority || 5 < Priority || 0 > ChunkNumber ||
                     0 > MaxAttempts || 0 > MinPsnr || 0 > MinVmaf ||
                     (Attempts.Where(a => !a.IsValid).Count() != 0))
                 { return false; }
@@ -127,7 +116,6 @@ namespace DataObjects
             VideoDirectoryPath = "";
             VideoFileName = "";
             AdjustmentFactor = AdjustmentFactor.accuracy;
-            ConfigFilePath = _configFilePathDefault;
             AdditionalCommandArguments = "";
             MinPsnr = 40;
             MinVmaf = 93;
@@ -153,7 +141,6 @@ namespace DataObjects
 
             return (otherJob.AdditionalCommandArguments == AdditionalCommandArguments &&
                 otherJob.AdjustmentFactor == AdjustmentFactor &&
-                otherJob.ConfigFilePath == ConfigFilePath &&
                 otherJob.ChunkInterval == ChunkInterval &&
                 otherJob.MaxAttempts == MaxAttempts &&
                 otherJob.MinPsnr == MinPsnr &&
@@ -177,7 +164,6 @@ namespace DataObjects
                 VideoDirectoryPath = (string)this.VideoDirectoryPath.Clone(),
                 MinPsnr = this.MinPsnr,
                 MinVmaf = this.MinVmaf,
-                ConfigFilePath = (string)this.ConfigFilePath.Clone(),
                 ChunkInterval = (string?)this.ChunkInterval?.Clone(),
                 MaxAttempts = this.MaxAttempts,
                 Priority = this.Priority,
@@ -195,7 +181,6 @@ namespace DataObjects
             hash.Add(ChunkInterval);
             hash.Add(VideoFileName);
             hash.Add(VideoDirectoryPath);
-            hash.Add(ConfigFilePath);
             hash.Add(AdditionalCommandArguments);
             hash.Add(Priority);
             hash.Add(MaxAttempts);
