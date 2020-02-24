@@ -6,9 +6,9 @@ using System.Collections.Generic;
 namespace AppLogic
 {
     /// <summary>
-    /// Scene related logic operations
+    /// Generic video related logic operations
     /// </summary>
-    public class SceneManager
+    public class VideoManager
     {
         /// <summary>
         /// Mushes scenes together based on desired speed/efficiency/accuracy/
@@ -49,9 +49,9 @@ namespace AppLogic
         /// <summary>
         /// Converts a video into timestamped scenes that match criteria
         /// </summary>
-        public static Scene[] AnalyzeVideoInput(string videoPath)
+        public static Scene[] GetScenesFromVideo(string videoPath)
         {
-            return AnalyzeScenes(SceneAccessor.AnalyzeVideoInput(videoPath));
+            return AnalyzeScenes(RealVideoAccessor.AnalyzeVideoInput(videoPath));
         }
     }
 }

@@ -9,7 +9,6 @@ namespace DataObjects
     {
         public double StartTime { get; set; }
         public double EndTime { get; set; }
-        public int VidSizeKB { get; set; }
         public TimeSpan Duration
         {
             get
@@ -22,13 +21,7 @@ namespace DataObjects
 
         public override string ToString()
         {
-            string output = "";
-
-            output += "Start time: " + StartTime;
-            output += ",End time: " + EndTime;
-            output += ",Duration: " + Duration.ToString();
-
-            return output;
+            return $"Start time: {StartTime}, End time: {EndTime}, Duration: {Duration.ToString()}";
         }
 
         public static Scene Combine(Scene firstScene, Scene secondScene)
@@ -37,7 +30,6 @@ namespace DataObjects
             {
                 StartTime = firstScene.StartTime,
                 EndTime = secondScene.EndTime,
-                VidSizeKB = firstScene.VidSizeKB + secondScene.VidSizeKB
             };
 
             return output;
@@ -59,6 +51,13 @@ namespace DataObjects
 
             return output;
         }
-    }
 
+        public static IEnumerable<Scene> ScenesFromTimeStamps(IEnumerable<double> pts)
+        {
+            var scenes = new List<Scene>(pts.Count());
+            for (int i = 1; i < pts.Count(); i++)
+            { scenes.Add(new Scene { StartTime = pts.ElementAt(i - 1), EndTime = pts.ElementAt(i) }); }
+            return scenes;
+        }
+    }
 }

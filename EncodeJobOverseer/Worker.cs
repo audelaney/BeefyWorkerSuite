@@ -1,5 +1,4 @@
 #nullable enable
-using EncodeJobExecuter;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -188,7 +187,7 @@ namespace EncodeJobOverseer
             oldJob.Id = activeJob.Id;
 
             //Do the encode
-            string encoderConfig = "libaomffmpeg";
+            string encoderConfig = "hevcffmpeg";
             EncoderManager.StartJob(activeJob, encoderConfig);
 
             // Update job doesn't update the completed status or checked out time.

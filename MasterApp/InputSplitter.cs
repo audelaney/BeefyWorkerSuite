@@ -28,8 +28,8 @@ namespace MasterApp
 
             System.Console.WriteLine("Using ffmepg to search for ideal points of scene change...");
             //Analyze the video and find scene changes
-            var scenes = SceneManager.AnalyzeVideoInput(videoInputPath);
-            System.Console.WriteLine(string.Format("Ended operation with {0} chunks. Transofrming into jobs...", scenes.Count()));
+            var scenes = VideoManager.GetScenesFromVideo(videoInputPath); 
+            System.Console.WriteLine($"Ended operation with {scenes.Count()} chunks. Transforming into jobs...");
 
             List<EncodeJob> jobs = new List<EncodeJob>();
 
@@ -43,7 +43,7 @@ namespace MasterApp
             catch (Exception up)
             { throw up; }
 
-            System.Console.WriteLine(jobs.Count + " jobs successfully built. Writing out to files...");
+            System.Console.WriteLine($"{jobs.Count} jobs successfully built. Writing out to files...");
 
             for (int i = 0; i < jobs.Count; i++)
             {
@@ -66,8 +66,6 @@ namespace MasterApp
             System.Console.WriteLine("All done, have a good day.");
         }
 
-        /// <todo>Move to an EncodeJob class static method that takes a valid EncodeJob and
-        /// an IEnumerable Scene and outputs an IEnumberalbe EncodeJob</todo>
         private static List<EncodeJob> ConvertToUnNumberedJobs(Scene[] chunks, string filename)
         {
             System.Console.WriteLine("Job requirements will now be prompted. Leave prompt empty to use default, and enter 'quit' at any time to quit and exit.");
@@ -76,7 +74,6 @@ namespace MasterApp
             int userPriority = 3;
             double userMinVmaf = 90;
             double userMinPsnr = 35;
-            string userConfigPath = "/var/local/svt-config/hi.cfg";
             string userAddtlCommands = "";
             int userAdjustmentFactor = 0;
 
@@ -167,20 +164,6 @@ namespace MasterApp
                     }
                     System.Console.WriteLine("\nInvalid input, try again.");
                 }
-                while (true)
-                {
-                    System.Console.Write(string.Format("Please enter a path for the config file [[{0}]]: ", userConfigPath));
-                    string input = System.Console.ReadLine();
-                    if (input.Trim().ToLower() == "quit")
-                    { throw new ApplicationException("User has quit."); }
-                    if (string.IsNullOrEmpty(input)) { break; }
-                    else if (File.Exists(input))
-                    {
-                        userConfigPath = input;
-                        break;
-                    }
-                    System.Console.WriteLine("\nInvalid input, file does not exist, try again.");
-                }
                 System.Console.WriteLine("Please note, there is no validation in place for user entered additional commands,");
                 System.Console.WriteLine(" I severely recommend you don't fuck this part up.");
 
@@ -200,7 +183,6 @@ namespace MasterApp
                 Priority = userPriority,
                 MinVmaf = userMinVmaf,
                 MinPsnr = userMinPsnr,
-                ConfigFilePath = userConfigPath,
                 AdditionalCommandArguments = userAddtlCommands,
                 AdjustmentFactor = (AdjustmentFactor)userAdjustmentFactor,
                 VideoFileName = filename
@@ -209,7 +191,7 @@ namespace MasterApp
             var output = chunks.Select(c =>
             {
                 var job = (EncodeJob)masterJob.Clone();
-                job.ChunkInterval = string.Format("{0}-{1}", c.StartTime, c.EndTime);
+                job.ChunkInterval = $"{c.StartTime}-{c.EndTime}";
                 return job;
             }).ToList();
 

@@ -41,39 +41,6 @@ namespace EncodeJobExecuter
 			throw new NotImplementedException("STOP RIGHT THERE CRIMINAL SCUM");
 			EncoderManager.StartJob(activeJob, "vp9test");
 		}
-		public static void RunEncode(object? job)
-		{
-			if (!(job is EncodeJob activeJob)) { return; }
-
-			EncodeJobManager.Instance.MarkJobCheckedOut(activeJob, true);
-			EncodeJob oldJob = (EncodeJob)activeJob.Clone();
-
-			//Do the encode
-			string encoderConfig = "LibaomFfmpeg";
-			EncoderManager.StartJob(activeJob, encoderConfig);
-
-			// Update job doesn't update the completed status or checked out time.
-			EncodeJobManager.Instance.UpdateJob(oldJob, activeJob);
-			var jobComplete = activeJob.DoesMostRecentAttemptMeetRequirements();
-			EncodeJobManager.Instance.MarkJobComplete(activeJob, jobComplete);
-			string oldWorkingDir = Path.Combine(AppConfigManager.Instance.ActiveBucketPath,
-										activeJob.Id.ToString());
-
-			if (Directory.Exists(oldWorkingDir))
-			{
-				string newDir = (jobComplete) ?
-							Path.Combine(AppConfigManager.Instance.CompletedBucketPath, activeJob.Id.ToString()) : 
-							Path.Combine(AppConfigManager.Instance.FailedBucketPath, activeJob.Id.ToString());
-				try
-				{
-					Directory.Move(oldWorkingDir, newDir);
-				}
-				catch
-				{ }
-			}
-			else
-			{ throw new InvalidOperationException("Something is bad is happening bruh"); }
-		}
 
 		public static EncodeJob BuildFakeJob(string vidDir)
 		{

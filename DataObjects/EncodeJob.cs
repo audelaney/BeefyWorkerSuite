@@ -10,10 +10,6 @@ namespace DataObjects
 {
     public class EncodeJob : ICloneable
     {
-        #region Static Fields
-        private static readonly string _configFilePathDefault = "/var/local/svt-config/hi.cfg";
-        #endregion
-
         #region Props
         [BsonId]
         [JsonIgnore]
@@ -37,11 +33,6 @@ namespace DataObjects
         /// changed for jobs where one video is used as a source for multiple jobs.
         /// </summary>
         public string VideoDirectoryPath { get; set; }
-        /// <summary>
-		/// Absolute path of the config file to be used. Can be used in generating command line
-		/// arguments.
-		/// </summary>
-        public string ConfigFilePath { get; set; }
         /// <summary>
         /// Additional arguments to be provided to the encoder. Will probably eventually change
         /// to a config object of some kind. If null, returns empty string.
@@ -103,9 +94,7 @@ namespace DataObjects
         {
             get
             {
-                if (string.IsNullOrWhiteSpace(VideoFileName) ||
-                    string.IsNullOrWhiteSpace(ConfigFilePath) ||
-                    0 > Priority || 5 < Priority || 0 > ChunkNumber ||
+                if (0 > Priority || 5 < Priority || 0 > ChunkNumber ||
                     0 > MaxAttempts || 0 > MinPsnr || 0 > MinVmaf ||
                     (Attempts.Where(a => !a.IsValid).Count() != 0))
                 { return false; }
@@ -127,7 +116,6 @@ namespace DataObjects
             VideoDirectoryPath = "";
             VideoFileName = "";
             AdjustmentFactor = AdjustmentFactor.accuracy;
-            ConfigFilePath = _configFilePathDefault;
             AdditionalCommandArguments = "";
             MinPsnr = 40;
             MinVmaf = 93;
@@ -153,7 +141,6 @@ namespace DataObjects
 
             return (otherJob.AdditionalCommandArguments == AdditionalCommandArguments &&
                 otherJob.AdjustmentFactor == AdjustmentFactor &&
-                otherJob.ConfigFilePath == ConfigFilePath &&
                 otherJob.ChunkInterval == ChunkInterval &&
                 otherJob.MaxAttempts == MaxAttempts &&
                 otherJob.MinPsnr == MinPsnr &&
@@ -177,7 +164,6 @@ namespace DataObjects
                 VideoDirectoryPath = (string)this.VideoDirectoryPath.Clone(),
                 MinPsnr = this.MinPsnr,
                 MinVmaf = this.MinVmaf,
-                ConfigFilePath = (string)this.ConfigFilePath.Clone(),
                 ChunkInterval = (string?)this.ChunkInterval?.Clone(),
                 MaxAttempts = this.MaxAttempts,
                 Priority = this.Priority,
@@ -195,7 +181,6 @@ namespace DataObjects
             hash.Add(ChunkInterval);
             hash.Add(VideoFileName);
             hash.Add(VideoDirectoryPath);
-            hash.Add(ConfigFilePath);
             hash.Add(AdditionalCommandArguments);
             hash.Add(Priority);
             hash.Add(MaxAttempts);
@@ -212,60 +197,45 @@ namespace DataObjects
         public override string ToString()
         {
             StringBuilder output = new StringBuilder();
-            output.Append("GUID: ");
-            output.Append(Id.ToString());
+            output.Append($"GUID: {Id.ToString()}");
             output.AppendLine();
 
             if (ChunkNumber != 0)
             {
-                output.Append("Chunk number: ");
-                output.Append(ChunkNumber);
+                output.Append($"Chunk number: {ChunkNumber}");
                 output.AppendLine();
             }
 
             if (!string.IsNullOrWhiteSpace(ChunkInterval))
             {
-                output.Append("Input interval: ");
-                output.Append(ChunkInterval);
+                output.Append($"Input interval: {ChunkInterval}");
                 output.AppendLine();
             }
 
-            output.Append("Video file name: ");
-            output.Append(VideoFileName);
+            output.Append($"Video file name: {VideoFileName}");
             output.AppendLine();
 
-            output.Append("Video directory: ");
-            output.Append(VideoDirectoryPath);
+            output.Append($"Video directory: {VideoDirectoryPath}");
             output.AppendLine();
 
-            output.Append("Config path: ");
-            output.Append(ConfigFilePath);
+            output.Append($"Additional arguments: {AdditionalCommandArguments}");
             output.AppendLine();
 
-            output.Append("Additional arguments: ");
-            output.Append(AdditionalCommandArguments);
+            output.Append($"Priority: {Priority}");
             output.AppendLine();
 
-            output.Append("Priority: ");
-            output.Append(Priority);
+            output.Append($"Max attempts: {MaxAttempts}");
             output.AppendLine();
 
-            output.Append("Max attempts: ");
-            output.Append(MaxAttempts);
+            output.Append($"Min psnr: {MinPsnr}");
             output.AppendLine();
 
-            output.Append("Min psnr: ");
-            output.Append(MinPsnr);
-            output.AppendLine();
-
-            output.Append("Min vmaf: ");
-            output.Append(MinVmaf);
+            output.Append($"Min vmaf: {MinVmaf}");
             output.AppendLine();
 
             for (int i = 0; i < Attempts.Count; i++)
             {
-                output.Append("Attempt #" + (i + 1) + ": ");
-                output.Append(Attempts[i].ToString());
+                output.Append($"Attempt #{(i + 1)}: {Attempts[i].ToString()}");
                 output.AppendLine();
             }
 
@@ -282,7 +252,7 @@ namespace DataObjects
             if (attempt == null)
             { return false; }
             else
-            {return attempt.VmafResult > MinVmaf;}
+            { return attempt.VmafResult > MinVmaf; }
         }
 
         /// <summary>
@@ -297,11 +267,33 @@ namespace DataObjects
         }
 
         /// <summary>
-        /// This needs to be coded out for more logic.
+        /// First tries to return the smallest filesize that matches MinVmaf
+        /// Failing to do that will return the largest Vmaf
         /// </summary>
         public EncodeAttempt? GetBestAttempt()
         {
-            throw new NotImplementedException();
+            if (Attempts.Count == 0)
+            { return null; }
+            else
+            {
+                var meetsVmaf = Attempts.Where(a => a.VmafResult >= this.MinVmaf);
+                if (meetsVmaf.Count() != 0)
+                { return meetsVmaf.OrderByDescending(a => a.FileSize).First(); }
+                else
+                { return Attempts.OrderBy(a => a.VmafResult).First(); }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool DoesBestAttemptMeetRequirements()
+        {
+            var attempt = GetBestAttempt();
+            if (attempt == null)
+            { return false; }
+            else
+            { return attempt.VmafResult > MinVmaf; }
         }
         #endregion
 

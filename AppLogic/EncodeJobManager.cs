@@ -3,7 +3,6 @@ using DataObjects;
 using System;
 using DataAccess;
 using System.IO;
-using DataAccess.Vmaf;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
@@ -80,8 +79,7 @@ namespace AppLogic
 
         internal static string GenerateJobOutputFilename(EncodeJob job)
         {
-            string result = "";
-            result += Path.GetFileNameWithoutExtension(job.VideoFileName);
+            string result = Path.GetFileNameWithoutExtension(job.VideoFileName);
             result += (job.IsChunk) ? ".chunk" + job.ChunkNumber : string.Empty;
             result += ".attempt" + (job.Attempts.Count + 1);
             result += ".mkv";
@@ -97,14 +95,10 @@ namespace AppLogic
         {
             string guid = new DirectoryInfo(directory).Name;
             try
-            {
-                return new Guid(guid);
-            }
+            { return new Guid(guid); }
             catch
-            {
-                return Guid.Empty;
+            { return Guid.Empty; }
             }
-        }
 
         /// <summary>
         /// Passes a logger into the manager for logging purposes
@@ -117,9 +111,7 @@ namespace AppLogic
                 return true;
             }
             catch
-            {
-                return false;
-            }
+            { return false; }
         }
 
         //Manager abstraction

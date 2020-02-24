@@ -123,7 +123,7 @@ namespace Tests.AppLogic
                     {
                         var jobAfterAdd = jobs.First();
                         var jobAfterChange = jobAfterAdd.Clone() as EncodeJob;
-                        jobAfterChange.VideoDirectoryPath = "/some/other/place/";
+                        jobAfterChange!.VideoDirectoryPath = "/some/other/place/";
 
                         var finalResult = EncodeJobManager.Instance.UpdateJob(jobAfterAdd,jobAfterChange);
                         var finalJobs = EncodeJobManager.Instance.GetIncompleteEncodeJobs();
