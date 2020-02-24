@@ -12,8 +12,23 @@ namespace AppLogic
     /// <summary>
     /// Encoding related logic operations
     /// </summary>
-    public static class EncoderManager
+    public abstract class EncoderManager
     {
+        /// <summary>
+        /// Instance used for actual logical operations of the publicly available methods
+        /// </summary>
+        public EncoderManager Instance
+        {
+            get
+    {
+                if (_instance == null)
+                { _instance = new RealEncoderManager(); }
+                return _instance;
+            }
+        }
+        private EncoderManager? _instance;
+
+
         /// <summary>
         /// Combines the resulting output from 
         /// </summary>
@@ -22,6 +37,11 @@ namespace AppLogic
         ///     - Any of the jobs are not marked as completed
         ///     - Jobs don't have an InputInterval
         ///     - Jobs that have a video source that doesn't match the first video
+        /// </exception>
+        /// <exception cref="System.IO.DirectoryNotFoundException">
+        /// Thrown if:
+        ///     - A job is found which is marked as completed but does not have a directory in the
+        ///     completed bucket.
         /// </exception>
         public static void Combine(EncodeJob[] jobs, string outputFileName)
         {
@@ -42,8 +62,11 @@ namespace AppLogic
                     if (!Directory.Exists(outDir) && Directory.GetFiles(outDir).Count() == 1)
                     { return Directory.GetFiles(outDir).First(); }
                     else
+                        { throw new InvalidOperationException($"{j.ToString()} has too many completed jobs"); }
+                    }
+                    else
                     {
-                        throw new InvalidOperationException(
+                        throw new DirectoryNotFoundException(
                             "Couldn't find job directory in completed bucket for job. CompletedBucket: "
                             + AppConfigManager.Instance.CompletedBucketPath
                             + " job: " + jobs.ToString());
