@@ -31,8 +31,7 @@ namespace AppLogic
                     _dao = new EncodeJobDAOMongo(connString);
                     break;
                 case "mssql":
-                    _dao = new EncodeJobDAOmssql(connString ??
-                                throw new ArgumentException("Connection string required for MSSQL db."));
+                    _dao = new EncodeJobDAOmssql(connString ?? "");
                     break;
                 case "mock-baddb":
                     _dao = new EncodeJobDAOMockBadDb();
@@ -75,9 +74,7 @@ namespace AppLogic
                         }
                     }
                     else if (alreadyExistingJob.Equals(newJob))
-                    {
-                        throw new ApplicationException("Job has already been added. String: " + newJob.ToString());
-                    }
+                    { throw new JobAlreadyExistsException($"Job: {newJob.ToString()}"); }
                     else
                     {
                         //Just try again with the new guid, should work for sure
@@ -178,8 +175,11 @@ namespace AppLogic
                     return false;
                 }
                 else
-                { throw ex; }
+                {
+                    ex.Data["message"] = message;
+                    throw ex;
             }
+        }
         }
 
         public override EncodeJob? FindEncodeJob(Guid id)
@@ -206,8 +206,11 @@ namespace AppLogic
                     return null;
                 }
                 else
-                { throw ex; }
+                {
+                    ex.Data["message"] = message;
+                    throw ex;
             }
+        }
         }
 
         public override bool MarkJobComplete(EncodeJob job, bool completedStatus)
@@ -217,9 +220,7 @@ namespace AppLogic
 
             string message = $"Exception encountered while completing job {job.ToString()} {PrintDB()}";
             try
-            {
-                return _dao.MarkJobCompletedStatus(job, completedStatus);
-            }
+            {return _dao.MarkJobCompletedStatus(job, completedStatus);}
             catch (DatabaseConnectionException dce)
             {
                 //TODO cache logic
@@ -234,8 +235,11 @@ namespace AppLogic
                     return false;
                 }
                 else
-                { throw ex; }
+                {
+                    ex.Data["message"] = message;
+                    throw ex;
             }
+        }
         }
 
         public override bool MarkJobComplete(Guid id, bool completedStatus)
@@ -260,8 +264,11 @@ namespace AppLogic
                     return false;
                 }
                 else
-                { throw ex; }
+                {
+                    ex.Data["message"] = message;
+                    throw ex;
             }
+        }
         }
 
         public override bool UpdateJob(EncodeJob oldJob, EncodeJob job)
@@ -289,7 +296,10 @@ namespace AppLogic
                     return false;
                 }
                 else
-                { throw ex; }
+                {
+                    ex.Data["message"] = message;
+                    throw ex;
+                }
             }
         }
 
@@ -318,7 +328,10 @@ namespace AppLogic
                 if (null != _logger)
                 { _logger.LogError(ex, message); }
                 else
-                { throw ex; }
+                {
+                    ex.Data["message"] = message;
+                    throw ex;
+                }
             }
 
             return output;
@@ -350,7 +363,10 @@ namespace AppLogic
                 if (null != _logger)
                 { _logger.LogError(ex, message); }
                 else
-                { throw ex; }
+                {
+                    ex.Data["message"] = message;
+                    throw ex;
+                }
             }
 
             return output;
@@ -384,7 +400,10 @@ namespace AppLogic
                 if (null != _logger)
                 { _logger.LogError(ex, message); }
                 else
-                { throw ex; }
+                {
+                    ex.Data["message"] = message;
+                    throw ex;
+                }
             }
 
             return output;
@@ -416,7 +435,10 @@ namespace AppLogic
                 if (null != _logger)
                 { _logger.LogError(ex, message); }
                 else
-                { throw ex; }
+                {
+                    ex.Data["message"] = message;
+                    throw ex;
+                }
             }
 
             return output;
@@ -446,7 +468,10 @@ namespace AppLogic
                 if (null != _logger)
                 { _logger.LogError(ex, message); }
                 else
-                { throw ex; }
+                {
+                    ex.Data["message"] = message;
+                    throw ex;
+                }
             }
 
             return output;

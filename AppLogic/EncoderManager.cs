@@ -52,6 +52,7 @@ namespace AppLogic
 
             //Concat the video files
             RealVideoAccessor.ConcatVideosIntoOneOutput(sortedJobOutputFiles.ToList()
+                                                    ,Path.Combine(/* completed bucket path */));
         }
 
         private static double? GetJobSceneStartTime(EncodeJob job)
@@ -110,11 +111,10 @@ namespace AppLogic
                         FileSize = (ulong)new FileInfo(outputPath).Length
                     };
                     job.Attempts.Add(attempt);
+                    // Update job in db?
                 }
                 catch
-                {
-                    attempt = null;
-                }
+                { attempt = null; }
             } while (RunAgain(job, attempt?.OriginalOutputPath));
         }
 

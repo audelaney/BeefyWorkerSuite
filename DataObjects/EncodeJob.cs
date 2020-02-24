@@ -267,7 +267,7 @@ namespace DataObjects
             if (attempt == null)
             { return false; }
             else
-            {return attempt.VmafResult > MinVmaf;}
+            { return attempt.VmafResult > MinVmaf; }
         }
 
         /// <summary>
@@ -282,11 +282,33 @@ namespace DataObjects
         }
 
         /// <summary>
-        /// This needs to be coded out for more logic.
+        /// First tries to return the smallest filesize that matches MinVmaf
+        /// Failing to do that will return the largest Vmaf
         /// </summary>
         public EncodeAttempt? GetBestAttempt()
         {
-            throw new NotImplementedException();
+            if (Attempts.Count == 0)
+            { return null; }
+            else
+            {
+                var meetsVmaf = Attempts.Where(a => a.VmafResult >= this.MinVmaf);
+                if (meetsVmaf.Count() != 0)
+                { return meetsVmaf.OrderByDescending(a => a.FileSize).First(); }
+                else
+                { return Attempts.OrderBy(a => a.VmafResult).First(); }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool DoesBestAttemptMeetRequirements()
+        {
+            var attempt = GetBestAttempt();
+            if (attempt == null)
+            { return false; }
+            else
+            { return attempt.VmafResult > MinVmaf; }
         }
         #endregion
 

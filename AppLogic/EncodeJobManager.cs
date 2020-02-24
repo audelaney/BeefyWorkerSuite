@@ -95,14 +95,10 @@ namespace AppLogic
         {
             string guid = new DirectoryInfo(directory).Name;
             try
-            {
-                return new Guid(guid);
-            }
+            { return new Guid(guid); }
             catch
-            {
-                return Guid.Empty;
+            { return Guid.Empty; }
             }
-        }
 
         /// <summary>
         /// Passes a logger into the manager for logging purposes
@@ -115,9 +111,7 @@ namespace AppLogic
                 return true;
             }
             catch
-            {
-                return false;
-            }
+            { return false; }
         }
 
         //Manager abstraction

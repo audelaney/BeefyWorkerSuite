@@ -41,7 +41,6 @@ namespace DataAccess
 			};
 
 			cmd.Parameters.AddWithValue("",job.AdditionalCommandArguments);
-			cmd.Parameters.AddWithValue("",job.ConfigFilePath);
 			cmd.Parameters.AddWithValue("",job.MaxAttempts);
 			cmd.Parameters.AddWithValue("",job.MinPsnr);
 			cmd.Parameters.AddWithValue("",job.Priority);

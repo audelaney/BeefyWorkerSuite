@@ -75,7 +75,7 @@ namespace EncodeJobIngester
                             File.Delete(Path.Combine(activeBucket, fileNameAndJob.Key));
                         }
                         else
-                        { throw new ApplicationException("Unable to add " + fileNameAndJob.Value + " to queue in database " + AppConfigManager.Instance.DBTypeAndString.Key); }
+                        { throw new ApplicationException($"Unable to add {fileNameAndJob.Value} to queue in database {config.DBTypeAndString.Key}"); }
                     }
                     catch (UnauthorizedAccessException unAuthEx)
                     {
@@ -119,7 +119,7 @@ namespace EncodeJobIngester
                                 File.Delete(Path.Combine(activeBucket, fileNameAndJob.Key));
                             }
                             else
-                            { throw new ApplicationException("Unable to add " + fileNameAndJob.Value.ToString() + " to queue in database " + AppConfigManager.Instance.DBTypeAndString.Key); }
+                            { throw new ApplicationException($"Unable to add {fileNameAndJob.Value.ToString()} to queue in database {config.DBTypeAndString.Key}"); }
                         }
 
                         File.Move(Path.Combine(activeBucket, masterVideo),

@@ -8,6 +8,7 @@ namespace DataObjects
         {
             TargetBitrateKbps = 1500;
             CRF = 33;
+            FPS = new FrameRate();
         }
         public int GopMaxSize {get;set;}
         public int GopMinSize { get; set; }

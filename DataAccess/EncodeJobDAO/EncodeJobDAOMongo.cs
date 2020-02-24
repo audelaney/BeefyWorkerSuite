@@ -32,9 +32,7 @@ namespace DataAccess
                 throw new BadConnectionStringException(connString ?? "NULL", "", mce);
             }
             catch (Exception ex)
-            {
-                throw ex;
-            }
+            { throw ex; }
         }
 
         /// <summary></summary>
@@ -93,9 +91,7 @@ namespace DataAccess
                     collection.UpdateOne(filter, update);
                 }
                 catch (Exception ex)
-                {
-                    throw ex;
-                }
+                { throw ex; }
             }
             else
             {
@@ -107,24 +103,22 @@ namespace DataAccess
         /// <summary></summary>
         public bool MarkEncodeJobCheckedOut(Guid id, DateTime? checkedOutTime)
         {
+            bool successful = false;
+
             if (id == Guid.Empty)
             { throw new ArgumentException("Empty guid in CheckoutEncodeJob method."); }
             try
             {
                 var collection = database.GetCollection<EncodeJob>(encodeJobCollectionName);
                 var filter = Builders<EncodeJob>.Filter.Eq("_id", id);
-                var update = Builders<EncodeJob>.Update.Set("CheckedOutTime", DateTime.Now);
-                collection.UpdateOne(filter, update, new UpdateOptions { IsUpsert = false });
-                var job = RetrieveEncodeJob(id);
-                if (job.CheckedOutTime == null)
-                { throw new ApplicationException("Unable to update checkout time for item guid: " + id); }
+                var update = Builders<EncodeJob>.Update.Set("CheckedOutTime", checkedOutTime);
+                var result = collection.UpdateOne(filter, update, new UpdateOptions { IsUpsert = false });
+                successful = result.ModifiedCount == 1;
             }
             catch (Exception ex)
-            {
-                throw ex;
-            }
+            { throw ex; }
 
-            return true;
+            return successful;
         }
 
         /// <summary></summary>
@@ -141,9 +135,7 @@ namespace DataAccess
                 return result.MatchedCount == 1;
             }
             catch (Exception ex)
-            {
-                throw ex;
-            }
+            { throw ex; }
         }
 
         /// <summary></summary>
@@ -166,9 +158,7 @@ namespace DataAccess
                     collection.UpdateOne(filter, update);
                 }
                 catch (Exception ex)
-                {
-                    throw ex;
-                }
+                { throw ex; }
             }
             else
             {
@@ -197,9 +187,7 @@ namespace DataAccess
                 result = collection.Find<EncodeJob>(filter).ToList();
             }
             catch (Exception ex)
-            {
-                throw ex;
-            }
+            { throw ex; }
 
             return result;
         }
@@ -217,9 +205,7 @@ namespace DataAccess
                 result = collection.Find<EncodeJob>(filter).ToList();
             }
             catch (Exception ex)
-            {
-                throw ex;
-            }
+            { throw ex; }
 
             return result;
         }
@@ -248,9 +234,7 @@ namespace DataAccess
                 throw apex;
             }
             catch (System.Exception ex)
-            {
-                throw ex;
-            }
+            { throw ex; }
         }
 
         /// <summary></summary>
@@ -265,9 +249,7 @@ namespace DataAccess
                 result = collection.Find<EncodeJob>(filter).ToList();
             }
             catch (Exception ex)
-            {
-                throw ex;
-            }
+            { throw ex; }
 
             return result;
         }
@@ -304,7 +286,7 @@ namespace DataAccess
             }
             catch (Exception ex)
             { throw ex; }
-            
+
             return result;
         }
 
