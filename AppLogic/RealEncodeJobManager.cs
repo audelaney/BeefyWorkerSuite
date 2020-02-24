@@ -49,10 +49,7 @@ namespace AppLogic
             if (!newJob.IsValid)
             { throw new ArgumentException("Cannot add invalid job to queue: " + newJob.ToString()); }
 
-            string message = "Exception encountered while adding job: ";
-            message += newJob.ToString();
-            message += PrintDB();
-
+            string message = $"Exception encountered while adding job: {newJob.ToString()} + {PrintDB()}";
             var result = false;
 
             try
@@ -63,7 +60,7 @@ namespace AppLogic
                 { result = true; }
                 else
                 {
-                    _logger?.LogWarning("Attempted to add the same job to the datastore. Guid: " + newJob.Id);
+                    _logger?.LogWarning($"Attempted to add the same job to the datastore. Guid: {newJob.Id}");
                     var alreadyExistingJob = FindEncodeJob(newJob.Id);
                     var badGuid = newJob.Id;
                     newJob.Id = Guid.NewGuid();
@@ -73,8 +70,8 @@ namespace AppLogic
                         _logger?.LogWarning("Trying again...");
                         if (!_dao.AddEncodeJobToQueue(newJob))
                         {
-                            throw new ApplicationException("A job was not found for old guid: " + badGuid + " and job "
-                            + newJob.ToString() + " was still unable to be added.");
+                            throw new ApplicationException($"A job was not found for old guid: {badGuid} and "
+                            + $"job {newJob.ToString()} was still unable to be added.");
                         }
                     }
                     else if (alreadyExistingJob.Equals(newJob))
@@ -115,9 +112,7 @@ namespace AppLogic
             if (Guid.Empty == id)
             { throw new ArgumentException("Cannot accept empty guid."); }
 
-            string message = "Exception encountered while checking out job with id: ";
-            message += id;
-            message += PrintDB();
+            string message = $"Exception encountered while checking out job with id: {id} {PrintDB()}";
             try
             {
                 var result = false;
@@ -149,11 +144,10 @@ namespace AppLogic
         public override bool MarkJobCheckedOut(EncodeJob job, bool checkedOutStatus)
         {
             if (!job.IsValid)
-            { throw new ArgumentException("Job is invalid: " + job.ToString()); }
+            { throw new ArgumentException($"Job is invalid: {job.ToString()}"); }
 
-            string message = "Exception encountered while checking out job with id: ";
-            message += job.ToString();
-            message += PrintDB();
+            string message = "Exception encountered while setting checked out status " 
+                + $"to {checkedOutStatus} for job with id: {job.ToString()} {PrintDB()}";
             try
             {
                 var result = false;
@@ -193,9 +187,7 @@ namespace AppLogic
             if (Guid.Empty == id)
             { throw new ArgumentException("Cannot find job for empty guid."); }
 
-            string message = "Exception encountered while finding job with id: ";
-            message += id;
-            message += PrintDB();
+            string message = $"Exception encountered while finding job with id: {id} {PrintDB()}";
             try
             { return _dao.RetrieveEncodeJob(id); }
             catch (ApplicationException)
@@ -221,10 +213,9 @@ namespace AppLogic
         public override bool MarkJobComplete(EncodeJob job, bool completedStatus)
         {
             if (!job.IsValid)
-            { throw new ArgumentException("Job invalid: " + job.ToString()); }
+            { throw new ArgumentException($"Job invalid: {job.ToString()}"); }
 
-            string message = "Exception encountered while completing job " + job.ToString();
-            message += PrintDB();
+            string message = $"Exception encountered while completing job {job.ToString()} {PrintDB()}";
             try
             {
                 return _dao.MarkJobCompletedStatus(job, completedStatus);
@@ -252,8 +243,7 @@ namespace AppLogic
             if (Guid.Empty == id)
             { throw new ArgumentException("Cannot mark complete for empty guid."); }
 
-            string message = "Exception encountered while completing job " + id;
-            message += PrintDB();
+            string message = $"Exception encountered while completing job {id} {PrintDB()}";
             try
             { return _dao.MarkJobCompletedStatus(id, completedStatus); }
             catch (DatabaseConnectionException dce)
@@ -277,12 +267,12 @@ namespace AppLogic
         public override bool UpdateJob(EncodeJob oldJob, EncodeJob job)
         {
             if (!oldJob.IsValid)
-            { throw new ArgumentException("Old job is invalid: " + oldJob.ToString()); }
+            { throw new ArgumentException($"Old job is invalid: {oldJob.ToString()}"); }
             if (!job.IsValid)
-            { throw new ArgumentException("New job is invalid: " + job.ToString()); }
+            { throw new ArgumentException($"New job is invalid: {job.ToString()}"); }
 
-            string message = "Exception encountered while updating job " + oldJob.ToString();
-            message += " to new job " + job.ToString() + PrintDB();
+            string message = $"Exception encountered while updating job {oldJob.ToString()}"
+                    + $" to new job {job.ToString()} {PrintDB()}";
             try
             { return _dao.UpdateJob(oldJob, job); }
             catch (DatabaseConnectionException dce)
@@ -306,9 +296,8 @@ namespace AppLogic
         public override IEnumerable<EncodeJob> GetIncompleteUncheckedOutEncodeJobs(int priority)
         {
             IEnumerable<EncodeJob> output = new EncodeJob[0];
-            string message = "Exception encountered while pulling incompleted job list. ";
-            message += "Priority: " + priority;
-            message += PrintDB();
+            string message = "Exception encountered while pulling incompleted job list. "
+                    + $"Priority: {priority} {PrintDB()}";
 
             try
             {
@@ -316,7 +305,7 @@ namespace AppLogic
                 if (result.Count() != 0)
                 { output = result; }
                 else
-                { _logger?.LogInformation("No incomplete jobs found for priority " + priority); }
+                { _logger?.LogInformation($"No incomplete jobs found for priority {priority}"); }
             }
             catch (DatabaseConnectionException dce)
             {
@@ -338,8 +327,7 @@ namespace AppLogic
         public override IEnumerable<EncodeJob> GetIncompleteUncheckedOutEncodeJobs()
         {
             IEnumerable<EncodeJob> output = new EncodeJob[0];
-            string message = "Exception encountered while pulling incompleted unchecked-out job list. ";
-            message += PrintDB();
+            string message = $"Exception encountered while pulling incompleted unchecked-out job list. {PrintDB()}";
 
             try
             {
@@ -372,9 +360,8 @@ namespace AppLogic
         public override IEnumerable<EncodeJob> GetIncompleteEncodeJobs(int priority)
         {
             IEnumerable<EncodeJob> output = new EncodeJob[0];
-            string message = "Exception encountered while pulling incompleted job list. ";
-            message += "Priority: " + priority;
-            message += PrintDB();
+            string message = "Exception encountered while pulling incompleted job list. "
+                    + $"Priority: {priority} {PrintDB()}";
 
             try
             {
@@ -406,8 +393,7 @@ namespace AppLogic
         public override IEnumerable<EncodeJob> GetIncompleteEncodeJobs()
         {
             IEnumerable<EncodeJob> output = new EncodeJob[0];
-            string message = "Exception encountered while pulling incompleted job list. ";
-            message += PrintDB();
+            string message = $"Exception encountered while pulling incompleted job list. {PrintDB()}";
 
             try
             {
@@ -439,8 +425,7 @@ namespace AppLogic
         public override IEnumerable<EncodeJob> GetJobsByVideoName(string videoName)
         {
             IEnumerable<EncodeJob> output = new EncodeJob[0];
-            string message = "Exception encountered while pulling jobs with video name: " + videoName;
-            message += PrintDB();
+            string message = $"Exception encountered while pulling jobs with video name: {videoName} {PrintDB()}";
 
             try
             {
@@ -448,9 +433,7 @@ namespace AppLogic
                 if (result.Count() != 0)
                 { output = result; }
                 else
-                {
-                    _logger?.LogInformation("No jobs found with video name: " + videoName);
-                }
+                { _logger?.LogInformation($"No jobs found with video name: {videoName}"); }
             }
             catch (DatabaseConnectionException dce)
             {

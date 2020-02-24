@@ -29,6 +29,7 @@ namespace MasterApp
             System.Console.WriteLine("Using ffmepg to search for ideal points of scene change...");
             //Analyze the video and find scene changes
             var scenes = VideoManager.GetScenesFromVideo(videoInputPath); 
+            System.Console.WriteLine($"Ended operation with {scenes.Count()} chunks. Transforming into jobs...");
 
             List<EncodeJob> jobs = new List<EncodeJob>();
 
@@ -42,7 +43,7 @@ namespace MasterApp
             catch (Exception up)
             { throw up; }
 
-            System.Console.WriteLine(jobs.Count + " jobs successfully built. Writing out to files...");
+            System.Console.WriteLine($"{jobs.Count} jobs successfully built. Writing out to files...");
 
             for (int i = 0; i < jobs.Count; i++)
             {
@@ -208,7 +209,7 @@ namespace MasterApp
             var output = chunks.Select(c =>
             {
                 var job = (EncodeJob)masterJob.Clone();
-                job.ChunkInterval = string.Format("{0}-{1}", c.StartTime, c.EndTime);
+                job.ChunkInterval = $"{c.StartTime}-{c.EndTime}";
                 return job;
             }).ToList();
 

@@ -22,13 +22,7 @@ namespace DataObjects
 
         public override string ToString()
         {
-            string output = "";
-
-            output += "Start time: " + StartTime;
-            output += ",End time: " + EndTime;
-            output += ",Duration: " + Duration.ToString();
-
-            return output;
+            return $"Start time: {StartTime}, End time: {EndTime}, Duration: {Duration.ToString()}";
         }
 
         public static Scene Combine(Scene firstScene, Scene secondScene)

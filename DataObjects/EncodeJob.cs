@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using Newtonsoft.Json;
 using System;
 using MongoDB.Bson.Serialization.Attributes;
@@ -212,60 +212,45 @@ namespace DataObjects
         public override string ToString()
         {
             StringBuilder output = new StringBuilder();
-            output.Append("GUID: ");
-            output.Append(Id.ToString());
+            output.Append($"GUID: {Id.ToString()}");
             output.AppendLine();
 
             if (ChunkNumber != 0)
             {
-                output.Append("Chunk number: ");
-                output.Append(ChunkNumber);
+                output.Append($"Chunk number: {ChunkNumber}");
                 output.AppendLine();
             }
 
             if (!string.IsNullOrWhiteSpace(ChunkInterval))
             {
-                output.Append("Input interval: ");
-                output.Append(ChunkInterval);
+                output.Append($"Input interval: {ChunkInterval}");
                 output.AppendLine();
             }
 
-            output.Append("Video file name: ");
-            output.Append(VideoFileName);
+            output.Append($"Video file name: {VideoFileName}");
             output.AppendLine();
 
-            output.Append("Video directory: ");
-            output.Append(VideoDirectoryPath);
+            output.Append($"Video directory: {VideoDirectoryPath}");
             output.AppendLine();
 
-            output.Append("Config path: ");
-            output.Append(ConfigFilePath);
+            output.Append($"Additional arguments: {AdditionalCommandArguments}");
             output.AppendLine();
 
-            output.Append("Additional arguments: ");
-            output.Append(AdditionalCommandArguments);
+            output.Append($"Priority: {Priority}");
             output.AppendLine();
 
-            output.Append("Priority: ");
-            output.Append(Priority);
+            output.Append($"Max attempts: {MaxAttempts}");
             output.AppendLine();
 
-            output.Append("Max attempts: ");
-            output.Append(MaxAttempts);
+            output.Append($"Min psnr: {MinPsnr}");
             output.AppendLine();
 
-            output.Append("Min psnr: ");
-            output.Append(MinPsnr);
-            output.AppendLine();
-
-            output.Append("Min vmaf: ");
-            output.Append(MinVmaf);
+            output.Append($"Min vmaf: {MinVmaf}");
             output.AppendLine();
 
             for (int i = 0; i < Attempts.Count; i++)
             {
-                output.Append("Attempt #" + (i + 1) + ": ");
-                output.Append(Attempts[i].ToString());
+                output.Append($"Attempt #{(i + 1)}: {Attempts[i].ToString()}");
                 output.AppendLine();
             }
 

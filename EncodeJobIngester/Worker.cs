@@ -45,19 +45,19 @@ namespace EncodeJobIngester
             while (!stoppingToken.IsCancellationRequested)
             {
                 string activeBucket = AppConfigManager.Instance.InputBucketPath;
-                _logger.LogInformation("Searching " + activeBucket + " for video files with matching job files..");
+                _logger.LogInformation($"Searching {activeBucket} for video files with matching job files..");
 
                 Dictionary<string, EncodeJob> jobFilesWithJobs = new Dictionary<string, EncodeJob>();
                 try { jobFilesWithJobs = SearchFilesForValidEncodeJobs(_logger, Directory.GetFiles(activeBucket)); }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex
-                        , "Uncaught exception while searching " + activeBucket + " for jobs");
+                        , $"Uncaught exception while searching {activeBucket} for jobs");
                 }
 
                 if (jobFilesWithJobs.Count > 0)
                 {
-                    _logger.LogInformation("Found " + jobFilesWithJobs.Count + " jobs. Iterating now");
+                    _logger.LogInformation($"Found {jobFilesWithJobs.Count} jobs. Iterating now");
                 }
 
                 //First operate on jobs that don't involve split input and master videos
@@ -156,7 +156,7 @@ namespace EncodeJobIngester
         {
             if (0 == files.Length) { return new Dictionary<string, EncodeJob>(); }
 
-            logger.LogInformation("Found " + files.Length + " files in input bucket.");
+            logger.LogInformation($"Found {files.Length} files in input bucket.");
             Dictionary<string, EncodeJob> output = new Dictionary<string, EncodeJob>(files.Length / 2);
 
             try

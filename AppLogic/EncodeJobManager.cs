@@ -79,8 +79,7 @@ namespace AppLogic
 
         internal static string GenerateJobOutputFilename(EncodeJob job)
         {
-            string result = "";
-            result += Path.GetFileNameWithoutExtension(job.VideoFileName);
+            string result = Path.GetFileNameWithoutExtension(job.VideoFileName);
             result += (job.IsChunk) ? ".chunk" + job.ChunkNumber : string.Empty;
             result += ".attempt" + (job.Attempts.Count + 1);
             result += ".mkv";
