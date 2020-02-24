@@ -17,6 +17,7 @@ namespace MasterApp
             Quit,
             InputSplitter,
             OutputCombiner,
+            JobModifier,
             SuiteDeployer
         }
 
@@ -44,7 +45,10 @@ namespace MasterApp
                         OutputCombiner.Run();
                         break;
                     case 3:
-
+                        JobModifier.Run();
+                        break;
+                    case 4:
+                        System.Console.WriteLine("Not implemented");
                         break;
                     case 0:
                     default:

@@ -98,7 +98,7 @@ namespace Tests.AppLogic
                 VideoFileName = "testing.mkv"
             };
             var newer = job.Clone() as EncodeJob;
-            newer.VideoDirectoryPath = "/somewhere/else/";
+            newer!.VideoDirectoryPath = "/somewhere/else/";
 
             var result = EncodeJobManager.Instance.UpdateJob(job, newer);
 

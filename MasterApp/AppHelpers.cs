@@ -4,7 +4,7 @@ using AppLogic;
 
 namespace MasterApp
 {
-    public static class AppHelpers
+    public class AppHelpers
     {
         /// <summary>
         /// Outputs a message and gets a valid file from the user
@@ -50,7 +50,7 @@ namespace MasterApp
             }
         }
 
-        public static void GetConfig()
+        public static void GetIngesterConfigInput()
         {
             while (true)
             {
@@ -58,12 +58,45 @@ namespace MasterApp
                 if (input == null) { continue; }
                 try
                 {
-                    AppConfigManager.SetConfig(input);
-                    var testing = AppConfigManager.Instance.InputBucketPath;
-                    var testingAgain = AppConfigManager.Instance.DBTypeAndString;
+                    System.Console.WriteLine("Not working");
                     break;
                 }
                 catch { }
+            }
+        }
+
+        public static void GetOverseerConfigInput()
+        {
+            while (true)
+            {
+                var input = AppHelpers.GetFileInput("Input a config file path: ");
+                if (input == null) { continue; }
+                try
+                {
+                    System.Console.WriteLine("Not working");
+                    break;
+                }
+                catch { }
+            }
+        }
+
+        public static Guid GetGuidInput()
+        {
+            while (true)
+            {
+                System.Console.WriteLine("Please enter a valid GUID, or q/quit to exit.");
+                var input = Console.ReadLine().Trim();
+                if (input.ToLower() == "q" || input.ToLower() == "quit")
+                { return Guid.Empty; }
+                else
+                {
+                    try
+                    {
+                        var id = new Guid(g: input);
+                        return id;
+                    }
+                    catch { }
+                }
             }
         }
     }

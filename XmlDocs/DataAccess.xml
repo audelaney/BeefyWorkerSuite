@@ -320,18 +320,6 @@
         <member name="M:DataAccess.Exceptions.JobAlreadyExistsException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
             <summary></summary>
         </member>
-        <member name="T:DataAccess.SceneAccessor">
-            <summary>
-            Accessor class for scene related operations
-            </summary>
-        </member>
-        <member name="M:DataAccess.SceneAccessor.AnalyzeVideoInput(System.String)">
-            <summary>
-            Verifies input exists, runs input through ffmpeg scene change
-            detection, uses resulting timestamp set to analyze scenes and returns the 
-            collection of those scenes.
-            </summary>
-        </member>
         <member name="T:DataAccess.SvtEncAppAccessor">
             <summary>
             For use in parsing files output by the SVT-AV1 sample application.
@@ -388,22 +376,62 @@
         <member name="M:DataAccess.TestSuite.MockSvtTestDao.AddSuccessfulTests(System.Collections.Generic.IEnumerable{DataObjects.TestSuite.SvtTestSuccess})">
             <summary></summary>
         </member>
-        <member name="T:DataAccess.VideoAccessor">
+        <member name="T:DataAccess.IVideoAccessor">
+            <summary>
+            Generic video related data operations interface
+            </summary>
+        </member>
+        <member name="M:DataAccess.IVideoAccessor.AnalyzeVideoInput(System.String)">
+            <summary>
+            Verifies input exists, runs input through ffmpeg scene change
+            detection, uses resulting timestamp set to analyze scenes and returns the 
+            collection of all scenes.
+            </summary>
+            <exception cref="T:System.IO.FileNotFoundException">
+            Thrown if:
+                - The video input does not exist
+            </exception>
+        </member>
+        <member name="T:DataAccess.MockVideoAccessor">
+            <summary></summary>
+        </member>
+        <member name="P:DataAccess.MockVideoAccessor.TestScenes">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.MockVideoAccessor.AnalyzeVideoInput(System.String)">
+            <summary></summary>
+        </member>
+        <member name="T:DataAccess.RealVideoAccessor">
             <summary>
             Static accessor for generic video functions
             </summary>
         </member>
-        <member name="M:DataAccess.VideoAccessor.ConcatVideosIntoOneOutput(System.Collections.Generic.List{System.String},System.String)">
+        <member name="M:DataAccess.RealVideoAccessor.AnalyzeVideoInput(System.String)">
+            <summary>
+            Verifies input exists, runs input through ffmpeg scene change
+            detection, uses resulting timestamp set to analyze scenes and returns the 
+            collection of all scenes.
+            </summary>
+            <exception cref="T:System.IO.FileNotFoundException">
+            Thrown if:
+                - The video input does not exist
+            </exception>
+        </member>
+        <member name="M:DataAccess.RealVideoAccessor.ConcatVideosIntoOneOutput(System.Collections.Generic.List{System.String},System.String)">
             <summary>
             Combines multiple videos into a single video in order
             </summary>
         </member>
-        <member name="T:DataAccess.Vmaf.VmafAccessor">
+        <member name="M:DataAccess.RealVideoAccessor.GetVideoDurationFfprobe(System.String)">
             <summary>
-            Class for pulling VMAF from videos
+            Uses ffprobe to get the duration for a specified video
             </summary>
+            <exception cref="T:System.IO.FileNotFoundException">
+            Thrown if:
+                - videoPath doesn't exist.
+            </exception>
         </member>
-        <member name="M:DataAccess.Vmaf.VmafAccessor.GetVmaf(System.String,System.String)">
+        <member name="M:DataAccess.RealVideoAccessor.GetVmaf(System.String,System.String)">
             <summary>
             Gets vmaf using ffmpeg from a source and path
             </summary>
@@ -412,7 +440,7 @@
                 - Either path does not exist
             </exception>
         </member>
-        <member name="M:DataAccess.Vmaf.VmafAccessor.GetVmafScene(System.String,System.String,System.Double,System.Double)">
+        <member name="M:DataAccess.RealVideoAccessor.GetVmafScene(System.String,System.String,System.Double,System.Double)">
             <summary>
             Gets vmaf using ffmpeg piping to ffmpeg from a source and path
             </summary>

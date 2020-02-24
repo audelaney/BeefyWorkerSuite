@@ -78,6 +78,9 @@ namespace DataAccess
                                                 .Select(ts => (double.TryParse(ts, out double res))
                                                         ? res : throw new InvalidCastException($"Bad ts: {ts}"))
                                                 .ToList();
+
+            // Add the final duration as the end point of the video, otherwise the last scene ends on the last scene
+            // change and not at the end of the video
             timeStamps.Add(GetVideoDurationFfprobe(videoInputPath));
 
             List<Scene> scenes = new List<Scene>();

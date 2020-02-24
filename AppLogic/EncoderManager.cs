@@ -62,9 +62,6 @@ namespace AppLogic
                     if (!Directory.Exists(outDir) && Directory.GetFiles(outDir).Count() == 1)
                     { return Directory.GetFiles(outDir).First(); }
                     else
-                        { throw new InvalidOperationException($"{j.ToString()} has too many completed jobs"); }
-                    }
-                    else
                     {
                         throw new DirectoryNotFoundException(
                             "Couldn't find job directory in completed bucket for job. CompletedBucket: "
@@ -75,7 +72,7 @@ namespace AppLogic
 
             //Concat the video files
             RealVideoAccessor.ConcatVideosIntoOneOutput(sortedJobOutputFiles.ToList()
-                                                    ,Path.Combine(/* completed bucket path */));
+                                    ,Path.Combine(AppConfigManager.Instance.CompletedBucketPath));
         }
 
         private static double? GetJobSceneStartTime(EncodeJob job)
