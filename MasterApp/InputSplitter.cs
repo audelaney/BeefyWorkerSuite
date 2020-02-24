@@ -28,8 +28,7 @@ namespace MasterApp
 
             System.Console.WriteLine("Using ffmepg to search for ideal points of scene change...");
             //Analyze the video and find scene changes
-            var scenes = SceneManager.AnalyzeVideoInput(videoInputPath);
-            System.Console.WriteLine(string.Format("Ended operation with {0} chunks. Transofrming into jobs...", scenes.Count()));
+            var scenes = VideoManager.GetScenesFromVideo(videoInputPath); 
 
             List<EncodeJob> jobs = new List<EncodeJob>();
 

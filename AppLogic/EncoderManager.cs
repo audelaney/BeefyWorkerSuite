@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System;
 using DataObjects;
 using System.IO;
-using DataAccess.Vmaf;
 
 namespace AppLogic
 {
@@ -52,8 +51,7 @@ namespace AppLogic
                 });
 
             //Concat the video files
-            VideoAccessor.ConcatVideosIntoOneOutput(sortedJobOutputFiles.ToList()
-                                                    , Path.Combine(AppConfigManager.Instance.CompletedBucketPath));
+            RealVideoAccessor.ConcatVideosIntoOneOutput(sortedJobOutputFiles.ToList()
         }
 
         private static double? GetJobSceneStartTime(EncodeJob job)
@@ -104,11 +102,11 @@ namespace AppLogic
                         StartTime = startTime,
                         EndTime = DateTime.Now,
                         VmafResult = (job.IsChunk) ?
-                            VmafAccessor.GetVmafScene(Path.Combine(job.VideoDirectoryPath, job.VideoFileName),
+                            RealVideoAccessor.GetVmafScene(Path.Combine(job.VideoDirectoryPath, job.VideoFileName),
                                                         outputPath,
                                                         double.Parse(job.ChunkInterval!.Split('-').First()),
                                                         double.Parse(job.ChunkInterval!.Split('-').Last())) :
-                            VmafAccessor.GetVmaf(Path.Combine(job.VideoDirectoryPath, job.VideoFileName), outputPath),
+                            RealVideoAccessor.GetVmaf(Path.Combine(job.VideoDirectoryPath, job.VideoFileName), outputPath),
                         FileSize = (ulong)new FileInfo(outputPath).Length
                     };
                     job.Attempts.Add(attempt);

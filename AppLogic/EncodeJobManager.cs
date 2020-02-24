@@ -3,7 +3,6 @@ using DataObjects;
 using System;
 using DataAccess;
 using System.IO;
-using DataAccess.Vmaf;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;

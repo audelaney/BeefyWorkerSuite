@@ -19,6 +19,5 @@
   <ItemGroup>
     <ProjectReference Include="..\DataObjects\DataObjects.csproj" />
     <ProjectReference Include="..\AppLogic\AppLogic.csproj" />
-    <ProjectReference Include="..\EncodeJobExecuter\EncodeJobExecuter.csproj" />
   </ItemGroup>
 </Project>
