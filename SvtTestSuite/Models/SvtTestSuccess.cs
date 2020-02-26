@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 
-namespace DataObjects.TestSuite
+namespace SvtTestSuite.Models
 {
     public class SvtTestSuccess : ISvtTest
     {
@@ -21,7 +21,7 @@ namespace DataObjects.TestSuite
         public string? ConfigFilePath { get; set; }
         public string? AdditionalCommands { get; set; }
         public string? Remarks { get; set; }
-        public string? OutputPath { get; set; }
+        public string? OutputPath { get; set; } = "";
         public double VMAF { get; set; }
 #nullable disable //This prop absolutely ruins intellisense when Nullable enabled...
         public EncodedPictureStat[] FrameLogs { get; set; }

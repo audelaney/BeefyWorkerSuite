@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DataObjects.TestSuite
+namespace SvtTestSuite.Models
 {
     public interface ISvtTest
     {
