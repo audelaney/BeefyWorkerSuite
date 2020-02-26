@@ -9,7 +9,7 @@ namespace DataObjects
         /// </summary>
         accuracy,
         /// <summary>
-        /// Favor a more complex/difficult starting point and smalller increments of change
+        /// Favor a more complex/difficult starting point and smaller increments of change
         /// </summary>
         precision
     }

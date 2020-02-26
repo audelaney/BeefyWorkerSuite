@@ -1,10 +1,10 @@
 ﻿#nullable enable
-using DataObjects.TestSuite;
+using SvtTestSuite.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DataAccess.TestSuite
+namespace SvtTestSuite.Infrastructure
 {
     /// <summary>Data store operations for <see cref="DataObjects.TestSuite.SvtTestSuccess" /></summary>
     public interface ISvtTestDao

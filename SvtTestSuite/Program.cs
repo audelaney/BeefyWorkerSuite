@@ -1,11 +1,9 @@
-﻿#nullable enable
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using DataObjects.TestSuite;
-using DataAccess;
-using DataAccess.TestSuite;
+using SvtTestSuite.Models;
+using SvtTestSuite.Infrastructure;
 
 namespace SvtTestSuite
 {

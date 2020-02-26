@@ -1,6 +1,7 @@
+#nullable enable
 using System;
 
-namespace DataObjects.TestSuite
+namespace SvtTestSuite.Models
 {
     public class SvtParam
 	{
