@@ -28,7 +28,7 @@ namespace MasterApp
 
             // Shoot them to the encode manager
             if (jobs.Count() > 0)
-            { EncoderManager.Combine(jobs.ToArray(), outputFileName); }
+            { EncoderManager.Instance.Combine(jobs.ToArray(), outputFileName); }
         }
     }
 }

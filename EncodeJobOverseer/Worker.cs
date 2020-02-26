@@ -188,7 +188,7 @@ namespace EncodeJobOverseer
 
             //Do the encode
             string encoderConfig = "hevcffmpeg";
-            EncoderManager.StartJob(activeJob, encoderConfig);
+            EncoderManager.Instance.StartJob(activeJob, encoderConfig);
 
             // Update job doesn't update the completed status or checked out time.
             EncodeJobManager.Instance.UpdateJob(oldJob, activeJob);

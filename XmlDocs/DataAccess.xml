@@ -320,6 +320,78 @@
         <member name="M:DataAccess.Exceptions.JobAlreadyExistsException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
             <summary></summary>
         </member>
+        <member name="T:DataAccess.IFileAccessor">
+            <summary>
+            Interface specifying basic, non-logical file based behavior/functionality
+            </summary>
+        </member>
+        <member name="M:DataAccess.IFileAccessor.DoesFileExist(System.String)">
+            <summary>
+            If the file path leads to an existing file.
+            </summary>
+        </member>
+        <member name="M:DataAccess.IFileAccessor.MoveFile(System.String,System.String)">
+            <summary>
+            Moves a file
+            </summary>
+            <exception cref="T:System.IO.FileNotFoundException">
+            Thrown if:
+                - The old path to the file is invalid or the file is not found
+            </exception>
+            <exception cref="T:DataAccess.Exceptions.FileAlreadyExistsException">
+            Thrown if:
+                - The path that the file is going to be move to is already occupied
+            </exception>
+        </member>
+        <member name="M:DataAccess.IFileAccessor.DeleteFile(System.String)">
+            <summary>
+            Deletes a file
+            </summary>
+        </member>
+        <member name="M:DataAccess.IFileAccessor.DoesFolderExist(System.String)">
+            <summary>
+            If the folder path leads to an existing folder.
+            </summary>
+        </member>
+        <member name="M:DataAccess.IFileAccessor.GetFilesInFolder(System.String)">
+            <summary>
+            Returns the full paths of all files in a folder
+            </summary>
+            <exception cref="T:System.IO.DirectoryNotFoundException">
+            Thrown if:
+                - The path to the folder is invalid or the folder is not found
+            </exception>
+        </member>
+        <member name="M:DataAccess.IFileAccessor.GetFileSize(System.String)">
+            <summary>
+            Returns the size in bytes of the specified file
+            </summary>
+            <exception cref="T:System.IO.FileNotFoundException">
+            Thrown if:
+                - The path to the file is invalid or the file is not found
+            </exception>
+        </member>
+        <member name="T:DataAccess.RealFileAccessor">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.RealFileAccessor.DeleteFile(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.RealFileAccessor.DoesFileExist(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.RealFileAccessor.DoesFolderExist(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.RealFileAccessor.GetFilesInFolder(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.RealFileAccessor.GetFileSize(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.RealFileAccessor.MoveFile(System.String,System.String)">
+            <summary></summary>
+        </member>
         <member name="T:DataAccess.SvtEncAppAccessor">
             <summary>
             For use in parsing files output by the SVT-AV1 sample application.

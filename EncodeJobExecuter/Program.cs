@@ -26,7 +26,8 @@ namespace EncodeJobExecuter
 			catch
 			{ }
 
-			Guid jobId = EncodeJobManager.GetGuidFromWorkingDirectory(targetDir);
+			var dirName = new DirectoryInfo(targetDir).Name;
+			Guid jobId = Guid.Parse(dirName);
 
 			EncodeJob activeJob = dataStoreType switch
 			{
@@ -39,7 +40,7 @@ namespace EncodeJobExecuter
 			{ PrintInvalidJob(activeJob); return; }
 
 			throw new NotImplementedException("STOP RIGHT THERE CRIMINAL SCUM");
-			EncoderManager.StartJob(activeJob, "vp9test");
+			EncoderManager.Instance.StartJob(activeJob, "vp9test");
 		}
 
 		public static EncodeJob BuildFakeJob(string vidDir)

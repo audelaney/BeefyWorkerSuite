@@ -95,13 +95,6 @@
             </summary>
             <todo>This isn't even close to being done</todo>
         </member>
-        <member name="M:AppLogic.EncodeJobManager.GetGuidFromWorkingDirectory(System.String)">
-            <summary>
-            Gets the guid from a designated working directory, passing back an empty if the directory 
-            is found/exists but does not translate to a guid.
-            </summary>
-            <todo>Move to accessor of some kind</todo>
-        </member>
         <member name="M:AppLogic.EncodeJobManager.SetLogger(Microsoft.Extensions.Logging.ILogger)">
             <summary>
             Passes a logger into the manager for logging purposes
@@ -252,6 +245,46 @@
             </summary>
             <returns>Collection of jobs, or an empty collection if there are none</returns>
         </member>
+        <member name="M:AppLogic.RealEncodeJobManager.PrintDB">
+            Helper for using the logger
+        </member>
+        <member name="T:AppLogic.EncoderManager">
+            <summary>
+            Encoding related logic operations
+            </summary>
+        </member>
+        <member name="P:AppLogic.EncoderManager.Instance">
+            <summary>
+            Instance used for actual logical operations of the publicly available methods
+            </summary>
+        </member>
+        <member name="M:AppLogic.EncoderManager.Combine(DataObjects.EncodeJob[],System.String)">
+            <summary>
+            Combines the resulting output from a successful round of transcodes
+            </summary>
+            <exception cref="T:System.ArgumentException">
+            Thrown if:
+                - Any of the jobs are not marked as completed
+                - Jobs don't have an InputInterval
+                - Jobs that have a video source that doesn't match the first video
+            </exception>
+            <exception cref="T:System.IO.DirectoryNotFoundException">
+            Thrown if:
+                - A job is found which is marked as completed but does not have a directory in the
+                completed bucket.
+            </exception>
+        </member>
+        <member name="M:AppLogic.EncoderManager.StartJob(DataObjects.EncodeJob,System.String)">
+            <summary>
+            Opens an encoder and starts encoding a specified job
+            </summary>
+        </member>
+        <member name="M:AppLogic.RealEncoderManager.RunAgain(DataObjects.EncodeJob,System.String)">
+            <todo>Move this</todo>
+        </member>
+        <member name="M:AppLogic.RealEncoderManager.GetJobSceneStartTime(DataObjects.EncodeJob)">
+            <todo>This should be in the EncodeJob class</todo>
+        </member>
         <member name="T:AppLogic.Encoders.EncoderHevcFfmpeg">
             <summary>
             Single pass ffmpeg based libaom encoder implementation
@@ -278,40 +311,6 @@
             Encodes the specified job, returning the new filename of the encode if successful,
             or null if unsuccessful.
             </summary>
-        </member>
-        <member name="T:AppLogic.EncoderManager">
-            <summary>
-            Encoding related logic operations
-            </summary>
-        </member>
-        <member name="P:AppLogic.EncoderManager.Instance">
-            <summary>
-            Instance used for actual logical operations of the publicly available methods
-            </summary>
-        </member>
-        <member name="M:AppLogic.EncoderManager.Combine(DataObjects.EncodeJob[],System.String)">
-            <summary>
-            Combines the resulting output from 
-            </summary>
-            <exception cref="T:System.ArgumentException">
-            Thrown if:
-                - Any of the jobs are not marked as completed
-                - Jobs don't have an InputInterval
-                - Jobs that have a video source that doesn't match the first video
-            </exception>
-            <exception cref="T:System.IO.DirectoryNotFoundException">
-            Thrown if:
-                - A job is found which is marked as completed but does not have a directory in the
-                completed bucket.
-            </exception>
-        </member>
-        <member name="M:AppLogic.EncoderManager.StartJob(DataObjects.EncodeJob,System.String)">
-            <summary>
-            Opens an encoder and starts encoding a specified job
-            </summary>
-        </member>
-        <member name="M:AppLogic.RealEncodeJobManager.PrintDB">
-            Helper for using the logger
         </member>
         <member name="T:AppLogic.VideoManager">
             <summary>

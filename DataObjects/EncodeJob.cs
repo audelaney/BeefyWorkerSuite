@@ -5,6 +5,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using System.Text;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 
 namespace DataObjects
 {
@@ -314,6 +315,14 @@ namespace DataObjects
             { return JsonConvert.SerializeObject(job, Formatting.Indented); }
             catch (System.Exception)
             { return null; }
+        }
+        public static string GenerateJobOutputFilename(EncodeJob job)
+        {
+            string result = Path.GetFileNameWithoutExtension(job.VideoFileName);
+            result += (job.IsChunk) ? ".chunk" + job.ChunkNumber : string.Empty;
+            result += ".attempt" + (job.Attempts.Count + 1);
+            result += ".mkv";
+            return result;
         }
         #endregion
     }
