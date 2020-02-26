@@ -61,7 +61,7 @@ namespace EncodeJobIngester
                 }
 
                 //First operate on jobs that don't involve split input and master videos
-                foreach (KeyValuePair<string, EncodeJob> fileNameAndJob in jobFilesWithJobs.Where(kp => kp.Value.ChunkInterval == null))
+                foreach (KeyValuePair<string, EncodeJob> fileNameAndJob in jobFilesWithJobs.Where(kp => !kp.Value.IsChunk))
                 {
                     try
                     {
