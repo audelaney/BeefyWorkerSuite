@@ -20,18 +20,18 @@ namespace AppLogic
         
         private readonly IFileAccessor _fileAccessor;
 
-        public override void Combine(EncodeJob[] jobs, string outputFileName)
+        public override void CombineSuccessfulEncodes(EncodeJob[] jobs, string outputFileName)
         {
             if (jobs.Where(j => !j.Completed).Count() != 0)
             { throw new ArgumentException("Some jobs not completed."); }
-            if (jobs.Where(j => null == GetJobSceneStartTime(j)).Count() != 0)
-            { throw new ArgumentException("Some jobs have invalid or no InputInterval."); }
+            if (jobs.Where(j => !j.IsChunk).Count() != 0)
+            { throw new ArgumentException("Some jobs have invalid or no chunk/scene."); }
             var unmantchedJobs = jobs.Where(j => j.VideoFileName != jobs.First().VideoFileName).Count();
             if (unmantchedJobs != 0)
             { throw new ArgumentException(unmantchedJobs + " jobs don't match videos"); }
 
             //Sort the jobs and verify their expected output video actually exist
-            var sortedJobs = jobs.OrderBy(j => GetJobSceneStartTime(j));
+            var sortedJobs = jobs.OrderBy(j => j.Chunk?.StartTime);
             var sortedJobOutputFiles = sortedJobs.Select(j =>
                 {
                     // The output file should be the only file in the job directory in the completed bucket
@@ -50,9 +50,12 @@ namespace AppLogic
 
             //Concat the video files
             RealVideoAccessor.ConcatVideosIntoOneOutput(sortedJobOutputFiles.ToList()
-                                    , Path.Combine(AppConfigManager.Instance.CompletedBucketPath));
+                                    ,Path.Combine(AppConfigManager.Instance.CompletedBucketPath));
         }
 
+        /// <summary>
+        /// Opens an encoder and starts encoding a specified job
+        /// </summary>
         public override void StartJob(EncodeJob job, string encoderType)
         {
             //make the encoder
@@ -87,8 +90,8 @@ namespace AppLogic
                         VmafResult = (job.IsChunk) ?
                             RealVideoAccessor.GetVmafScene(Path.Combine(job.VideoDirectoryPath, job.VideoFileName),
                                                         outputPath,
-                                                        double.Parse(job.ChunkInterval!.Split('-').First()),
-                                                        double.Parse(job.ChunkInterval!.Split('-').Last())) :
+                                                        job.Chunk!.StartTime,
+                                                        job.Chunk!.EndTime ) :
                             RealVideoAccessor.GetVmaf(Path.Combine(job.VideoDirectoryPath, job.VideoFileName), outputPath),
                         FileSize = _fileAccessor.GetFileSize(outputPath)
                     };

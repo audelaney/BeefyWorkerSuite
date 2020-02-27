@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using DataObjects.TestSuite;
+using SvtTestSuite.Models;
 
 namespace SvtTestSuite
 {

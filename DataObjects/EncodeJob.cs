@@ -18,13 +18,13 @@ namespace DataObjects
         /// <summary>
         /// The chunk number of the video that it is being sliced from. Default 0 for no chunk.
         /// </summary>
-        public int ChunkNumber { get; set; }
+        public uint ChunkNumber { get; set; }
         /// <summary>
         /// A very lazy way of designating a timespan from a video input that is being used for
         /// multiple encode jobs...
         /// </summary>
         /// <example>23.4-57.9001</example>
-        public string? ChunkInterval { get; set; }
+        public Scene? Chunk { get; set; }
         /// <summary>
         /// The no path, file name with extension of the associated video.
         /// </summary>
@@ -82,7 +82,13 @@ namespace DataObjects
         public bool IsChunk
         {
             get
-            { return ChunkNumber != 0 && ChunkInterval != null; }
+            { 
+                if (Chunk == null)
+                    return false;
+                if (ChunkNumber == 0)
+                    return false;
+                return true;
+            }
         }
         /// <summary>
         /// If this particular object is considered a "valid" object. Currently
@@ -95,7 +101,7 @@ namespace DataObjects
         {
             get
             {
-                if (0 > Priority || 5 < Priority || 0 > ChunkNumber ||
+                if (0 > Priority || 5 < Priority || 
                     0 > MaxAttempts || 0 > MinPsnr || 0 > MinVmaf ||
                     (Attempts.Where(a => !a.IsValid).Count() != 0))
                 { return false; }
@@ -125,7 +131,7 @@ namespace DataObjects
             IngestDateTime = DateTime.Now;
             Completed = false;
             CheckedOutTime = null;
-            ChunkInterval = null;
+            Chunk = null;
             ChunkNumber = 0;
             Attempts = new List<EncodeAttempt>();
         }
@@ -142,7 +148,7 @@ namespace DataObjects
 
             return (otherJob.AdditionalCommandArguments == AdditionalCommandArguments &&
                 otherJob.AdjustmentFactor == AdjustmentFactor &&
-                otherJob.ChunkInterval == ChunkInterval &&
+                otherJob.Chunk == Chunk &&
                 otherJob.MaxAttempts == MaxAttempts &&
                 otherJob.MinPsnr == MinPsnr &&
                 otherJob.MinVmaf == MinVmaf &&
@@ -165,7 +171,7 @@ namespace DataObjects
                 VideoDirectoryPath = (string)this.VideoDirectoryPath.Clone(),
                 MinPsnr = this.MinPsnr,
                 MinVmaf = this.MinVmaf,
-                ChunkInterval = (string?)this.ChunkInterval?.Clone(),
+                Chunk = this.Chunk?.Clone() as Scene,
                 MaxAttempts = this.MaxAttempts,
                 Priority = this.Priority,
                 Completed = this.Completed,
@@ -179,7 +185,7 @@ namespace DataObjects
         {
             HashCode hash = new HashCode();
             hash.Add(Id);
-            hash.Add(ChunkInterval);
+            hash.Add(Chunk);
             hash.Add(VideoFileName);
             hash.Add(VideoDirectoryPath);
             hash.Add(AdditionalCommandArguments);
@@ -207,9 +213,11 @@ namespace DataObjects
                 output.AppendLine();
             }
 
-            if (!string.IsNullOrWhiteSpace(ChunkInterval))
+            if (Chunk != null)
             {
-                output.Append($"Input interval: {ChunkInterval}");
+                output.Append("-- Chunk Data --");
+                output.AppendLine();
+                output.Append(Chunk.ToString());
                 output.AppendLine();
             }
 

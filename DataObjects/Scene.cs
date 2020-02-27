@@ -5,8 +5,15 @@ using System.Linq;
 
 namespace DataObjects
 {
-    public class Scene
+    public class Scene : ICloneable
     {
+        public Scene(double startTime, double endTime) =>
+        (this.StartTime, this.EndTime) = (startTime, endTime);
+
+        public Scene()
+        {
+        }
+
         public double StartTime { get; set; }
         public double EndTime { get; set; }
         public TimeSpan Duration
@@ -23,14 +30,16 @@ namespace DataObjects
         {
             return $"Start time: {StartTime}, End time: {EndTime}, Duration: {Duration.ToString()}";
         }
+        
+        public object Clone()
+        {
+            return new Scene(this.StartTime, this.EndTime);
+        }
 
+        #region Static
         public static Scene Combine(Scene firstScene, Scene secondScene)
         {
-            var output = new Scene
-            {
-                StartTime = firstScene.StartTime,
-                EndTime = secondScene.EndTime,
-            };
+            var output = new Scene(firstScene.StartTime,secondScene.EndTime);
 
             return output;
         }
@@ -59,5 +68,6 @@ namespace DataObjects
             { scenes.Add(new Scene { StartTime = pts.ElementAt(i - 1), EndTime = pts.ElementAt(i) }); }
             return scenes;
         }
+        #endregion
     }
 }

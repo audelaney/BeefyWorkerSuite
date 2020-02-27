@@ -49,7 +49,7 @@ namespace MasterApp
             {
                 try
                 {
-                    jobs[i].ChunkNumber = i + 1;
+                    jobs[i].ChunkNumber = (uint) i + 1;
                     using (StreamWriter sw = new StreamWriter(Path.Combine(videoOutputDirectory, videoName + ".chunk" + (i + 1) + ".json")))
                     {
                         sw.Write(EncodeJob.ToJson(jobs[i]));
@@ -191,7 +191,7 @@ namespace MasterApp
             var output = chunks.Select(c =>
             {
                 var job = (EncodeJob)masterJob.Clone();
-                job.ChunkInterval = $"{c.StartTime}-{c.EndTime}";
+                job.Chunk = new Scene(c.StartTime, c.EndTime);
                 return job;
             }).ToList();
 

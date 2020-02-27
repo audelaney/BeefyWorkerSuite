@@ -314,7 +314,7 @@ namespace DataAccess
                                     Builders<EncodeJob>.Filter.Eq("VideoFilePath", job.VideoDirectoryPath) &
                                     Builders<EncodeJob>.Filter.Eq("AdditionalCommandArguments", job.AdditionalCommandArguments) &
                                     Builders<EncodeJob>.Filter.Eq("ChunkNumber", job.ChunkNumber) &
-                                    Builders<EncodeJob>.Filter.Eq("ChunkInterval", job.ChunkInterval) &
+                                    Builders<EncodeJob>.Filter.Eq("Chunk", job.Chunk) &
                                     Builders<EncodeJob>.Filter.Eq("Priority", job.Priority));
         }
     }

@@ -2,9 +2,9 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using DataObjects.TestSuite;
+using SvtTestSuite.Models;
 
-namespace DataAccess.TestSuite
+namespace SvtTestSuite.Infrastructure
 {
 	/// <summary>
 	/// Mock class, dummy returns

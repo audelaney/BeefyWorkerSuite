@@ -29,16 +29,9 @@ namespace AppLogic.Encoders
                 string processArguments = "";
                 if (encodeJob.IsChunk)
                 {
-                    string[] times = encodeJob.ChunkInterval!.Split('-');
-                    if (double.TryParse(times[0], out double start) &&
-                        double.TryParse(times[1], out double end))
-                    {
-                        processArguments += "-ss " + times[0];
-                        processArguments += " -to " + end;
-                        processArguments += " -i " + input;
-                    }
-                    else
-                    { throw new ApplicationException(); }
+                    processArguments += "-ss " + encodeJob.Chunk!.StartTime;
+                    processArguments += " -to " + encodeJob.Chunk!.EndTime;
+                    processArguments += " -i " + input;
                 }
                 else
                 { processArguments += "-i " + input; }

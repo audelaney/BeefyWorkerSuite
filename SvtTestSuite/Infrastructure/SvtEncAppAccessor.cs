@@ -4,10 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using DataObjects;
-using DataObjects.TestSuite;
+using SvtTestSuite.Models;
 
-namespace DataAccess
+namespace SvtTestSuite.Infrastructure
 {
     /// <summary>
     /// For use in parsing files output by the SVT-AV1 sample application.

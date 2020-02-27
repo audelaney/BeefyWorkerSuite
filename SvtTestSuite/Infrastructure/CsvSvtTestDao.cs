@@ -2,12 +2,12 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using DataObjects.TestSuite;
+using SvtTestSuite.Models;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Text;
 
-namespace DataAccess.TestSuite
+namespace SvtTestSuite.Infrastructure
 {
     /// <summary>
     /// Mostly for writing test cases to a csv file.
