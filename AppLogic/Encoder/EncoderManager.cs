@@ -34,7 +34,7 @@ namespace AppLogic
         /// <exception cref="System.ArgumentException">
         /// Thrown if:
         ///     - Any of the jobs are not marked as completed
-        ///     - Jobs don't have an InputInterval
+        ///     - Jobs don't have a <see cref="DataObjects.EncodeJob.Chunk" />
         ///     - Jobs that have a video source that doesn't match the first video
         /// </exception>
         /// <exception cref="System.IO.DirectoryNotFoundException">
@@ -42,12 +42,12 @@ namespace AppLogic
         ///     - A job is found which is marked as completed but does not have a directory in the
         ///     completed bucket.
         /// </exception>
-        public abstract void Combine(EncodeJob[] jobs, string outputFileName);
+        public abstract void CombineSuccessfulEncodes(EncodeJob[] jobs, string outputFileName);
 
 
         /// <summary>
         /// Opens an encoder and starts encoding a specified job
         /// </summary>
-        public abstract void StartJob(EncodeJob job, string encoderType);
+        public abstract void AttemptJobEncode(EncodeJob job, string encoderType);
     }
 }

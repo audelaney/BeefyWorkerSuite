@@ -56,7 +56,7 @@ namespace AppLogic
         /// <summary>
         /// Opens an encoder and starts encoding a specified job
         /// </summary>
-        public override void StartJob(EncodeJob job, string encoderType)
+        public override void AttemptJobEncode(EncodeJob job, string encoderType)
         {
             //make the encoder
             IEncoder encoder = encoderType.ToLower() switch
@@ -114,20 +114,6 @@ namespace AppLogic
             { return false; }
 
             return true;
-        }
-        
-        /// <todo>This should be in the EncodeJob class</todo>
-        private double? GetJobSceneStartTime(EncodeJob job)
-        {
-            try
-            {
-                if (double.TryParse(job.ChunkInterval?.Split('-').First() ?? "", out double result))
-                { return result; }
-            }
-            catch
-            { }
-
-            return null;
         }
     }
 }

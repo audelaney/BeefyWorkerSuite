@@ -258,14 +258,14 @@
             Instance used for actual logical operations of the publicly available methods
             </summary>
         </member>
-        <member name="M:AppLogic.EncoderManager.Combine(DataObjects.EncodeJob[],System.String)">
+        <member name="M:AppLogic.EncoderManager.CombineSuccessfulEncodes(DataObjects.EncodeJob[],System.String)">
             <summary>
             Combines the resulting output from a successful round of transcodes
             </summary>
             <exception cref="T:System.ArgumentException">
             Thrown if:
                 - Any of the jobs are not marked as completed
-                - Jobs don't have an InputInterval
+                - Jobs don't have a <see cref="P:DataObjects.EncodeJob.Chunk" />
                 - Jobs that have a video source that doesn't match the first video
             </exception>
             <exception cref="T:System.IO.DirectoryNotFoundException">
@@ -274,16 +274,18 @@
                 completed bucket.
             </exception>
         </member>
-        <member name="M:AppLogic.EncoderManager.StartJob(DataObjects.EncodeJob,System.String)">
+        <member name="M:AppLogic.EncoderManager.AttemptJobEncode(DataObjects.EncodeJob,System.String)">
+            <summary>
+            Opens an encoder and starts encoding a specified job
+            </summary>
+        </member>
+        <member name="M:AppLogic.RealEncoderManager.AttemptJobEncode(DataObjects.EncodeJob,System.String)">
             <summary>
             Opens an encoder and starts encoding a specified job
             </summary>
         </member>
         <member name="M:AppLogic.RealEncoderManager.RunAgain(DataObjects.EncodeJob,System.String)">
             <todo>Move this</todo>
-        </member>
-        <member name="M:AppLogic.RealEncoderManager.GetJobSceneStartTime(DataObjects.EncodeJob)">
-            <todo>This should be in the EncodeJob class</todo>
         </member>
         <member name="T:AppLogic.Encoders.EncoderHevcFfmpeg">
             <summary>
