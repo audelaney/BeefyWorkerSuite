@@ -5,6 +5,8 @@ using DataObjects;
 using System.Linq;
 using DataAccess;
 using System.Collections.Generic;
+using AppConfig.Models;
+using AppConfig;
 
 namespace Tests.AppLogic
 {
@@ -14,13 +16,18 @@ namespace Tests.AppLogic
         [TestInitialize]
         public void TestSetup()
         {
-            AppConfigManager.SetConfig("mock");
+            var mockConfigModel = TestHelper.MakeConfig();
+            mockConfigModel.FileAccessor = FileAccessorType.combineSuccessMock;
+            AppConfigManager.SetConfig(mockConfigModel);
         }
 
         [TestMethod]
         public void CombineJustWorksMan()
         {
-            var jobs = TestHelper.MakeJobs(valid:true);            
+            var jobs = TestHelper.MakeJobs(valid:true).ToList();
+            jobs.ForEach(j => j.Completed = true);
+
+            EncoderManager.Instance.CombineSuccessfulEncodes(jobs.ToArray(), "somefile.mkv");
         }
     }
 }

@@ -320,6 +320,29 @@
         <member name="M:DataAccess.Exceptions.JobAlreadyExistsException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
             <summary></summary>
         </member>
+        <member name="T:DataAccess.GoodFakeFileAccessor">
+            <summary>
+            Basic good returns
+            </summary>
+        </member>
+        <member name="M:DataAccess.GoodFakeFileAccessor.DeleteFile(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.GoodFakeFileAccessor.DoesFileExist(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.GoodFakeFileAccessor.DoesFolderExist(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.GoodFakeFileAccessor.GetFilesInFolder(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.GoodFakeFileAccessor.GetFileSize(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.GoodFakeFileAccessor.MoveFile(System.String,System.String)">
+            <summary></summary>
+        </member>
         <member name="T:DataAccess.IFileAccessor">
             <summary>
             Interface specifying basic, non-logical file based behavior/functionality
@@ -392,6 +415,29 @@
         <member name="M:DataAccess.RealFileAccessor.MoveFile(System.String,System.String)">
             <summary></summary>
         </member>
+        <member name="T:DataAccess.TestingCombineSuccessFakeFileAccessor">
+            <summary>
+            For testing purposes
+            </summary>
+        </member>
+        <member name="M:DataAccess.TestingCombineSuccessFakeFileAccessor.DeleteFile(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.TestingCombineSuccessFakeFileAccessor.DoesFileExist(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.TestingCombineSuccessFakeFileAccessor.DoesFolderExist(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.TestingCombineSuccessFakeFileAccessor.GetFilesInFolder(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.TestingCombineSuccessFakeFileAccessor.GetFileSize(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.TestingCombineSuccessFakeFileAccessor.MoveFile(System.String,System.String)">
+            <summary></summary>
+        </member>
         <member name="T:DataAccess.IVideoAccessor">
             <summary>
             Generic video related data operations interface
@@ -408,6 +454,38 @@
                 - The video input does not exist
             </exception>
         </member>
+        <member name="M:DataAccess.IVideoAccessor.ConcatVideosIntoOneOutput(System.Collections.Generic.List{System.String},System.String)">
+            <summary>
+            Combines multiple videos into a single video in order
+            </summary>
+        </member>
+        <member name="M:DataAccess.IVideoAccessor.GetVideoDuration(System.String)">
+            <summary>
+            Uses ffprobe to get the duration for a specified video
+            </summary>
+            <exception cref="T:System.IO.FileNotFoundException">
+            Thrown if:
+                - videoPath doesn't exist.
+            </exception>
+        </member>
+        <member name="M:DataAccess.IVideoAccessor.GetVmaf(System.String,System.String)">
+            <summary>
+            Gets vmaf using ffmpeg from a source and path
+            </summary>
+            <exception cref="T:System.ArgumentException">
+            Throws if:
+                - Either path does not exist
+            </exception>
+        </member>
+        <member name="M:DataAccess.IVideoAccessor.GetVmafScene(System.String,System.String,System.Double,System.Double)">
+            <summary>
+            Gets vmaf using ffmpeg piping to ffmpeg from a source and path
+            </summary>
+            <exception cref="T:System.ArgumentException">
+            Throws if:
+                - Either path does not exist
+            </exception>
+        </member>
         <member name="T:DataAccess.MockVideoAccessor">
             <summary></summary>
         </member>
@@ -417,53 +495,37 @@
         <member name="M:DataAccess.MockVideoAccessor.AnalyzeVideoInput(System.String)">
             <summary></summary>
         </member>
+        <member name="M:DataAccess.MockVideoAccessor.ConcatVideosIntoOneOutput(System.Collections.Generic.List{System.String},System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.MockVideoAccessor.GetVideoDuration(System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.MockVideoAccessor.GetVmaf(System.String,System.String)">
+            <summary></summary>
+        </member>
+        <member name="M:DataAccess.MockVideoAccessor.GetVmafScene(System.String,System.String,System.Double,System.Double)">
+            <summary></summary>
+        </member>
         <member name="T:DataAccess.RealVideoAccessor">
             <summary>
-            Static accessor for generic video functions
+            Accessor for generic video functions
             </summary>
         </member>
         <member name="M:DataAccess.RealVideoAccessor.AnalyzeVideoInput(System.String)">
-            <summary>
-            Verifies input exists, runs input through ffmpeg scene change
-            detection, uses resulting timestamp set to analyze scenes and returns the 
-            collection of all scenes.
-            </summary>
-            <exception cref="T:System.IO.FileNotFoundException">
-            Thrown if:
-                - The video input does not exist
-            </exception>
+            <summary></summary>
         </member>
         <member name="M:DataAccess.RealVideoAccessor.ConcatVideosIntoOneOutput(System.Collections.Generic.List{System.String},System.String)">
-            <summary>
-            Combines multiple videos into a single video in order
-            </summary>
+            <summary></summary>
         </member>
-        <member name="M:DataAccess.RealVideoAccessor.GetVideoDurationFfprobe(System.String)">
-            <summary>
-            Uses ffprobe to get the duration for a specified video
-            </summary>
-            <exception cref="T:System.IO.FileNotFoundException">
-            Thrown if:
-                - videoPath doesn't exist.
-            </exception>
+        <member name="M:DataAccess.RealVideoAccessor.GetVideoDuration(System.String)">
+            <summary></summary>
         </member>
         <member name="M:DataAccess.RealVideoAccessor.GetVmaf(System.String,System.String)">
-            <summary>
-            Gets vmaf using ffmpeg from a source and path
-            </summary>
-            <exception cref="T:System.ArgumentException">
-            Throws if:
-                - Either path does not exist
-            </exception>
+            <summary></summary>
         </member>
         <member name="M:DataAccess.RealVideoAccessor.GetVmafScene(System.String,System.String,System.Double,System.Double)">
-            <summary>
-            Gets vmaf using ffmpeg piping to ffmpeg from a source and path
-            </summary>
-            <exception cref="T:System.ArgumentException">
-            Throws if:
-                - Either path does not exist
-            </exception>
+            <summary></summary>
         </member>
     </members>
 </doc>

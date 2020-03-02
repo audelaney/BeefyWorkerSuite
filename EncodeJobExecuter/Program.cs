@@ -40,7 +40,7 @@ namespace EncodeJobExecuter
 			{ PrintInvalidJob(activeJob); return; }
 
 			throw new NotImplementedException("STOP RIGHT THERE CRIMINAL SCUM");
-			EncoderManager.Instance.AttemptJobEncode(activeJob, "vp9test");
+			//EncoderManager.Instance.AttemptJobEncode(activeJob, "vp9test");
 		}
 
 		public static EncodeJob BuildFakeJob(string vidDir)

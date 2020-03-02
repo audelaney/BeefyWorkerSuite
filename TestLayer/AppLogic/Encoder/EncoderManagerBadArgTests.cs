@@ -4,6 +4,9 @@ using System;
 using DataObjects;
 using System.Linq;
 using DataAccess;
+using AppConfig.Models;
+using System.Collections.Generic;
+using AppConfig;
 
 namespace Tests.AppLogic
 {
@@ -13,7 +16,8 @@ namespace Tests.AppLogic
         [TestInitialize]
         public void TestSetup()
         {
-            // Set config
+            var mockConfigModel = TestHelper.MakeConfig();
+            AppConfigManager.SetConfig(mockConfigModel);
         }
 
         [TestMethod]

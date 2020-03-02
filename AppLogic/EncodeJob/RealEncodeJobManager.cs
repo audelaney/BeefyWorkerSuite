@@ -5,42 +5,31 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using System.Linq;
 using DataAccess.Exceptions;
+using AppConfig;
+using AppConfig.Models;
 
 namespace AppLogic
 {
-    internal class RealEncodeJobManager : EncodeJobManager
+    internal class RealEncodeJobManager : EncodeJobManager, IConfigWatcher
     {
         /// Helper for using the logger
         private string PrintDB()
         {
             string result = " ";
-            result += "database type: " + AppConfigManager.Instance.DBTypeAndString.Key;
-            if (string.IsNullOrWhiteSpace(AppConfigManager.Instance.DBTypeAndString.Value))
+            result += "database type: " + AppConfigManager.Model.DBTypeAndString.Key;
+            if (string.IsNullOrWhiteSpace(AppConfigManager.Model.DBTypeAndString.Value))
             { result += ", no conn string."; }
             else
-            { result += ", conn string: " + AppConfigManager.Instance.DBTypeAndString.Value + "."; }
+            { result += ", conn string: " + AppConfigManager.Model.DBTypeAndString.Value + "."; }
             return result;
         }
 
-        private IEncodeJobDAO _dao;
-        internal RealEncodeJobManager(string dataStoreType, string? connString)
+        private IEncodeJobDAO _jobAccessor;
+
+        internal RealEncodeJobManager()
         {
-            switch (dataStoreType)
-            {
-                case "mongo":
-                    _dao = new EncodeJobDAOMongo(connString);
-                    break;
-                case "mssql":
-                    _dao = new EncodeJobDAOmssql(connString ?? "");
-                    break;
-                case "mock-baddb":
-                    _dao = new EncodeJobDAOMockBadDb();
-                    break;
-                case "mock":
-                default:
-                    _dao = new EncodeJobDAOMockAlive();
-                    break;
-            }
+            AppConfigManager.WatchForChanges(this);
+            SetupFromConfig();
         }
 
         public override bool AddEncodeJobToQueue(EncodeJob newJob)
@@ -55,7 +44,7 @@ namespace AppLogic
             {
                 if (Guid.Empty == newJob.Id)
                 { newJob.Id = Guid.NewGuid(); }
-                if (_dao.AddEncodeJobToQueue(newJob))
+                if (_jobAccessor.AddEncodeJobToQueue(newJob))
                 { result = true; }
                 else
                 {
@@ -67,7 +56,7 @@ namespace AppLogic
                     {
                         //try again i guess
                         _logger?.LogWarning("Trying again...");
-                        if (!_dao.AddEncodeJobToQueue(newJob))
+                        if (!_jobAccessor.AddEncodeJobToQueue(newJob))
                         {
                             throw new ApplicationException($"A job was not found for old guid: {badGuid} and "
                             + $"job {newJob.ToString()} was still unable to be added.");
@@ -78,7 +67,7 @@ namespace AppLogic
                     else
                     {
                         //Just try again with the new guid, should work for sure
-                        result = _dao.AddEncodeJobToQueue(newJob);
+                        result = _jobAccessor.AddEncodeJobToQueue(newJob);
                     }
                 }
             }
@@ -114,7 +103,7 @@ namespace AppLogic
             {
                 var result = false;
                 DateTime? time = (checkedOutStatus) ? DateTime.Now : (DateTime?)null;
-                result = _dao.MarkEncodeJobCheckedOut(id, time);
+                result = _jobAccessor.MarkEncodeJobCheckedOut(id, time);
                 return result;
             }
             catch (DatabaseConnectionException dce)
@@ -151,12 +140,12 @@ namespace AppLogic
                 if (checkedOutStatus)
                 {
                     DateTime time = DateTime.Now;
-                    result = _dao.MarkEncodeJobCheckedOut(job, time);
+                    result = _jobAccessor.MarkEncodeJobCheckedOut(job, time);
                     if (result) { job.CheckedOutTime = time; }
                 }
                 else
                 {
-                    result = _dao.MarkEncodeJobCheckedOut(job, null);
+                    result = _jobAccessor.MarkEncodeJobCheckedOut(job, null);
                     if (result) { job.CheckedOutTime = null; }
                 }
                 return result;
@@ -189,7 +178,7 @@ namespace AppLogic
 
             string message = $"Exception encountered while finding job with id: {id} {PrintDB()}";
             try
-            { return _dao.RetrieveEncodeJob(id); }
+            { return _jobAccessor.RetrieveEncodeJob(id); }
             catch (ApplicationException)
             { return null; }
             catch (DatabaseConnectionException dce)
@@ -220,7 +209,7 @@ namespace AppLogic
 
             string message = $"Exception encountered while completing job {job.ToString()} {PrintDB()}";
             try
-            {return _dao.MarkJobCompletedStatus(job, completedStatus);}
+            {return _jobAccessor.MarkJobCompletedStatus(job, completedStatus);}
             catch (DatabaseConnectionException dce)
             {
                 //TODO cache logic
@@ -249,7 +238,7 @@ namespace AppLogic
 
             string message = $"Exception encountered while completing job {id} {PrintDB()}";
             try
-            { return _dao.MarkJobCompletedStatus(id, completedStatus); }
+            { return _jobAccessor.MarkJobCompletedStatus(id, completedStatus); }
             catch (DatabaseConnectionException dce)
             {
                 //TODO cache logic
@@ -281,7 +270,7 @@ namespace AppLogic
             string message = $"Exception encountered while updating job {oldJob.ToString()}"
                     + $" to new job {job.ToString()} {PrintDB()}";
             try
-            { return _dao.UpdateJob(oldJob, job); }
+            { return _jobAccessor.UpdateJob(oldJob, job); }
             catch (DatabaseConnectionException dce)
             {
                 //TODO cache logic
@@ -311,7 +300,7 @@ namespace AppLogic
 
             try
             {
-                var result = _dao.RetrieveIncompleteEncodeJobs(priority);
+                var result = _jobAccessor.RetrieveIncompleteEncodeJobs(priority);
                 if (result.Count() != 0)
                 { output = result; }
                 else
@@ -344,7 +333,7 @@ namespace AppLogic
 
             try
             {
-                var result = _dao.RetrieveIncompleteEncodeJobs();
+                var result = _jobAccessor.RetrieveIncompleteEncodeJobs();
                 if (result.Count() != 0)
                 { output = result; }
                 else
@@ -381,7 +370,7 @@ namespace AppLogic
 
             try
             {
-                var result = _dao.RetrieveIncompleteEncodeJobs(priority);
+                var result = _jobAccessor.RetrieveIncompleteEncodeJobs(priority);
                 if (result.Count() != 0)
                 { output = result; }
                 else
@@ -416,7 +405,7 @@ namespace AppLogic
 
             try
             {
-                var result = _dao.RetrieveIncompleteEncodeJobs();
+                var result = _jobAccessor.RetrieveIncompleteEncodeJobs();
                 if (result.Count() != 0)
                 { output = result; }
                 else
@@ -451,7 +440,7 @@ namespace AppLogic
 
             try
             {
-                var result = _dao.RetrieveCompleteEncodeJobsByVideoName(videoName);
+                var result = _jobAccessor.RetrieveCompleteEncodeJobsByVideoName(videoName);
                 if (result.Count() != 0)
                 { output = result; }
                 else
@@ -475,6 +464,20 @@ namespace AppLogic
             }
 
             return output;
+        }
+
+        public void Notify() =>
+            SetupFromConfig();
+
+        private void SetupFromConfig()
+        {
+            _jobAccessor = AppConfigManager.Model.DBTypeAndString.Key switch
+            {
+                DbType.mongo => new EncodeJobDAOMongo(AppConfigManager.Model.DBTypeAndString.Value),
+                DbType.mssql => new EncodeJobDAOmssql(AppConfigManager.Model.DBTypeAndString.Value),
+                DbType.mockBadDb => new EncodeJobDAOMockBadDb(),
+                _ => new EncodeJobDAOMockAlive()
+            };
         }
     }
 }

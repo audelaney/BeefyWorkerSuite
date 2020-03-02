@@ -14,69 +14,72 @@ namespace DataObjects
         #region Props
         [BsonId]
         [JsonIgnore]
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.Empty;
         /// <summary>
         /// The chunk number of the video that it is being sliced from. Default 0 for no chunk.
         /// </summary>
-        public uint ChunkNumber { get; set; }
+        public uint ChunkNumber { get; set; } = 0;
         /// <summary>
         /// A very lazy way of designating a timespan from a video input that is being used for
         /// multiple encode jobs...
         /// </summary>
         /// <example>23.4-57.9001</example>
-        public Scene? Chunk { get; set; }
+        public Scene? Chunk { get; set; } = null;
         /// <summary>
         /// The no path, file name with extension of the associated video.
         /// </summary>
-        public string VideoFileName { get; set; }
+        public string VideoFileName { get; set; } = "";
         /// <summary>
         /// The path to the directory that the video will reside in, which should only be 
         /// changed for jobs where one video is used as a source for multiple jobs.
         /// </summary>
-        public string VideoDirectoryPath { get; set; }
+        public string VideoDirectoryPath { get; set; } = "";
         /// <summary>
         /// Additional arguments to be provided to the encoder. Will probably eventually change
         /// to a config object of some kind. If null, returns empty string.
         /// </summary>
-        public string AdditionalCommandArguments { get; set; }
-        public int Priority { get; set; }
+        public string AdditionalCommandArguments { get; set; } = "";
+        /// <summary>
+        /// Ranked priority of a job, lower is more important.
+        /// </summary>
+        public int Priority { get; set; } = 5;
         /// <summary>
         /// How many times the encoder should attempt to change the arguments
         /// used to run the job, per execution pass.
         /// </summary>
-        public int MaxAttempts { get; set; }
+        public int MaxAttempts { get; set; } = 3;
         /// <summary>
         /// When performing a re-encode, favoring accuracy entails more settings changing
         /// more drastically.
         /// </summary>
-        public double MinPsnr { get; set; }
+        public double MinPsnr { get; set; } = 40;
         /// <summary>
         /// Minimum allowed VMAF by the "smart" encode
         /// </summary>
-        public double MinVmaf { get; set; }
+        public double MinVmaf { get; set; } = 90;
         /// <summary>
         /// When changing settings (TODO which are not implemented), adjustment factor
         /// factor is deterministic of what kind of steps will be taken to change those
         /// settings.
         /// </summary>
-        public AdjustmentFactor AdjustmentFactor { get; set; }
+        public AdjustmentFactor AdjustmentFactor { get; set; } = AdjustmentFactor.accuracy;
         /// <summary>
         /// Date-time that this job was ingested into the system
         /// </summary>
         [JsonIgnore]
-        public DateTime IngestDateTime { get; set; }
+        public DateTime IngestDateTime { get; set; } = DateTime.Now;
         /// <summary>
         /// Date-time that this job was assigned for encode execution
         /// </summary>
-        public DateTime? CheckedOutTime { get; set; }
+        public DateTime? CheckedOutTime { get; set; } = null;
         /// <summary>
         /// If the job has been completed currently.
         /// </summary>
-        public bool Completed { get; set; }
+        public bool Completed { get; set; } = false;
         /// <summary>
         /// Record of the attempts made to perform the encode
         /// </summary>
-        public List<EncodeAttempt> Attempts { get; set; }
+        public List<EncodeAttempt> Attempts { get; set; } = new List<EncodeAttempt>();
         [JsonIgnore]
         [BsonIgnore]
         public bool IsChunk
@@ -94,6 +97,14 @@ namespace DataObjects
         /// If this particular object is considered a "valid" object. Currently
         /// does not check for guid, so pre-database loaded objects can be
         /// validated.
+        /// Checks:
+        ///     - Priority
+        ///     - MaxAttempts
+        ///     - MinPsnr
+        ///     - MinVmaf
+        ///     - Attempts
+        ///     - Chunk (if chunk)
+        ///     - VideoFileName
         /// </summary>
         [JsonIgnore]
         [BsonIgnore]
@@ -101,9 +112,11 @@ namespace DataObjects
         {
             get
             {
-                if (0 > Priority || 5 < Priority || 
-                    0 > MaxAttempts || 0 > MinPsnr || 0 > MinVmaf ||
-                    (Attempts.Where(a => !a.IsValid).Count() != 0))
+                if (0 > Priority || 5 < Priority
+                    || 0 > MaxAttempts || 0 > MinPsnr || 0 > MinVmaf
+                    || (Attempts.Where(a => a.IsValid).Count() != 0)
+                    || (IsChunk && !Chunk!.IsValid)
+                    || string.IsNullOrWhiteSpace(VideoFileName))
                 { return false; }
                 else
                 {
@@ -118,23 +131,7 @@ namespace DataObjects
         /// Default constructor
         /// </summary>
         public EncodeJob()
-        {
-            Id = Guid.Empty;
-            VideoDirectoryPath = "";
-            VideoFileName = "";
-            AdjustmentFactor = AdjustmentFactor.accuracy;
-            AdditionalCommandArguments = "";
-            MinPsnr = 40;
-            MinVmaf = 93;
-            MaxAttempts = 3;
-            Priority = 3;
-            IngestDateTime = DateTime.Now;
-            Completed = false;
-            CheckedOutTime = null;
-            Chunk = null;
-            ChunkNumber = 0;
-            Attempts = new List<EncodeAttempt>();
-        }
+        { }
 
         /// <summary>
         /// Does not evaluate Id, completed, time fields, or attempts.

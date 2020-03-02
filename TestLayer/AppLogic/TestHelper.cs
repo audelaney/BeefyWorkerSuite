@@ -1,19 +1,58 @@
 using System;
 using System.Collections.Generic;
+using AppConfig.Models;
 using DataObjects;
 
 namespace Tests
 {
     public static class TestHelper
     {
-        public static EncodeJob MakeJob(bool valid, int num = 4)
+        public static ConfigModel MakeConfig()
         {
-            throw new NotImplementedException();
+            return new ConfigModel()
+            {
+                VideoAccessor = VideoAccessorType.fake,
+                FileAccessor = FileAccessorType.workingFake,
+                DBTypeAndString = new KeyValuePair<DbType, string>(DbType.mock, ""),
+                CompletedBucketPath = "/completed/",
+                InputBucketPath = "/input/",
+                ProcessedBucketPath = "/processed"
+            };
+        }
+        public static EncodeJob MakeJob(bool valid)
+        {
+            if (valid)
+            {
+                var job = new EncodeJob();
+                job.VideoFileName = "realname.mkv";
+                if (job.IsValid) {return job;}
+                else
+                { throw new TestHelperException("Job isn't valid"); }
+            }
+            else
+            {
+                var job = new EncodeJob();
+                job.Priority = 10;
+                if (!job.IsValid) {return job;}
+                else
+                { throw new TestHelperException("Job is valid"); }
+            }
         }
 
         public static IEnumerable<EncodeJob> MakeJobs(bool valid, int num = 4)
         {
-            throw new NotImplementedException();
+            var jobs = new List<EncodeJob>();
+
+            for (int i = 0; i < num; i++)
+            {
+                var job = MakeJob(valid:valid);
+                job.ChunkNumber = (uint)(i+1);
+                var scene = new Scene(i, job.ChunkNumber);
+                job.Chunk = scene;
+                jobs.Add(job);
+            }
+
+            return jobs;
         }
 
         /// <summary>

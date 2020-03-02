@@ -4,24 +4,26 @@ using System.Linq;
 using AppLogic.Encoders;
 using DataAccess;
 using DataObjects;
+using AppConfig;
+using AppConfig.Models;
 
 namespace AppLogic
 {
-    internal class RealEncoderManager : EncoderManager
+    internal class RealEncoderManager : EncoderManager, IConfigWatcher
     {
         public RealEncoderManager()
         {
-            if (AppConfigManager.Instance.DBTypeAndString
-                .Key.ToLower().Contains("mock"))
-            { _fileAccessor = new GoodFakeFileAccessor(); }
-            else
-            { _fileAccessor = new RealFileAccessor(); }
+            AppConfigManager.WatchForChanges(this);
+            SetupFromConfig();
         }
         
-        private readonly IFileAccessor _fileAccessor;
+        private IFileAccessor _fileAccessor;
+        private IVideoAccessor _videoAccessor;
 
         public override void CombineSuccessfulEncodes(EncodeJob[] jobs, string outputFileName)
         {
+            if (jobs.Length == 0)
+            { throw new ArgumentException("0 successful encodes to combine."); }
             if (jobs.Where(j => !j.Completed).Count() != 0)
             { throw new ArgumentException("Some jobs not completed."); }
             if (jobs.Where(j => !j.IsChunk).Count() != 0)
@@ -35,22 +37,22 @@ namespace AppLogic
             var sortedJobOutputFiles = sortedJobs.Select(j =>
                 {
                     // The output file should be the only file in the job directory in the completed bucket
-                    var outDir = Path.Combine(AppConfigManager.Instance.CompletedBucketPath, j.Id.ToString());
-                    if (!_fileAccessor.DoesFolderExist(outDir)
+                    var outDir = Path.Combine(AppConfigManager.Model.CompletedBucketPath, j.Id.ToString());
+                    if (_fileAccessor.DoesFolderExist(outDir)
                         && _fileAccessor.GetFilesInFolder(outDir).Count() == 1)
                     { return _fileAccessor.GetFilesInFolder(outDir).First(); }
                     else
                     {
                         throw new DirectoryNotFoundException(
                             "Couldn't find job directory in completed bucket for job. CompletedBucket: "
-                            + AppConfigManager.Instance.CompletedBucketPath
+                            + AppConfigManager.Model.CompletedBucketPath
                             + " job: " + jobs.ToString());
                     }
                 });
 
             //Concat the video files
-            RealVideoAccessor.ConcatVideosIntoOneOutput(sortedJobOutputFiles.ToList()
-                                    ,Path.Combine(AppConfigManager.Instance.CompletedBucketPath));
+            _videoAccessor.ConcatVideosIntoOneOutput(sortedJobOutputFiles.ToList()
+                                    ,Path.Combine(AppConfigManager.Model.CompletedBucketPath));
         }
 
         /// <summary>
@@ -73,7 +75,7 @@ namespace AppLogic
                 { EncodeJobManager.ImproveQuality(job); }
                 try
                 {
-                    var outputPath = Path.Combine(AppConfigManager.Instance.ActiveBucketPath,
+                    var outputPath = Path.Combine(AppConfigManager.Model.ActiveBucketPath,
                                                     job.Id.ToString(),
                                                     EncodeJob.GenerateJobOutputFilename(job));
 
@@ -88,11 +90,11 @@ namespace AppLogic
                         StartTime = startTime,
                         EndTime = DateTime.Now,
                         VmafResult = (job.IsChunk) ?
-                            RealVideoAccessor.GetVmafScene(Path.Combine(job.VideoDirectoryPath, job.VideoFileName),
+                            _videoAccessor.GetVmafScene(Path.Combine(job.VideoDirectoryPath, job.VideoFileName),
                                                         outputPath,
                                                         job.Chunk!.StartTime,
                                                         job.Chunk!.EndTime ) :
-                            RealVideoAccessor.GetVmaf(Path.Combine(job.VideoDirectoryPath, job.VideoFileName), outputPath),
+                            _videoAccessor.GetVmaf(Path.Combine(job.VideoDirectoryPath, job.VideoFileName), outputPath),
                         FileSize = _fileAccessor.GetFileSize(outputPath)
                     };
                     job.Attempts.Add(attempt);
@@ -114,6 +116,27 @@ namespace AppLogic
             { return false; }
 
             return true;
+        }
+
+        public void Notify() =>
+            SetupFromConfig();
+
+        private void SetupFromConfig()
+        {
+            _fileAccessor = AppConfigManager.Model.FileAccessor switch
+            {
+                FileAccessorType.real => new RealFileAccessor(),
+                FileAccessorType.workingFake => new GoodFakeFileAccessor(),
+                FileAccessorType.combineSuccessMock 
+                        => new TestingCombineSuccessFakeFileAccessor(),
+                _ => new GoodFakeFileAccessor()
+            };
+            _videoAccessor = AppConfigManager.Model.VideoAccessor switch
+            {
+                VideoAccessorType.real => new RealVideoAccessor(),
+                VideoAccessorType.fake => new MockVideoAccessor(),
+                _ => new MockVideoAccessor()
+            };
         }
     }
 }

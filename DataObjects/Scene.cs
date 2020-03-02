@@ -26,6 +26,17 @@ namespace DataObjects
             }
         }
 
+        public bool IsValid 
+        {
+            get
+            {
+                if (StartTime < 0 || EndTime < StartTime)
+                { return false; }
+                else
+                { return true; }
+            }
+        }
+
         public override string ToString()
         {
             return $"Start time: {StartTime}, End time: {EndTime}, Duration: {Duration.ToString()}";

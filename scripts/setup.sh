@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#execute from top project directory
+
 #Where the action happens
 mkdir -p ~/Videos/EncodeWorker/jobs/completed
 mkdir -p ~/Videos/EncodeWorker/jobs/active
@@ -8,8 +10,7 @@ mkdir -p ~/Videos/EncodeWorker/jobs/processed
 mkdir -p ~/Videos/EncodeWorker/input
 
 #Config folder goodness
-cp -n EncodeJobIngester/global.config ~/Videos/EncodeWorker/ingester-xml.config
-cp -n EncodeJobOverseer/global.config ~/Videos/EncodeWorker/overseer-xml.config
+cp -n AppConfig/default.config ~/Videos/EncodeWorker/local.config
 
 cd MasterApp && dotnet publish -c Release && \
 sudo cp bin/Release/netcoreapp3.0/ubuntu.18.04-x64/publish/MasterApp /usr/local/bin/

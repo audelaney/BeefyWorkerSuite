@@ -8,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
+using AppConfig;
+using AppConfig.Models;
 
 namespace EncodeJobIngester
 {
@@ -27,7 +29,7 @@ namespace EncodeJobIngester
 				.MinimumLevel.Debug()
 				.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
 				.Enrich.FromLogContext()
-				.WriteTo.File(AppConfigManager.Instance.LogFilePath)
+				.WriteTo.File(AppConfigManager.Model.LogFilePath)
 				.CreateLogger();
 
 			CreateHostBuilder(args).Build().Run();

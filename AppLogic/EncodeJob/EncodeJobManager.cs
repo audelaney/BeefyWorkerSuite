@@ -26,16 +26,10 @@ namespace AppLogic
             {
                 if (null == _instance)
                 {
-                    _instance = new RealEncodeJobManager(AppConfigManager.Instance.DBTypeAndString.Key,
-                                                         AppConfigManager.Instance.DBTypeAndString.Value);
+                    _instance = new RealEncodeJobManager();
                 }
                 return _instance;
             }
-        }
-
-        internal static void ConfigReset()
-        {
-            _instance = null;
         }
 
         /// <summary>

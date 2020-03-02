@@ -4,6 +4,7 @@ using System;
 using DataObjects;
 using System.Linq;
 using DataAccess;
+using AppConfig;
 
 namespace Tests.AppLogic
 {
@@ -13,10 +14,10 @@ namespace Tests.AppLogic
         [TestInitialize]
         public void TestSetup()
         {
-            // Set config
+            var mockConfigModel = TestHelper.MakeConfig();
+            AppConfigManager.SetConfig(mockConfigModel);
         }
 
-        [TestMethod]
         public void GetScenesFromVideoValid()
         {
             var initialScenePts = new[]
@@ -25,7 +26,7 @@ namespace Tests.AppLogic
             };
             var initialScenes = Scene.ScenesFromTimeStamps(initialScenePts);
 
-            var result = VideoManager.GetScenesFromVideo("success");
+            var result = VideoManager.Instance.GetScenesFromVideo("success");
 
             Assert.AreEqual(1, result.Count());
         }
