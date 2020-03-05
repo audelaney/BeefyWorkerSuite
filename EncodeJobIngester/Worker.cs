@@ -1,7 +1,6 @@
 #nullable enable
 using AppLogic;
 using System;
-using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -10,13 +9,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.IO;
 using DataObjects;
-using Newtonsoft.Json;
+using AppConfig;
+using AppConfig.Models;
 
 namespace EncodeJobIngester
 {
     public class Worker : BackgroundService
     {
-        private readonly int searchIntervalMS = 60 * 1000;
         private readonly ILogger<Worker> _logger;
 
         /// <summary>
@@ -30,10 +29,10 @@ namespace EncodeJobIngester
 
         public override Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Video input being retrieved from " + AppConfigManager.Instance.InputBucketPath);
-            _logger.LogInformation("Video output set for " + AppConfigManager.Instance.ProcessedBucketPath);
-            _logger.LogInformation("Database being used: " + AppConfigManager.Instance.DBTypeAndString.Key + " @@ "
-                                    + AppConfigManager.Instance.DBTypeAndString.Value);
+            _logger.LogInformation("Video input being retrieved from " + AppConfigManager.Model.InputBucketPath);
+            _logger.LogInformation("Video output set for " + AppConfigManager.Model.ProcessedBucketPath);
+            _logger.LogInformation("Database being used: " + AppConfigManager.Model.DBTypeAndString.Key + " @@ "
+                                    + AppConfigManager.Model.DBTypeAndString.Value);
             if (!EncodeJobManager.SetLogger(_logger))
             { _logger.LogError("Unable to pass logger into logic layer."); }
 
@@ -44,7 +43,7 @@ namespace EncodeJobIngester
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                string activeBucket = AppConfigManager.Instance.InputBucketPath;
+                string activeBucket = AppConfigManager.Model.InputBucketPath;
                 _logger.LogInformation($"Searching {activeBucket} for video files with matching job files..");
 
                 Dictionary<string, EncodeJob> jobFilesWithJobs = new Dictionary<string, EncodeJob>();
@@ -71,12 +70,12 @@ namespace EncodeJobIngester
                         {
                             _logger.LogInformation("Encode job added to DB from file " + fileNameAndJob.Key);
                             File.Move(Path.Combine(activeBucket, fileNameAndJob.Value.VideoFileName),
-                                      Path.Combine(AppConfigManager.Instance.InputBucketPath, fileNameAndJob.Value.VideoFileName));
+                                      Path.Combine(AppConfigManager.Model.InputBucketPath, fileNameAndJob.Value.VideoFileName));
                             File.Delete(Path.Combine(activeBucket, fileNameAndJob.Key));
                         }
                         else
                         { throw new ApplicationException($"Unable to add {fileNameAndJob.Value}"
-                                    + $" to queue in database {AppConfigManager.Instance.DBTypeAndString.Key}"); }
+                                    + $" to queue in database {AppConfigManager.Model.DBTypeAndString.Key}"); }
                     }
                     catch (UnauthorizedAccessException unAuthEx)
                     {
@@ -121,11 +120,11 @@ namespace EncodeJobIngester
                             }
                             else
                             { throw new ApplicationException($"Unable to add {fileNameAndJob.Value.ToString()}"
-                                    + " to queue in database {AppConfigManager.Instance.DBTypeAndString.Key}"); }
+                                    + " to queue in database {AppConfigManager.Model.DBTypeAndString.Key}"); }
                         }
 
                         File.Move(Path.Combine(activeBucket, masterVideo),
-                                  Path.Combine(AppConfigManager.Instance.ProcessedBucketPath, masterVideo));
+                                  Path.Combine(AppConfigManager.Model.ProcessedBucketPath, masterVideo));
                     }
                     catch (UnauthorizedAccessException unAuthEx)
                     {
@@ -144,7 +143,8 @@ namespace EncodeJobIngester
                     }
                 }
 
-                await Task.Delay(searchIntervalMS, stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(AppConfigManager.Model.PollingInterval)
+                                , stoppingToken);
             }
         }
 

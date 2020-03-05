@@ -8,32 +8,22 @@ using DataObjects;
 namespace DataAccess
 {
     /// <summary>
-    /// Static accessor for generic video functions
+    /// Accessor for generic video functions
     /// </summary>
-    public class RealVideoAccessor
+    public class RealVideoAccessor : IVideoAccessor
     {
-        private static string FfmpegExecutablePath 
+        private static string FfmpegExecutablePath
         {
             get
             { return "ffmpeg"; }
         }
-
         private static string FfprobeExecutablePath
         {
             get
             { return "ffprobe"; }
         }
-        
-        /// <summary>
-        /// Verifies input exists, runs input through ffmpeg scene change
-        /// detection, uses resulting timestamp set to analyze scenes and returns the 
-        /// collection of all scenes.
-        /// </summary>
-        /// <exception cref="System.IO.FileNotFoundException">
-        /// Thrown if:
-        ///     - The video input does not exist
-        /// </exception>
-        public static Scene[] AnalyzeVideoInput(string videoInputPath)
+        /// <summary></summary>
+        public Scene[] AnalyzeVideoInput(string videoInputPath)
         {
             if (!File.Exists(videoInputPath))
             { throw new FileNotFoundException("Video does not exist"); }
@@ -63,7 +53,6 @@ namespace DataAccess
                     { unparsedFfmpegLines.Add(buffer); }
                 }
                 ffmpegProcess.Close();
-                ffmpegProcess.Dispose();
             }
 
             if (unparsedFfmpegLines.Count == 0)
@@ -81,7 +70,7 @@ namespace DataAccess
 
             // Add the final duration as the end point of the video, otherwise the last scene ends on the last scene
             // change and not at the end of the video
-            timeStamps.Add(GetVideoDurationFfprobe(videoInputPath));
+            timeStamps.Add(GetVideoDuration(videoInputPath));
 
             List<Scene> scenes = new List<Scene>();
             for (int i = 0; i < timeStamps.Count() - 1; i++)
@@ -102,29 +91,28 @@ namespace DataAccess
 
             return scenes.ToArray();
         }
-
-        /// <summary>
-        /// Combines multiple videos into a single video in order
-        /// </summary>
-        public static void ConcatVideosIntoOneOutput(List<string> videoPaths, string outputVideoFile)
+        /// <summary></summary>
+        public void ConcatVideosIntoOneOutput(List<string> videoPaths, string outputVideoPath)
         {
-            if (File.Exists(outputVideoFile))
-            { File.Delete(outputVideoFile); }
+            if (File.Exists(outputVideoPath))
+            { File.Delete(outputVideoPath); }
             videoPaths.ForEach(p => { if (!File.Exists(p)) { throw new ArgumentException(p + " doesn't exist"); } });
 
             // Write the list of video files out to a text file to use for the ffmpeg command
-            string textFileName = outputVideoFile + ".txt";
+            string textFileName = outputVideoPath + ".txt";
             using (StreamWriter writer = new StreamWriter(textFileName))
             {
-                videoPaths.ForEach(p => writer.WriteLine(p));
+                videoPaths.ForEach(p => writer.WriteLine($"file '{p}'"));
                 writer.Close();
             }
 
             var ffmpegStartInfo = new ProcessStartInfo
             {
+                CreateNoWindow = true,
+                UseShellExecute = false,
                 RedirectStandardError = true,
                 FileName = FfmpegExecutablePath,
-                Arguments = "-f concat -safe 0 -i " + textFileName + " -c copy " + outputVideoFile
+                Arguments = "-f concat -safe 0 -i " + textFileName + " -c copy " + outputVideoPath
             };
 
             using (Process ffmpegProcess = new Process { StartInfo = ffmpegStartInfo })
@@ -132,27 +120,23 @@ namespace DataAccess
                 ffmpegProcess.Start();
                 ffmpegProcess.Refresh();
                 ffmpegProcess.WaitForExit();
+                var output = ffmpegProcess.StandardError.ReadToEnd();
                 ffmpegProcess.Close();
             }
 
             File.Delete(textFileName);
         }
-
-        /// <summary>
-        /// Uses ffprobe to get the duration for a specified video
-        /// </summary>
-        /// <exception cref="System.IO.FileNotFoundException">
-        /// Thrown if:
-        ///     - videoPath doesn't exist.
-        /// </exception>
-        public static double GetVideoDurationFfprobe(string videoPath)
+        /// <summary></summary>
+        public double GetVideoDuration(string videoPath)
         {
             if (!File.Exists(videoPath))
             { throw new FileNotFoundException($"{videoPath} does not exist."); }
 
             var ffprobeStartInfo = new ProcessStartInfo
             {
-                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
                 FileName = FfprobeExecutablePath,
                 Arguments = "-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 " + videoPath
             };
@@ -164,7 +148,7 @@ namespace DataAccess
                 ffprobeProcess.Start();
                 ffprobeProcess.Refresh();
                 ffprobeProcess.WaitForExit();
-                processOutput = ffprobeProcess.StandardError.ReadToEnd().Trim();
+                processOutput = ffprobeProcess.StandardOutput.ReadToEnd().Trim();
                 ffprobeProcess.Close();
             }
 
@@ -173,15 +157,8 @@ namespace DataAccess
             catch
             { return 0; }
         }
-
-        /// <summary>
-        /// Gets vmaf using ffmpeg from a source and path
-        /// </summary>
-        /// <exception cref="System.ArgumentException">
-        /// Throws if:
-        ///     - Either path does not exist
-        /// </exception>
-        public static double GetVmaf(string sourcePath, string encodedPath)
+        /// <summary></summary>
+        public double GetVmaf(string sourcePath, string encodedPath)
         {
             if (!File.Exists(sourcePath) || !File.Exists(encodedPath))
             { throw new ArgumentException("Either path is invalid"); }
@@ -216,21 +193,14 @@ namespace DataAccess
                         }
                     }
                 }
-                catch (Exception ex)
+                catch
                 { }
             }
 
             return output;
         }
-
-        /// <summary>
-        /// Gets vmaf using ffmpeg piping to ffmpeg from a source and path
-        /// </summary>
-        /// <exception cref="System.ArgumentException">
-        /// Throws if:
-        ///     - Either path does not exist
-        /// </exception>
-        public static double GetVmafScene(string sourcePath, string scenePath, double sceneStartTime, double sceneEndTime)
+        /// <summary></summary>
+        public double GetVmafScene(string sourcePath, string scenePath, double sceneStartTime, double sceneEndTime)
         {
             if (!File.Exists(sourcePath) || !File.Exists(scenePath))
             { throw new ArgumentException("Either path is invalid"); }
@@ -272,7 +242,7 @@ namespace DataAccess
             return output;
         }
 
-        private static double? ParseVmafFromLine(string? line)
+        private double? ParseVmafFromLine(string? line)
         {
             double? output = null;
 
@@ -287,6 +257,5 @@ namespace DataAccess
 
             return output;
         }
-
     }
 }

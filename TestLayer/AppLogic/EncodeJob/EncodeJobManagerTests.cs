@@ -3,6 +3,9 @@ using AppLogic;
 using System;
 using DataObjects;
 using System.Linq;
+using AppConfig.Models;
+using System.Collections.Generic;
+using AppConfig;
 
 namespace Tests.AppLogic
 {
@@ -13,18 +16,16 @@ namespace Tests.AppLogic
         [TestInitialize]
         public void TestSetup()
         {
-            AppConfigManager.SetConfig("mock");
+            var mockConfigModel = TestHelper.MakeConfig();
+            AppConfigManager.SetConfig(mockConfigModel);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ApplicationException))]
         public void AddEncodeJobToQueueFailJobExistsSameGuid()
         {
-            var sourceJob = new EncodeJob
-            {
-                VideoFileName = "somefile.mkv",
-                Id = Guid.NewGuid()
-            };
+            var sourceJob = TestHelper.MakeJob(valid:true);
+            sourceJob.Id = Guid.NewGuid();
 
             if (sourceJob.IsValid)
             {
@@ -44,8 +45,7 @@ namespace Tests.AppLogic
         [TestMethod]
         public void AddEncodeJobToQueueSuccess()
         {
-            var job = new EncodeJob
-            { VideoFileName = "somefile.mkv" };
+            var job = TestHelper.MakeJob(valid:true);
 
             if (job.IsValid)
             {
@@ -71,10 +71,7 @@ namespace Tests.AppLogic
         [TestMethod]
         public void FindEncodeJobSucessValidReturn()
         {
-            var job = new EncodeJob
-            {
-                VideoFileName = "somefile.mkv"
-            };
+            var job = TestHelper.MakeJob(valid:true);
 
             if (job.IsValid)
             {
@@ -109,10 +106,7 @@ namespace Tests.AppLogic
         [TestMethod]
         public void UpdateEncodeJobSuccess()
         {
-            var firstJob = new EncodeJob
-            {
-                VideoFileName = "somefile.mkv"
-            };
+            var firstJob = TestHelper.MakeJob(valid:true);
 
             if (firstJob.IsValid)
             {
@@ -125,17 +119,17 @@ namespace Tests.AppLogic
                         var jobAfterChange = jobAfterAdd.Clone() as EncodeJob;
                         jobAfterChange!.VideoDirectoryPath = "/some/other/place/";
 
-                        var finalResult = EncodeJobManager.Instance.UpdateJob(jobAfterAdd,jobAfterChange);
+                        var finalResult = EncodeJobManager.Instance.UpdateJob(jobAfterAdd, jobAfterChange);
                         var finalJobs = EncodeJobManager.Instance.GetIncompleteEncodeJobs();
                         var finalJob = finalJobs.First();
 
                         Assert.IsTrue(finalResult);
-                        Assert.AreEqual(jobAfterChange,finalJob);
-                        Assert.AreEqual(1,finalJobs.Count());
+                        Assert.AreEqual(jobAfterChange, finalJob);
+                        Assert.AreEqual(1, finalJobs.Count());
                     }
                     else
                     {
-                        Assert.Fail("Too many or too few jobs found in GetIncompleteEncodeJobs");
+                        Assert.Fail($"Found {jobs.Count()} in GetIncompleteEncodeJobs, expected 1");
                     }
                 }
                 else

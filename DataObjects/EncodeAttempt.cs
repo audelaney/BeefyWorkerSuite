@@ -55,14 +55,8 @@ namespace DataObjects
         /// <summary>
         /// Default constructor, initializes all values but is in an invalid state
         /// </summary>
-        /// <exception cref="System.ArgumentNullException">
-        /// Thrown if:
-        ///     - Output path is null
-        /// </exception>
-        public EncodeAttempt(string? outputPath)
+        public EncodeAttempt(string outputPath)
         {
-            if (outputPath == null)
-                throw new ArgumentNullException("Ouputpath null.");
             OriginalOutputPath = outputPath;
             CommandLineArgs = "";
             StartTime = DateTime.Now;
@@ -77,27 +71,21 @@ namespace DataObjects
 
             sb.Append("CLI args: ");
             sb.Append(CommandLineArgs);
-            sb.Append(", ");
 
-            sb.Append("Start time: ");
+            sb.Append(", Start time: ");
             sb.Append(StartTime);
-            sb.Append(", ");
 
-            sb.Append("End time: ");
+            sb.Append(", End time: ");
             sb.Append(EndTime);
-            sb.Append(", ");
 
-            sb.Append("VMAF result: ");
+            sb.Append(", VMAF result: ");
             sb.Append(VmafResult);
-            sb.Append(", ");
 
-            sb.Append("File size: ");
+            sb.Append(", File size: ");
             sb.Append(FileSize.ToString());
-            sb.Append(", ");
 
-            sb.Append("Original path: ");
+            sb.Append(", Original path: ");
             sb.Append(OriginalOutputPath);
-            sb.Append(", ");
 
             return sb.ToString();
         }

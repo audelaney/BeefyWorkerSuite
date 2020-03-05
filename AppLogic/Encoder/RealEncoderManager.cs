@@ -1,50 +1,29 @@
-#nullable enable
-using DataAccess;
+using System;
+using System.IO;
 using System.Linq;
 using AppLogic.Encoders;
-using System.Collections.Generic;
-using System;
+using DataAccess;
 using DataObjects;
-using System.IO;
+using AppConfig;
+using AppConfig.Models;
 
 namespace AppLogic
 {
-    /// <summary>
-    /// Encoding related logic operations
-    /// </summary>
-    public abstract class EncoderManager
+    internal class RealEncoderManager : EncoderManager, IConfigWatcher
     {
-        /// <summary>
-        /// Instance used for actual logical operations of the publicly available methods
-        /// </summary>
-        public EncoderManager Instance
+        public RealEncoderManager()
         {
-            get
-    {
-                if (_instance == null)
-                { _instance = new RealEncoderManager(); }
-                return _instance;
-            }
+            AppConfigManager.WatchForChanges(this);
+            SetupFromConfig();
         }
-        private EncoderManager? _instance;
+        
+        private IFileAccessor _fileAccessor;
+        private IVideoAccessor _videoAccessor;
 
-
-        /// <summary>
-        /// Combines the resulting output from 
-        /// </summary>
-        /// <exception cref="System.ArgumentException">
-        /// Thrown if:
-        ///     - Any of the jobs are not marked as completed
-        ///     - Jobs don't have an InputInterval
-        ///     - Jobs that have a video source that doesn't match the first video
-        /// </exception>
-        /// <exception cref="System.IO.DirectoryNotFoundException">
-        /// Thrown if:
-        ///     - A job is found which is marked as completed but does not have a directory in the
-        ///     completed bucket.
-        /// </exception>
-        public static void Combine(EncodeJob[] jobs, string outputFileName)
+        public override void CombineSuccessfulEncodes(EncodeJob[] jobs, string outputFileName)
         {
+            if (jobs.Length == 0)
+            { throw new ArgumentException("0 successful encodes to combine."); }
             if (jobs.Where(j => !j.Completed).Count() != 0)
             { throw new ArgumentException("Some jobs not completed."); }
             if (jobs.Where(j => !j.IsChunk).Count() != 0)
@@ -58,27 +37,28 @@ namespace AppLogic
             var sortedJobOutputFiles = sortedJobs.Select(j =>
                 {
                     // The output file should be the only file in the job directory in the completed bucket
-                    var outDir = Path.Combine(AppConfigManager.Instance.CompletedBucketPath, j.Id.ToString());
-                    if (!Directory.Exists(outDir) && Directory.GetFiles(outDir).Count() == 1)
-                    { return Directory.GetFiles(outDir).First(); }
+                    var outDir = Path.Combine(AppConfigManager.Model.CompletedBucketPath, j.Id.ToString());
+                    if (_fileAccessor.DoesFolderExist(outDir)
+                        && _fileAccessor.GetFilesInFolder(outDir).Count() == 1)
+                    { return _fileAccessor.GetFilesInFolder(outDir).First(); }
                     else
                     {
                         throw new DirectoryNotFoundException(
                             "Couldn't find job directory in completed bucket for job. CompletedBucket: "
-                            + AppConfigManager.Instance.CompletedBucketPath
+                            + AppConfigManager.Model.CompletedBucketPath
                             + " job: " + jobs.ToString());
                     }
                 });
 
             //Concat the video files
-            RealVideoAccessor.ConcatVideosIntoOneOutput(sortedJobOutputFiles.ToList()
-                                    ,Path.Combine(AppConfigManager.Instance.CompletedBucketPath));
+            _videoAccessor.ConcatVideosIntoOneOutput(sortedJobOutputFiles.ToList()
+                                    ,Path.Combine(AppConfigManager.Model.CompletedBucketPath,outputFileName));
         }
 
         /// <summary>
         /// Opens an encoder and starts encoding a specified job
         /// </summary>
-        public static void StartJob(EncodeJob job, string encoderType)
+        public override void AttemptJobEncode(EncodeJob job, string encoderType)
         {
             //make the encoder
             IEncoder encoder = encoderType.ToLower() switch
@@ -95,9 +75,9 @@ namespace AppLogic
                 { EncodeJobManager.ImproveQuality(job); }
                 try
                 {
-                    var outputPath = Path.Combine(AppConfigManager.Instance.ActiveBucketPath,
+                    var outputPath = Path.Combine(AppConfigManager.Model.ActiveBucketPath,
                                                     job.Id.ToString(),
-                                                    EncodeJobManager.GenerateJobOutputFilename(job));
+                                                    EncodeJob.GenerateJobOutputFilename(job));
 
                     //Start the encode
                     DateTime startTime = DateTime.Now;
@@ -110,12 +90,12 @@ namespace AppLogic
                         StartTime = startTime,
                         EndTime = DateTime.Now,
                         VmafResult = (job.IsChunk) ?
-                            RealVideoAccessor.GetVmafScene(Path.Combine(job.VideoDirectoryPath, job.VideoFileName),
+                            _videoAccessor.GetVmafScene(Path.Combine(job.VideoDirectoryPath, job.VideoFileName),
                                                         outputPath,
                                                         job.Chunk!.StartTime,
                                                         job.Chunk!.EndTime ) :
-                            RealVideoAccessor.GetVmaf(Path.Combine(job.VideoDirectoryPath, job.VideoFileName), outputPath),
-                        FileSize = (ulong)new FileInfo(outputPath).Length
+                            _videoAccessor.GetVmaf(Path.Combine(job.VideoDirectoryPath, job.VideoFileName), outputPath),
+                        FileSize = _fileAccessor.GetFileSize(outputPath)
                     };
                     job.Attempts.Add(attempt);
                     // Update job in db?
@@ -125,7 +105,8 @@ namespace AppLogic
             } while (RunAgain(job, attempt?.OriginalOutputPath));
         }
 
-        private static bool RunAgain(EncodeJob job, string? result)
+        /// <todo>Move this</todo>
+        private bool RunAgain(EncodeJob job, string? result)
         {
             if (result == null)
             { return true; }
@@ -135,6 +116,27 @@ namespace AppLogic
             { return false; }
 
             return true;
+        }
+
+        public void Notify() =>
+            SetupFromConfig();
+
+        private void SetupFromConfig()
+        {
+            _fileAccessor = AppConfigManager.Model.FileAccessor switch
+            {
+                FileAccessorType.real => new RealFileAccessor(),
+                FileAccessorType.workingFake => new GoodFakeFileAccessor(),
+                FileAccessorType.combineSuccessMock 
+                        => new TestingCombineSuccessFakeFileAccessor(),
+                _ => new GoodFakeFileAccessor()
+            };
+            _videoAccessor = AppConfigManager.Model.VideoAccessor switch
+            {
+                VideoAccessorType.real => new RealVideoAccessor(),
+                VideoAccessorType.fake => new MockVideoAccessor(),
+                _ => new MockVideoAccessor()
+            };
         }
     }
 }

@@ -9,6 +9,8 @@ using AppLogic;
 using DataObjects;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using AppConfig;
+using AppConfig.Models;
 
 namespace EncodeJobOverseer
 {
@@ -17,16 +19,17 @@ namespace EncodeJobOverseer
         #region HelperProperties
         public bool CanStartNewJob
         {
-            get
-            { return runningLocalJobs.Count < AppConfigManager.Instance.MaxRunningLocalJobs; }
+            get => runningLocalJobs.Count < AppConfigManager.Model.MaxRunningLocalJobs;
         }
         #endregion
 
         #region Fields
-        private readonly int jobCheckIntervalSeconds = 60;
+        private int JobCheckIntervalSeconds
+        {
+            get => AppConfigManager.Model.PollingInterval;
+        }
 
         private readonly ILogger<Worker> _logger;
-        private static ILogger? staticLogger;
 
         private List<Thread> runningLocalJobs = new List<Thread>();
         #endregion
@@ -34,18 +37,17 @@ namespace EncodeJobOverseer
         public Worker(ILogger<Worker> logger)
         {
             _logger = logger;
-            staticLogger = logger;
         }
 
         public override Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Videos for jobs being retrieved from " + AppConfigManager.Instance.ProcessedBucketPath);
-            _logger.LogInformation("Local jobs setup in directory " + AppConfigManager.Instance.ActiveBucketPath);
-            _logger.LogInformation("Encoded videos output to " + AppConfigManager.Instance.CompletedBucketPath);
-            _logger.LogInformation("Failed jobs moved to " + AppConfigManager.Instance.FailedBucketPath);
-            _logger.LogInformation("Completed jobs moved to " + AppConfigManager.Instance.CompletedBucketPath);
-            _logger.LogInformation("Database being used: " + AppConfigManager.Instance.DBTypeAndString.Key + " @@ "
-                                                            + AppConfigManager.Instance.DBTypeAndString.Value);
+            _logger.LogInformation("Videos for jobs being retrieved from " + AppConfigManager.Model.ProcessedBucketPath);
+            _logger.LogInformation("Local jobs setup in directory " + AppConfigManager.Model.ActiveBucketPath);
+            _logger.LogInformation("Encoded videos output to " + AppConfigManager.Model.CompletedBucketPath);
+            _logger.LogInformation("Failed jobs moved to " + AppConfigManager.Model.FailedBucketPath);
+            _logger.LogInformation("Completed jobs moved to " + AppConfigManager.Model.CompletedBucketPath);
+            _logger.LogInformation("Database being used: " + AppConfigManager.Model.DBTypeAndString.Key + " @@ "
+                                                            + AppConfigManager.Model.DBTypeAndString.Value);
             if (!EncodeJobManager.SetLogger(_logger))
             { _logger.LogError("Unable to pass logger into logic layer."); }
 
@@ -66,13 +68,12 @@ namespace EncodeJobOverseer
 
                     if (null != encodeJob)
                     {
-                        PrepLocalJobDirectory(encodeJob);
-
-                        StartLocalJob(encodeJob);
+                        if (PrepLocalJobDirectory(encodeJob))
+                            StartLocalJob(encodeJob);
                     }
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(jobCheckIntervalSeconds), stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(JobCheckIntervalSeconds), stoppingToken);
             }
         }
 
@@ -111,7 +112,7 @@ namespace EncodeJobOverseer
             try
             {
                 //build output directory
-                string outputDirectory = Path.Combine(AppConfigManager.Instance.ActiveBucketPath, job.Id.ToString());
+                string outputDirectory = Path.Combine(AppConfigManager.Model.ActiveBucketPath, job.Id.ToString());
                 if (!Directory.Exists(outputDirectory))
                 { Directory.CreateDirectory(outputDirectory); }
                 else
@@ -120,11 +121,11 @@ namespace EncodeJobOverseer
                     { throw new ApplicationException("Directory already exists and is not empty, something is busted somewhere."); }
                 }
 
-                string videoDir = AppConfigManager.Instance.ProcessedBucketPath;
+                string videoDir = AppConfigManager.Model.ProcessedBucketPath;
 
                 // If the job is a chunk, it won't be in the working dir, it will be one above
                 string targetVideoDirectory = (job.IsChunk) ?
-                                                AppConfigManager.Instance.ActiveBucketPath :
+                                                AppConfigManager.Model.ActiveBucketPath :
                                                 outputDirectory;
 
                 if (!File.Exists(Path.Combine(targetVideoDirectory, job.VideoFileName)))
@@ -189,21 +190,21 @@ namespace EncodeJobOverseer
             oldJob.Id = activeJob.Id;
 
             //Do the encode
-            string encoderConfig = "hevcffmpeg";
-            EncoderManager.StartJob(activeJob, encoderConfig);
+            string encoderConfig = AppConfigManager.Model.DefaultEncoder;
+            EncoderManager.Instance.AttemptJobEncode(activeJob, encoderConfig);
 
             // Update job doesn't update the completed status or checked out time.
             EncodeJobManager.Instance.UpdateJob(oldJob, activeJob);
             var jobComplete = activeJob.DoesMostRecentAttemptMeetRequirements();
             EncodeJobManager.Instance.MarkJobComplete(activeJob, jobComplete);
-            string oldWorkingDir = Path.Combine(AppConfigManager.Instance.ActiveBucketPath,
+            string oldWorkingDir = Path.Combine(AppConfigManager.Model.ActiveBucketPath,
                                         activeJob.Id.ToString());
 
             if (Directory.Exists(oldWorkingDir))
             {
                 string newDir = (jobComplete) ?
-                    Path.Combine(AppConfigManager.Instance.CompletedBucketPath, activeJob.Id.ToString()) :
-                    Path.Combine(AppConfigManager.Instance.FailedBucketPath, activeJob.Id.ToString());
+                    Path.Combine(AppConfigManager.Model.CompletedBucketPath, activeJob.Id.ToString()) :
+                    Path.Combine(AppConfigManager.Model.FailedBucketPath, activeJob.Id.ToString());
                 try
                 { Directory.Move(oldWorkingDir, newDir); }
                 catch

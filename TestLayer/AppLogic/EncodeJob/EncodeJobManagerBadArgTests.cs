@@ -2,6 +2,9 @@ using System;
 using AppLogic;
 using DataObjects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using AppConfig;
+using AppConfig.Models;
+using System.Collections.Generic;
 
 namespace Tests.AppLogic
 {
@@ -11,14 +14,15 @@ namespace Tests.AppLogic
         [ClassInitialize]
         public static void ClassStartup(TestContext context)
         {
-            AppConfigManager.SetConfig("mock");
+            var mockConfigModel = TestHelper.MakeConfig();
+            AppConfigManager.SetConfig(mockConfigModel);
         }
-
+        
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void AddEncodeJobToQueueFailInvalidJob()
         {
-            var job = new EncodeJob();
+            var job = TestHelper.MakeJob(valid: false);
 
             if (job.IsValid)
             { Assert.Fail("You made a valid job bruh"); }
@@ -41,7 +45,7 @@ namespace Tests.AppLogic
         [ExpectedException(typeof(ArgumentException))]
         public void MarkJobCompleteFailInvalidJob()
         {
-            var job = new EncodeJob();
+            var job = TestHelper.MakeJob(valid: false);
 
             if (job.IsValid)
             { Assert.Fail("You made a valid job bruh"); }
@@ -64,7 +68,7 @@ namespace Tests.AppLogic
         [ExpectedException(typeof(ArgumentException))]
         public void MarkJobCheckedOutFailInvalidJob()
         {
-            var job = new EncodeJob();
+            var job = TestHelper.MakeJob(valid: false);
 
             if (job.IsValid)
             { Assert.Fail("You made a valid job bruh"); }
@@ -87,32 +91,37 @@ namespace Tests.AppLogic
         [ExpectedException(typeof(ArgumentException))]
         public void UpdateJobFailInvalidOldJob()
         {
-            var job = new EncodeJob();
-            var goodJob = new EncodeJob
-            { VideoFileName = "goodvideo.mkv" };
+            var job = TestHelper.MakeJob(valid: false);
+            var goodJob = TestHelper.MakeJob(valid: true);
+            var videoName = "goodvideo.mkv";
+
+            (job.VideoFileName, goodJob.VideoFileName) = (videoName, videoName);
 
             if (!job.IsValid && goodJob.IsValid)
             {
                 EncodeJobManager.Instance.UpdateJob(job, goodJob);
+                Assert.Fail("UpdateJob accepted arguments");
             }
 
-            Assert.Fail();
+            Assert.Fail("Jobs have incorrect validity");
         }
-        
+
         [TestMethod]
         [ExpectedException(typeof(ArgumentException))]
         public void UpdateJobFailInvalidNewJob()
         {
-            var job = new EncodeJob();
-            var goodJob = new EncodeJob
-            { VideoFileName = "goodvideo.mkv" };
+            var job = TestHelper.MakeJob(valid: false);
+            var goodJob = TestHelper.MakeJob(valid: true);
+            var videoName = "goodvideo.mkv";
+
+            (job.VideoFileName, goodJob.VideoFileName) = (videoName, videoName);
 
             if (!job.IsValid && goodJob.IsValid)
             {
                 EncodeJobManager.Instance.UpdateJob(goodJob, job);
             }
 
-            Assert.Fail();
+            Assert.Fail("Jobs have incorrect validity");
         }
     }
 }

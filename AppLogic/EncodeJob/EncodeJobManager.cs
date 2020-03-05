@@ -2,7 +2,6 @@
 using DataObjects;
 using System;
 using DataAccess;
-using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
@@ -27,16 +26,10 @@ namespace AppLogic
             {
                 if (null == _instance)
                 {
-                    _instance = new RealEncodeJobManager(AppConfigManager.Instance.DBTypeAndString.Key,
-                                                         AppConfigManager.Instance.DBTypeAndString.Value);
+                    _instance = new RealEncodeJobManager();
                 }
                 return _instance;
             }
-        }
-
-        internal static void ConfigReset()
-        {
-            _instance = null;
         }
 
         /// <summary>
@@ -76,29 +69,6 @@ namespace AppLogic
                 catch { }
             }
         }
-
-        internal static string GenerateJobOutputFilename(EncodeJob job)
-        {
-            string result = Path.GetFileNameWithoutExtension(job.VideoFileName);
-            result += (job.IsChunk) ? ".chunk" + job.ChunkNumber : string.Empty;
-            result += ".attempt" + (job.Attempts.Count + 1);
-            result += ".mkv";
-            return result;
-        }
-
-        /// <summary>
-        /// Gets the guid from a designated working directory, passing back an empty if the directory 
-        /// is found/exists but does not translate to a guid.
-        /// </summary>
-        /// <todo>Move to accessor of some kind</todo>
-        public static Guid GetGuidFromWorkingDirectory(string directory)
-        {
-            string guid = new DirectoryInfo(directory).Name;
-            try
-            { return new Guid(guid); }
-            catch
-            { return Guid.Empty; }
-            }
 
         /// <summary>
         /// Passes a logger into the manager for logging purposes

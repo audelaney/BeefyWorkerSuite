@@ -32,10 +32,10 @@ namespace MasterApp
 
         public static string? GetDirectoryInput(string message, string? preExistingPath = null)
         {
-            if (string.IsNullOrEmpty(preExistingPath))
+            if (string.IsNullOrWhiteSpace(preExistingPath))
             {
                 System.Console.Write(message);
-                string directory = System.Console.ReadLine();
+                string directory = System.Console.ReadLine().Trim();
                 if (Directory.Exists(directory))
                 { return directory; }
                 else
@@ -50,30 +50,15 @@ namespace MasterApp
             }
         }
 
-        public static void GetIngesterConfigInput()
+        public static void GetConfigInput(string? configPath = null)
         {
             while (true)
             {
-                var input = AppHelpers.GetFileInput("Input a config file path: ");
+                var input = AppHelpers.GetFileInput("Input a config file path: ", configPath);
                 if (input == null) { continue; }
                 try
                 {
-                    System.Console.WriteLine("Not working");
-                    break;
-                }
-                catch { }
-            }
-        }
-
-        public static void GetOverseerConfigInput()
-        {
-            while (true)
-            {
-                var input = AppHelpers.GetFileInput("Input a config file path: ");
-                if (input == null) { continue; }
-                try
-                {
-                    System.Console.WriteLine("Not working");
+                    AppConfig.AppConfigManager.SetConfig(input);
                     break;
                 }
                 catch { }

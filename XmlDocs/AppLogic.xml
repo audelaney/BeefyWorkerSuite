@@ -4,78 +4,6 @@
         <name>AppLogic</name>
     </assembly>
     <members>
-        <member name="T:AppLogic.AppConfigManager">
-            <summary>
-            Holds/gets globally used strings for the application
-            </summary>
-        </member>
-        <member name="P:AppLogic.AppConfigManager.Instance">
-            <summary>
-            Singleton instance
-            </summary>
-        </member>
-        <member name="M:AppLogic.AppConfigManager.SetConfig(System.String)">
-            <summary>
-            Sets the config instance to whatever is found at the path, or throws
-            an exception if there is nothing at the end of the path or the file
-            is not compatible. Also resets the EncodeJobManager instance.
-            </summary>
-        </member>
-        <member name="P:AppLogic.AppConfigManager.InputBucketPath">
-            <summary>
-            The path/location of the directory where files will be placed 
-            for the app to ingest and then process.
-            </summary>
-        </member>
-        <member name="P:AppLogic.AppConfigManager.ProcessedBucketPath">
-            <summary>
-            The path/location of the directory where files will be placed
-            after their jobs have been ingested by the app and they are 
-            awaiting their turn to be encoded in the queue.
-            </summary>
-        </member>
-        <member name="P:AppLogic.AppConfigManager.ActiveBucketPath">
-            <summary>
-            The path/location of the directory where directories will be placed
-            jobs are being performed and they need a directory to be perforemed
-            in.
-            </summary>
-        </member>
-        <member name="P:AppLogic.AppConfigManager.CompletedBucketPath">
-            <summary>
-            The path/location of the directory where files will be placed
-            after their job is completed and the encode is ready to be exported
-            </summary>
-        </member>
-        <member name="P:AppLogic.AppConfigManager.LogFilePath">
-            <summary>
-            The path and filename of the file app logs will be placed
-            </summary>
-        </member>
-        <member name="P:AppLogic.AppConfigManager.DBTypeAndString">
-            <summary>
-            The type of datastore to use and the connection string or file
-            name of that data store.
-            </summary>
-        </member>
-        <member name="P:AppLogic.AppConfigManager.MaxRunningLocalJobs">
-            <summary>
-            The maximum number of running jobs the system can withstand.
-            </summary>
-        </member>
-        <member name="P:AppLogic.AppConfigManager.FailedBucketPath">
-            <summary>
-            The path/location of the directory where directories will be placed
-            when their job has reached its max number of attempts but the job
-            did not meet the requirements.
-            </summary>
-        </member>
-        <member name="P:AppLogic.XMLAppConfigReader.ConfigFileChanged">
-            <summary>
-            Check if the config file was changed to enable the use of cached values.
-            </summary>
-            <returns>If the file was changed since last check.</returns>
-        </member>
         <member name="T:AppLogic.EncodeJobManager">
             <summary>
             Logical encode job operations
@@ -94,13 +22,6 @@
             Improves the quality of a job by altering command line arguments
             </summary>
             <todo>This isn't even close to being done</todo>
-        </member>
-        <member name="M:AppLogic.EncodeJobManager.GetGuidFromWorkingDirectory(System.String)">
-            <summary>
-            Gets the guid from a designated working directory, passing back an empty if the directory 
-            is found/exists but does not translate to a guid.
-            </summary>
-            <todo>Move to accessor of some kind</todo>
         </member>
         <member name="M:AppLogic.EncodeJobManager.SetLogger(Microsoft.Extensions.Logging.ILogger)">
             <summary>
@@ -252,6 +173,48 @@
             </summary>
             <returns>Collection of jobs, or an empty collection if there are none</returns>
         </member>
+        <member name="M:AppLogic.RealEncodeJobManager.PrintDB">
+            Helper for using the logger
+        </member>
+        <member name="T:AppLogic.EncoderManager">
+            <summary>
+            Encoding related logic operations
+            </summary>
+        </member>
+        <member name="P:AppLogic.EncoderManager.Instance">
+            <summary>
+            Instance used for actual logical operations of the publicly available methods
+            </summary>
+        </member>
+        <member name="M:AppLogic.EncoderManager.CombineSuccessfulEncodes(DataObjects.EncodeJob[],System.String)">
+            <summary>
+            Combines the resulting output from a successful round of transcodes
+            </summary>
+            <exception cref="T:System.ArgumentException">
+            Thrown if:
+                - Any of the jobs are not marked as completed
+                - Jobs don't have a <see cref="P:DataObjects.EncodeJob.Chunk" />
+                - Jobs that have a video source that doesn't match the first video
+            </exception>
+            <exception cref="T:System.IO.DirectoryNotFoundException">
+            Thrown if:
+                - A job is found which is marked as completed but does not have a directory in the
+                completed bucket.
+            </exception>
+        </member>
+        <member name="M:AppLogic.EncoderManager.AttemptJobEncode(DataObjects.EncodeJob,System.String)">
+            <summary>
+            Opens an encoder and starts encoding a specified job
+            </summary>
+        </member>
+        <member name="M:AppLogic.RealEncoderManager.AttemptJobEncode(DataObjects.EncodeJob,System.String)">
+            <summary>
+            Opens an encoder and starts encoding a specified job
+            </summary>
+        </member>
+        <member name="M:AppLogic.RealEncoderManager.RunAgain(DataObjects.EncodeJob,System.String)">
+            <todo>Move this</todo>
+        </member>
         <member name="T:AppLogic.Encoders.EncoderHevcFfmpeg">
             <summary>
             Single pass ffmpeg based libaom encoder implementation
@@ -279,51 +242,35 @@
             or null if unsuccessful.
             </summary>
         </member>
-        <member name="T:AppLogic.EncoderManager">
+        <member name="T:AppLogic.RealVideoManager">
             <summary>
-            Encoding related logic operations
+            Video manager that has the real logic
             </summary>
         </member>
-        <member name="P:AppLogic.EncoderManager.Instance">
+        <member name="M:AppLogic.RealVideoManager.GetScenesFromVideo(System.String)">
             <summary>
-            Instance used for actual logical operations of the publicly available methods
+            Converts a video into timestamped scenes that match criteria
             </summary>
         </member>
-        <member name="M:AppLogic.EncoderManager.Combine(DataObjects.EncodeJob[],System.String)">
+        <member name="M:AppLogic.RealVideoManager.Notify">
             <summary>
-            Combines the resulting output from 
+            Notify the manager of a configuration change
             </summary>
-            <exception cref="T:System.ArgumentException">
-            Thrown if:
-                - Any of the jobs are not marked as completed
-                - Jobs don't have an InputInterval
-                - Jobs that have a video source that doesn't match the first video
-            </exception>
-            <exception cref="T:System.IO.DirectoryNotFoundException">
-            Thrown if:
-                - A job is found which is marked as completed but does not have a directory in the
-                completed bucket.
-            </exception>
-        </member>
-        <member name="M:AppLogic.EncoderManager.StartJob(DataObjects.EncodeJob,System.String)">
-            <summary>
-            Opens an encoder and starts encoding a specified job
-            </summary>
-        </member>
-        <member name="M:AppLogic.RealEncodeJobManager.PrintDB">
-            Helper for using the logger
         </member>
         <member name="T:AppLogic.VideoManager">
             <summary>
             Generic video related logic operations
             </summary>
         </member>
-        <member name="M:AppLogic.VideoManager.AnalyzeScenes(DataObjects.Scene[])">
+        <member name="P:AppLogic.VideoManager.Instance">
             <summary>
-            Mushes scenes together based on desired speed/efficiency/accuracy/
-            precision.
+            Singleton instance
             </summary>
-            <param name="sceneData">The scenes to mush together.</param>
+        </member>
+        <member name="M:AppLogic.VideoManager.GetScenesFromVideo(System.String)">
+            <summary>
+            Converts a video into timestamped scenes that match criteria
+            </summary>
         </member>
         <member name="M:AppLogic.VideoManager.MeetsCriteria(DataObjects.Scene)">
             <summary>
@@ -332,10 +279,12 @@
             <todo>Should be adding a 'criteria' object of some kind as
             a param.</todo>
         </member>
-        <member name="M:AppLogic.VideoManager.GetScenesFromVideo(System.String)">
+        <member name="M:AppLogic.VideoManager.AnalyzeScenes(DataObjects.Scene[])">
             <summary>
-            Converts a video into timestamped scenes that match criteria
+            Mushes scenes together based on desired speed/efficiency/accuracy/
+            precision.
             </summary>
+            <param name="sceneData">The scenes to mush together.</param>
         </member>
     </members>
 </doc>

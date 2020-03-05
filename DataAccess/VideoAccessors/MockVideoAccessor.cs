@@ -20,5 +20,19 @@ namespace DataAccess
             { return TestScenes.ToArray(); }
             throw new FileNotFoundException();
         }
+
+        /// <summary></summary>
+        public void ConcatVideosIntoOneOutput(List<string> videoPaths, string outputVideoFile)
+        { }
+
+        /// <summary></summary>
+        public double GetVideoDuration(string videoPath) => 20;
+
+        /// <summary></summary>
+        public double GetVmaf(string sourcePath, string encodedPath) => 97;
+
+        /// <summary></summary>
+        public double GetVmafScene(string sourcePath, string scenePath, double sceneStartTime, double sceneEndTime)
+                => 97;
     }
 }

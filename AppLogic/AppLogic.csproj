@@ -10,6 +10,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.0.0" />
     <ProjectReference Include="..\DataObjects\DataObjects.csproj" />
     <ProjectReference Include="..\DataAccess\DataAccess.csproj" />
+    <ProjectReference Include="..\AppConfig\AppConfig.csproj" />
   </ItemGroup>
 
 </Project>

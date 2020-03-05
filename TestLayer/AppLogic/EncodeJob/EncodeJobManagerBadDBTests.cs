@@ -2,6 +2,9 @@ using System;
 using AppLogic;
 using DataObjects;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using AppConfig;
+using AppConfig.Models;
+using System.Collections.Generic;
 
 namespace Tests.AppLogic
 {
@@ -11,17 +14,19 @@ namespace Tests.AppLogic
         [ClassInitialize]
         public static void ClassStartup(TestContext context)
         {
-            AppConfigManager.SetConfig("mock-baddb");
+            var mockConfigModel = new ConfigModel()
+            {
+                FileAccessor = FileAccessorType.workingFake,
+                DBTypeAndString = new KeyValuePair<DbType, string>(DbType.mockBadDb, "")
+            };
+            AppConfigManager.SetConfig(mockConfigModel);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ApplicationException))]
         public void AddEncodeJobToQueueFailBadDatabaseConnection()
         {
-            var job = new EncodeJob
-            {
-                VideoFileName = "somevideo.mkv"
-            };
+            var job = TestHelper.MakeJob(valid:true);
 
             var result = EncodeJobManager.Instance.AddEncodeJobToQueue(job);
 
@@ -43,10 +48,7 @@ namespace Tests.AppLogic
         [ExpectedException(typeof(ApplicationException))]
         public void MarkJobCompleteJobFailBadDatabaseConnection()
         {
-            var job = new EncodeJob
-            {
-                VideoFileName = "testing.mkv"
-            };
+            var job = TestHelper.MakeJob(valid:true);
 
             var result = EncodeJobManager.Instance.MarkJobComplete(job, true);
 
@@ -68,10 +70,7 @@ namespace Tests.AppLogic
         [ExpectedException(typeof(ApplicationException))]
         public void MarkJobCheckedOutJobFailBadDatabaseConnection()
         {
-            var job = new EncodeJob
-            {
-                VideoFileName = "testing.mkv"
-            };
+            var job = TestHelper.MakeJob(valid:true);
 
             var result = EncodeJobManager.Instance.MarkJobCheckedOut(job, true);
 
@@ -93,10 +92,7 @@ namespace Tests.AppLogic
         [ExpectedException(typeof(ApplicationException))]
         public void UpdateJobFailBadDatabaseConnection()
         {
-            var job = new EncodeJob
-            {
-                VideoFileName = "testing.mkv"
-            };
+            var job = TestHelper.MakeJob(valid:true);
             var newer = job.Clone() as EncodeJob;
             newer!.VideoDirectoryPath = "/somewhere/else/";
 

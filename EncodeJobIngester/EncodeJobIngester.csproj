@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AppLogic\AppLogic.csproj" />
+    <ProjectReference Include="..\AppConfig\AppConfig.csproj" />
     <ProjectReference Include="..\DataObjects\DataObjects.csproj" />
   </ItemGroup>
 </Project>
