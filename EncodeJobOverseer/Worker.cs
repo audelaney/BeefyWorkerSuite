@@ -19,16 +19,17 @@ namespace EncodeJobOverseer
         #region HelperProperties
         public bool CanStartNewJob
         {
-            get
-            { return runningLocalJobs.Count < AppConfigManager.Model.MaxRunningLocalJobs; }
+            get => runningLocalJobs.Count < AppConfigManager.Model.MaxRunningLocalJobs;
         }
         #endregion
 
         #region Fields
-        private readonly int jobCheckIntervalSeconds = 60;
+        private int JobCheckIntervalSeconds
+        {
+            get => AppConfigManager.Model.PollingInterval;
+        }
 
         private readonly ILogger<Worker> _logger;
-        private static ILogger? staticLogger;
 
         private List<Thread> runningLocalJobs = new List<Thread>();
         #endregion
@@ -36,7 +37,6 @@ namespace EncodeJobOverseer
         public Worker(ILogger<Worker> logger)
         {
             _logger = logger;
-            staticLogger = logger;
         }
 
         public override Task StartAsync(CancellationToken cancellationToken)
@@ -68,13 +68,12 @@ namespace EncodeJobOverseer
 
                     if (null != encodeJob)
                     {
-                        PrepLocalJobDirectory(encodeJob);
-
-                        StartLocalJob(encodeJob);
+                        if (PrepLocalJobDirectory(encodeJob))
+                            StartLocalJob(encodeJob);
                     }
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(jobCheckIntervalSeconds), stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(JobCheckIntervalSeconds), stoppingToken);
             }
         }
 
@@ -191,7 +190,7 @@ namespace EncodeJobOverseer
             oldJob.Id = activeJob.Id;
 
             //Do the encode
-            string encoderConfig = "hevcffmpeg";
+            string encoderConfig = AppConfigManager.Model.DefaultEncoder;
             EncoderManager.Instance.AttemptJobEncode(activeJob, encoderConfig);
 
             // Update job doesn't update the completed status or checked out time.

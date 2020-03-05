@@ -4,6 +4,7 @@ using DataAccess;
 using System.Collections.Generic;
 using AppConfig;
 using AppConfig.Models;
+using System.Linq;
 
 namespace AppLogic
 {
@@ -17,7 +18,12 @@ namespace AppLogic
         /// </summary>
         public static VideoManager Instance
         {
-            get => _instance ?? throw new NotImplementedException();
+            get
+            {
+                if (_instance == null)
+                { _instance = new RealVideoManager(); }
+                return _instance;
+            }
         }
         private static VideoManager? _instance;
 
@@ -51,14 +57,29 @@ namespace AppLogic
         {
             var chunks = new List<Scene>();
 
-            for (int i = 1; i < sceneData.Length; i++)
-            {
-                var thisScene = sceneData[i - 1];
+            chunks.Add(sceneData.First());
 
-                if (!MeetsCriteria(thisScene))
-                { sceneData[i] = Scene.Combine(thisScene, sceneData[i]); }
+            var scenes = sceneData.Length;
+            for (int i = 1; i < scenes; i++)
+            {
+                if (MeetsCriteria(chunks.Last()))
+                {
+                    var remaining = sceneData.ToList().GetRange(i,scenes-i);
+                    if (MeetsCriteria(Scene.Combine(remaining)))
+                    {
+                        chunks.Add(sceneData[i]);
+                    }
+                    else
+                    {
+                        var lastScene = chunks.Last();
+                        chunks[chunks.Count - 1] = Scene.Combine(lastScene, sceneData[i]);
+                    }
+                }
                 else
-                { chunks.Add(thisScene); }
+                {
+                    var lastScene = chunks.Last();
+                    chunks[chunks.Count - 1] = Scene.Combine(lastScene, sceneData[i]);
+                }
             }
 
             return chunks.ToArray();

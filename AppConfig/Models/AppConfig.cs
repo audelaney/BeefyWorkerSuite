@@ -54,5 +54,13 @@ namespace AppConfig.Models
         /// The type of video accessor to use
         /// </summary>
         public VideoAccessorType VideoAccessor { get; set; }
+        /// <summary>
+        /// Default encoder for the application to use when not specified by job
+        /// </summary>
+        public string DefaultEncoder { get; set; } = "";
+        /// <summary>
+        /// Seconds between application runs
+        /// </summary>
+        public int PollingInterval { get; set; }
     }
 }

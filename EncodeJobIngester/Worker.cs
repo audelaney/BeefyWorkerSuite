@@ -1,7 +1,6 @@
 #nullable enable
 using AppLogic;
 using System;
-using System.Diagnostics;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -10,7 +9,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.IO;
 using DataObjects;
-using Newtonsoft.Json;
 using AppConfig;
 using AppConfig.Models;
 
@@ -18,7 +16,6 @@ namespace EncodeJobIngester
 {
     public class Worker : BackgroundService
     {
-        private readonly int searchIntervalMS = 60 * 1000;
         private readonly ILogger<Worker> _logger;
 
         /// <summary>
@@ -146,7 +143,8 @@ namespace EncodeJobIngester
                     }
                 }
 
-                await Task.Delay(searchIntervalMS, stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(AppConfigManager.Model.PollingInterval)
+                                , stoppingToken);
             }
         }
 

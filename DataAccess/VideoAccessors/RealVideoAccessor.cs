@@ -53,7 +53,6 @@ namespace DataAccess
                     { unparsedFfmpegLines.Add(buffer); }
                 }
                 ffmpegProcess.Close();
-                ffmpegProcess.Dispose();
             }
 
             if (unparsedFfmpegLines.Count == 0)
@@ -93,25 +92,27 @@ namespace DataAccess
             return scenes.ToArray();
         }
         /// <summary></summary>
-        public void ConcatVideosIntoOneOutput(List<string> videoPaths, string outputVideoFile)
+        public void ConcatVideosIntoOneOutput(List<string> videoPaths, string outputVideoPath)
         {
-            if (File.Exists(outputVideoFile))
-            { File.Delete(outputVideoFile); }
+            if (File.Exists(outputVideoPath))
+            { File.Delete(outputVideoPath); }
             videoPaths.ForEach(p => { if (!File.Exists(p)) { throw new ArgumentException(p + " doesn't exist"); } });
 
             // Write the list of video files out to a text file to use for the ffmpeg command
-            string textFileName = outputVideoFile + ".txt";
+            string textFileName = outputVideoPath + ".txt";
             using (StreamWriter writer = new StreamWriter(textFileName))
             {
-                videoPaths.ForEach(p => writer.WriteLine(p));
+                videoPaths.ForEach(p => writer.WriteLine($"file '{p}'"));
                 writer.Close();
             }
 
             var ffmpegStartInfo = new ProcessStartInfo
             {
+                CreateNoWindow = true,
+                UseShellExecute = false,
                 RedirectStandardError = true,
                 FileName = FfmpegExecutablePath,
-                Arguments = "-f concat -safe 0 -i " + textFileName + " -c copy " + outputVideoFile
+                Arguments = "-f concat -safe 0 -i " + textFileName + " -c copy " + outputVideoPath
             };
 
             using (Process ffmpegProcess = new Process { StartInfo = ffmpegStartInfo })
@@ -119,6 +120,7 @@ namespace DataAccess
                 ffmpegProcess.Start();
                 ffmpegProcess.Refresh();
                 ffmpegProcess.WaitForExit();
+                var output = ffmpegProcess.StandardError.ReadToEnd();
                 ffmpegProcess.Close();
             }
 
@@ -132,7 +134,9 @@ namespace DataAccess
 
             var ffprobeStartInfo = new ProcessStartInfo
             {
-                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
                 FileName = FfprobeExecutablePath,
                 Arguments = "-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 " + videoPath
             };
@@ -144,7 +148,7 @@ namespace DataAccess
                 ffprobeProcess.Start();
                 ffprobeProcess.Refresh();
                 ffprobeProcess.WaitForExit();
-                processOutput = ffprobeProcess.StandardError.ReadToEnd().Trim();
+                processOutput = ffprobeProcess.StandardOutput.ReadToEnd().Trim();
                 ffprobeProcess.Close();
             }
 

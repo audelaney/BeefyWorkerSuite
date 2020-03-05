@@ -1,4 +1,6 @@
+using Newtonsoft.Json;
 using System;
+using MongoDB.Bson.Serialization.Attributes;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +18,8 @@ namespace DataObjects
 
         public double StartTime { get; set; }
         public double EndTime { get; set; }
+        [BsonIgnore]
+        [JsonIgnore]
         public TimeSpan Duration
         {
             get
@@ -25,8 +29,9 @@ namespace DataObjects
                 return end.Subtract(start);
             }
         }
-
-        public bool IsValid 
+        [BsonIgnore]
+        [JsonIgnore]
+        public bool IsValid
         {
             get
             {
@@ -41,7 +46,7 @@ namespace DataObjects
         {
             return $"Start time: {StartTime}, End time: {EndTime}, Duration: {Duration.ToString()}";
         }
-        
+
         public object Clone()
         {
             return new Scene(this.StartTime, this.EndTime);
@@ -50,7 +55,7 @@ namespace DataObjects
         #region Static
         public static Scene Combine(Scene firstScene, Scene secondScene)
         {
-            var output = new Scene(firstScene.StartTime,secondScene.EndTime);
+            var output = new Scene(firstScene.StartTime, secondScene.EndTime);
 
             return output;
         }

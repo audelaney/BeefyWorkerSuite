@@ -15,7 +15,7 @@ namespace MasterApp
         }
         public static void Run()
         {
-            AppHelpers.GetOverseerConfigInput();
+            AppHelpers.GetConfigInput();
             
             var keepGoing = true;
             while (keepGoing)

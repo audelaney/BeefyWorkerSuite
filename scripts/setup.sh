@@ -10,7 +10,8 @@ mkdir -p ~/Videos/EncodeWorker/jobs/processed
 mkdir -p ~/Videos/EncodeWorker/input
 
 #Config folder goodness
-cp -n AppConfig/default.config ~/Videos/EncodeWorker/local.config
+cp -n AppConfig/default.config ~/Videos/EncodeWorker/local.overseer.config
+cp -n AppConfig/default.config ~/Videos/EncodeWorker/local.ingester.config
 
 cd MasterApp && dotnet publish -c Release && \
 sudo cp bin/Release/netcoreapp3.0/ubuntu.18.04-x64/publish/MasterApp /usr/local/bin/

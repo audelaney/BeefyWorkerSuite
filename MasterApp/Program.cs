@@ -61,22 +61,46 @@ namespace MasterApp
 
         private static void HandleInput(string[] args)
         {
-            switch (args.First())
+            for (int i = 0; i < args.Length; i++)
             {
-                case "--input-splitter":
-                    string? video = null;
-                    string? targetDir = null;
-                    try
-                    {
-                        video = args[1];
-                        targetDir = args[2];
-                    }
-                    catch
-                    { System.Console.WriteLine("--input-splitter {video-path} {output-dir}"); }
-                    InputSplitter.Run(video, targetDir);
-                    break;
-                default:
-                    break;
+                switch (args[i])
+                {
+                    case "-c":
+                    case "--config":
+                        try
+                        {
+                            AppHelpers.GetConfigInput(args[i + 1]);
+                        }
+                        catch
+                        { }
+                        break;
+                    case "--input-splitter":
+                        string? videoInputPath = null;
+                        string? videoOutputDirectoryInput = null;
+                        try
+                        {
+                            videoInputPath = args[i + 1];
+                            videoOutputDirectoryInput = args[i + 2];
+                        }
+                        catch
+                        { System.Console.WriteLine("--input-splitter {video-path} {output-dir}"); }
+                        InputSplitter.Run(videoInputPath, videoOutputDirectoryInput);
+                        break;
+                    case "--output-combiner":
+                        string? oldVideo = null;
+                        string? newVideo = null;
+                        try
+                        {
+                            oldVideo = args[i + 1];
+                            newVideo = args[i + 2];
+                        }
+                        catch
+                        { System.Console.WriteLine("--output-combiner {old-video} {new-video}"); }
+                        OutputCombiner.Run(oldVideo, newVideo);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 

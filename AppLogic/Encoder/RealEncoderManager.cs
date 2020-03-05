@@ -52,7 +52,7 @@ namespace AppLogic
 
             //Concat the video files
             _videoAccessor.ConcatVideosIntoOneOutput(sortedJobOutputFiles.ToList()
-                                    ,Path.Combine(AppConfigManager.Model.CompletedBucketPath));
+                                    ,Path.Combine(AppConfigManager.Model.CompletedBucketPath,outputFileName));
         }
 
         /// <summary>

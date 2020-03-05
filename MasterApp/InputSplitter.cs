@@ -10,28 +10,25 @@ namespace MasterApp
 {
     public class InputSplitter
     {
-        public static void Run(string? videoInputPathInput = null, string? videoOutputDirectoryInput = null)
+        public static void Run(string? videoInputPath = null, string? videoOutputDirectory = null)
         {
-            videoInputPathInput = AppHelpers.GetFileInput("Input video file to be split: ", videoInputPathInput);
-            videoOutputDirectoryInput = AppHelpers.GetDirectoryInput("Output directory for video jobs: ", videoOutputDirectoryInput);
+            videoInputPath = AppHelpers.GetFileInput("Input video file to be split: ", videoInputPath);
+            videoOutputDirectory = AppHelpers.GetDirectoryInput("Output directory for video jobs: ", videoOutputDirectory);
 
-            if (null == videoInputPathInput || null == videoOutputDirectoryInput)
+            if (null == videoInputPath || null == videoOutputDirectory)
             {
                 System.Console.WriteLine("One or both paths do not exist... exiting input splitter.");
                 return;
             }
 
-            string videoInputPath = videoInputPathInput;
-            string videoOutputDirectory = videoOutputDirectoryInput;
-
             string videoName = Path.GetFileNameWithoutExtension(videoInputPath);
 
             System.Console.WriteLine("Using ffmepg to search for ideal points of scene change...");
             //Analyze the video and find scene changes
-            var scenes = VideoManager.Instance.GetScenesFromVideo(videoInputPath); 
+            var scenes = VideoManager.Instance.GetScenesFromVideo(videoInputPath);
             System.Console.WriteLine($"Ended operation with {scenes.Count()} chunks. Transforming into jobs...");
 
-            List<EncodeJob> jobs = new List<EncodeJob>();
+            var jobs = new List<EncodeJob>();
 
             try
             { jobs = ConvertToUnNumberedJobs(scenes, Path.GetFileName(videoInputPath)); }
@@ -71,7 +68,7 @@ namespace MasterApp
             System.Console.WriteLine("Job requirements will now be prompted. Leave prompt empty to use default, and enter 'quit' at any time to quit and exit.");
             System.Console.WriteLine("[] denotes valid range, [[]] denotes default.");
             int userMaxAttempts = 3;
-            int userPriority = 3;
+            int userPriority = 5;
             double userMinVmaf = 90;
             double userMinPsnr = 35;
             string userAddtlCommands = "";
@@ -98,14 +95,14 @@ namespace MasterApp
                 }
                 while (true)
                 {
-                    System.Console.Write("Please enter a number for job's priority [1-3][[3]]: ");
+                    System.Console.Write("Please enter a number for job's priority [1-5][[5]]: ");
                     string input = System.Console.ReadLine();
                     if (input.Trim().ToLower() == "quit")
                     { throw new ApplicationException("User has quit."); }
                     if (string.IsNullOrEmpty(input)) { break; }
                     else if (int.TryParse(input, out int result))
                     {
-                        if (0 < result && 3 >= result)
+                        if (0 < result && 5 >= result)
                         {
                             userPriority = result;
                             break;

@@ -16,7 +16,7 @@ namespace Tests
                 DBTypeAndString = new KeyValuePair<DbType, string>(DbType.mock, ""),
                 CompletedBucketPath = "/completed/",
                 InputBucketPath = "/input/",
-                ProcessedBucketPath = "/processed"
+                ProcessedBucketPath = "/processed/"
             };
         }
         public static EncodeJob MakeJob(bool valid)

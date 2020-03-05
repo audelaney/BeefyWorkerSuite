@@ -112,16 +112,19 @@ namespace DataObjects
         {
             get
             {
-                if (0 > Priority || 5 < Priority
-                    || 0 > MaxAttempts || 0 > MinPsnr || 0 > MinVmaf
-                    || (Attempts.Where(a => a.IsValid).Count() != 0)
-                    || (IsChunk && !Chunk!.IsValid)
-                    || string.IsNullOrWhiteSpace(VideoFileName))
-                { return false; }
-                else
+                if (Priority > 0 && Priority <= 5
+                    && MaxAttempts > 0
+                    && MinPsnr > 0 && MinVmaf > 0
+                    && Attempts.Where(a => a.IsValid).Count() == Attempts.Count
+                    && !string.IsNullOrWhiteSpace(VideoFileName)
+                    )
                 {
-                    return true;
+                    if (IsChunk)
+                    { return Chunk!.IsValid; }
+                    else
+                    { return true; }
                 }
+                return false;
             }
         }
         #endregion

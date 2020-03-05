@@ -16,6 +16,9 @@ namespace AppConfig.Accessors
         public ConfigModel GetConfig()
         {
             var config = new ConfigModel();
+            config.PollingInterval = IntervalTime;
+            config.DefaultEncoder = DefaultEncoder;
+            config.ActiveBucketPath = ActiveBucketPath;
             config.InputBucketPath = InputBucketPath;
             config.CompletedBucketPath = CompletedBucketPath;
             config.DBTypeAndString = DBTypeAndString;
@@ -113,6 +116,20 @@ namespace AppConfig.Accessors
                 }
             }
         }
+        public string DefaultEncoder
+        {
+            get
+            {
+                try
+                {
+                    return GetAttributePathValueFromRunningOrDefaultNode("DefaultEncoder","type");
+                }
+                catch (Exception)
+                {
+                    return "";
+                }
+            }
+        }
         public KeyValuePair<DbType, string> DBTypeAndString
         {
             get
@@ -120,7 +137,7 @@ namespace AppConfig.Accessors
                 try
                 {
                     //Check if the startup node has a useful entry for the DbConnection
-                    var startupNode = XDocument.Load(XmlReader.Create(_path)).Root.Element("Startup");
+                    var startupNode = XDocument.Load(XmlReader.Create(_path)).Root.Element("Local");
                     bool startupNodeHasDbConnectionData = ((startupNode.HasElements &&
                                                             startupNode.Element("DbConnection").Attribute("type") != null &&
                                                             startupNode.Element("DbConnection").Attribute("string") != null));
@@ -155,23 +172,35 @@ namespace AppConfig.Accessors
                 var rootNode = XDocument.Load(XmlReader.Create(_path)).Root;
 
                 //Try to find the value from the running node first
-                if (!string.IsNullOrWhiteSpace(rootNode.Element("Running").Element("MaxJobs").Attribute("num").Value))
-                { result = rootNode.Element("Running").Element("MaxJobs").Attribute("num").Value; }
+                if (!string.IsNullOrWhiteSpace(rootNode.Element("Local").Element("MaxJobs").Attribute("num").Value))
+                { result = rootNode.Element("Local").Element("MaxJobs").Attribute("num").Value; }
                 //Then the default node
-                else if (!string.IsNullOrWhiteSpace(rootNode.Element("Defaults").Element("MaxJobs").Attribute("num").Value))
-                { result = rootNode.Element("Defaults").Element("MaxJobs").Attribute("num").Value; }
                 else
-                {
-                    return 0;
-                }
+                { return 0; }
                 if (int.TryParse(result, out int jobMax))
-                {
-                    return jobMax;
-                }
+                { return jobMax; }
                 else
-                {
-                    return 0;
-                }
+                { return 0; }
+            }
+        }
+        public int IntervalTime
+        {
+            get
+            {
+                string result;
+
+                var rootNode = XDocument.Load(XmlReader.Create(_path)).Root;
+
+                //Try to find the value from the running node first
+                if (!string.IsNullOrWhiteSpace(rootNode.Element("Local").Element("IntervalTime").Attribute("seconds").Value))
+                { result = rootNode.Element("Local").Element("IntervalTime").Attribute("seconds").Value; }
+                //Then the default node
+                else
+                { return 61; }
+                if (int.TryParse(result, out int interval))
+                { return interval; }
+                else
+                { return 61; }
             }
         }
 
@@ -183,11 +212,9 @@ namespace AppConfig.Accessors
 
             //Try to find the value from the running node first
             if (!string.IsNullOrWhiteSpace(rootNode.Element("Local").Element(node).Attribute(attribute).Value))
-            { result = rootNode.Element("Running").Element(node).Attribute(attribute).Value; }
+            { result = rootNode.Element("Local").Element(node).Attribute(attribute).Value; }
             else
-            {
-                throw new ApplicationException("Failed to read XML for " + node);
-            }
+            { throw new ApplicationException("Failed to read XML for " + node); }
 
             return result;
         }
