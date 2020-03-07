@@ -37,7 +37,9 @@ namespace AppLogic
         {
             _videoAccessor = AppConfigManager.Model.VideoAccessor switch
             {
-                VideoAccessorType.real => new RealVideoAccessor(),
+                VideoAccessorType.real => new RealVideoAccessor("ffmpeg",
+                                                                "ffprobe",
+                                                                "/home/userbeef/server-files/encode-items/pts.sh"),
                 VideoAccessorType.fake => new MockVideoAccessor(),
                 _ => new MockVideoAccessor()
             };

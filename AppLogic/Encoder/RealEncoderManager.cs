@@ -133,7 +133,9 @@ namespace AppLogic
             };
             _videoAccessor = AppConfigManager.Model.VideoAccessor switch
             {
-                VideoAccessorType.real => new RealVideoAccessor(),
+                VideoAccessorType.real => new RealVideoAccessor(AppConfigManager.Model.FfmpegPath,
+                                                                AppConfigManager.Model.FfprobePath,
+                                                                AppConfigManager.Model.PtsScriptPath),
                 VideoAccessorType.fake => new MockVideoAccessor(),
                 _ => new MockVideoAccessor()
             };

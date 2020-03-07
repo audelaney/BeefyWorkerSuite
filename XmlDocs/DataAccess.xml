@@ -509,7 +509,12 @@
         </member>
         <member name="T:DataAccess.RealVideoAccessor">
             <summary>
-            Accessor for generic video functions
+            Accessor for generic video functions. Currently linux dependent
+            </summary>
+        </member>
+        <member name="M:DataAccess.RealVideoAccessor.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Initializes a video accessor with the supplied paths
             </summary>
         </member>
         <member name="M:DataAccess.RealVideoAccessor.AnalyzeVideoInput(System.String)">

@@ -83,7 +83,7 @@ namespace EncodeJobOverseer
 
             try
             {
-                int[] priorityRange = { 1, 2, 3 };
+                int[] priorityRange = { 1, 2, 3, 4, 5 };
                 for (int i = 0; i < priorityRange.Length; i++)
                 {
                     output ??= EncodeJobManager.Instance.GetIncompleteEncodeJobs(priorityRange[i])?.FirstOrDefault(j => j.CheckedOutTime == null);

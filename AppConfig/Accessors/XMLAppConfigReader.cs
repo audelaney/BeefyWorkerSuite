@@ -29,6 +29,9 @@ namespace AppConfig.Accessors
             config.ProcessedBucketPath = ProcessedBucketPath;
             config.FileAccessor = FileAccessorType.real;
             config.VideoAccessor = VideoAccessorType.real;
+            config.FfprobePath = FfprobePath;
+            config.FfmpegPath = FfmpegPath;
+            config.PtsScriptPath = PtsScriptPath;
             return config;
         }
 
@@ -122,7 +125,7 @@ namespace AppConfig.Accessors
             {
                 try
                 {
-                    return GetAttributePathValueFromRunningOrDefaultNode("DefaultEncoder","type");
+                    return GetAttributePathValueFromRunningOrDefaultNode("DefaultEncoder", "type");
                 }
                 catch (Exception)
                 {
@@ -201,6 +204,49 @@ namespace AppConfig.Accessors
                 { return interval; }
                 else
                 { return 61; }
+            }
+        }
+
+        public string FfprobePath
+        {
+            get
+            {
+                try
+                {
+                    return GetAttributePathValueFromRunningOrDefaultNode("Ffprobe", "path");
+                }
+                catch (Exception)
+                {
+                    return "";
+                }
+            }
+        }
+        public string FfmpegPath
+        {
+            get
+            {
+                try
+                {
+                    return GetAttributePathValueFromRunningOrDefaultNode("Ffprobe", "path");
+                }
+                catch (Exception)
+                {
+                    return "";
+                }
+            }
+        }
+        public string PtsScriptPath
+        {
+            get
+            {
+                try
+                {
+                    return GetAttributePathValueFromRunningOrDefaultNode("PtsScript", "path");
+                }
+                catch (Exception)
+                {
+                    return "";
+                }
             }
         }
 

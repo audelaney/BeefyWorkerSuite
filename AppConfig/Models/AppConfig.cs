@@ -61,6 +61,18 @@ namespace AppConfig.Models
         /// <summary>
         /// Seconds between application runs
         /// </summary>
-        public int PollingInterval { get; set; }
+        public int PollingInterval { get; set; } = 60;
+        /// <summary>
+        /// Path to ffprobe executable file
+        /// </summary>
+        public string FfprobePath { get; set; } = "";
+        /// <summary>
+        /// Path to ffmpeg executable file
+        /// </summary>
+        public string FfmpegPath { get; set; } = "";
+        /// <summary>
+        /// Path to the script used for getting a video's scene change PTS
+        /// </summary>
+        public string PtsScriptPath { get; set; } = "";
     }
 }

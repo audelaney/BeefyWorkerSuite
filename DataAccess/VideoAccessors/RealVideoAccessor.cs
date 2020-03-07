@@ -8,20 +8,24 @@ using DataObjects;
 namespace DataAccess
 {
     /// <summary>
-    /// Accessor for generic video functions
+    /// Accessor for generic video functions. Currently linux dependent
     /// </summary>
     public class RealVideoAccessor : IVideoAccessor
     {
-        private static string FfmpegExecutablePath
+        /// <summary>
+        /// Initializes a video accessor with the supplied paths
+        /// </summary>
+        public RealVideoAccessor(string ffmpegPath, string ffprobePath, string ptsScriptPath)
         {
-            get
-            { return "ffmpeg"; }
+            _ffmpegExecutablePath = ffmpegPath;
+            _ffprobeExecutablePath = ffprobePath;
+            _ptsScriptPath = ptsScriptPath;
         }
-        private static string FfprobeExecutablePath
-        {
-            get
-            { return "ffprobe"; }
-        }
+        
+        private readonly string _ffmpegExecutablePath;
+        private readonly string _ffprobeExecutablePath;
+        private readonly string _ptsScriptPath;
+
         /// <summary></summary>
         public Scene[] AnalyzeVideoInput(string videoInputPath)
         {
@@ -34,28 +38,26 @@ namespace DataAccess
             //Ffmpeg the video for scene change time stamps
             var processInfo = new ProcessStartInfo
             {
-                FileName = FfmpegExecutablePath,
-                Arguments = $"-i {videoInputPath} -filter:v \"select='gt(scene,0.4)',showinfo\" -f null -",
+                FileName = "sh",
+                Arguments =  $"{_ptsScriptPath} {videoInputPath}",
                 RedirectStandardError = true,
                 CreateNoWindow = true,
                 UseShellExecute = false
             };
 
-            var unparsedFfmpegLines = new List<string>();
+            IEnumerable<string> unparsedFfmpegLines = new List<string>();
 
             using (Process ffmpegProcess = new Process { StartInfo = processInfo })
             {
                 ffmpegProcess.Start();
-                while (!ffmpegProcess.StandardError.EndOfStream)
-                {
-                    string buffer = ffmpegProcess.StandardError.ReadLine() ?? "";
-                    if (buffer.Contains("pts_time:"))
-                    { unparsedFfmpegLines.Add(buffer); }
-                }
+                ffmpegProcess.Refresh();
+                var lineSep = new[] {'\r','\n'};
+                var buffer = ffmpegProcess.StandardError.ReadToEnd().Split(lineSep, StringSplitOptions.RemoveEmptyEntries);
+                unparsedFfmpegLines = buffer.Where(l => l.Contains("pts_time:"));
                 ffmpegProcess.Close();
             }
 
-            if (unparsedFfmpegLines.Count == 0)
+            if (unparsedFfmpegLines.Count() == 0)
             { throw new ApplicationException("No time stamp markers found in ffmpeg output."); }
 
             //basically fuck readability
@@ -111,7 +113,7 @@ namespace DataAccess
                 CreateNoWindow = true,
                 UseShellExecute = false,
                 RedirectStandardError = true,
-                FileName = FfmpegExecutablePath,
+                FileName = _ffmpegExecutablePath,
                 Arguments = "-f concat -safe 0 -i " + textFileName + " -c copy " + outputVideoPath
             };
 
@@ -137,7 +139,7 @@ namespace DataAccess
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 RedirectStandardOutput = true,
-                FileName = FfprobeExecutablePath,
+                FileName = _ffprobeExecutablePath,
                 Arguments = "-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 " + videoPath
             };
 
@@ -171,7 +173,7 @@ namespace DataAccess
                 RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true,
-                FileName = FfmpegExecutablePath
+                FileName = _ffmpegExecutablePath
             };
 
             using (Process vmafFfmpegProcess = new Process { StartInfo = vmafFfmpegStartInfo })
@@ -207,11 +209,11 @@ namespace DataAccess
 
             double output = 0;
 
-            string processArgs = $"-c \"{FfmpegExecutablePath} -hide_banner";
+            string processArgs = $"-c \"{_ffmpegExecutablePath} -hide_banner";
             processArgs += $" -ss  {sceneStartTime} -to  {sceneEndTime}";
             processArgs += $" -i {sourcePath}";
             processArgs += " -an -sn -f yuv4mpegpipe -pix_fmt yuv420p - | ";
-            processArgs += $"{FfmpegExecutablePath} -r 23.976 -i {scenePath}";
+            processArgs += $"{_ffmpegExecutablePath} -r 23.976 -i {scenePath}";
             processArgs += " -r 23.976 -i pipe: -lavfi libvmaf -f null -\"";
 
             ProcessStartInfo vmafFfmpegStartInfo = new ProcessStartInfo
