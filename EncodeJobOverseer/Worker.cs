@@ -191,7 +191,7 @@ namespace EncodeJobOverseer
 
             //Do the encode
             string encoderConfig = AppConfigManager.Model.DefaultEncoder;
-            EncoderManager.Instance.AttemptJobEncode(activeJob, encoderConfig);
+            EncoderManager.Instance.BeginEncodeJobAttempts(activeJob, encoderConfig);
 
             // Update job doesn't update the completed status or checked out time.
             EncodeJobManager.Instance.UpdateJob(oldJob, activeJob);
