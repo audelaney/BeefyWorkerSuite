@@ -202,18 +202,15 @@
                 completed bucket.
             </exception>
         </member>
-        <member name="M:AppLogic.EncoderManager.AttemptJobEncode(DataObjects.EncodeJob,System.String)">
+        <member name="M:AppLogic.EncoderManager.BeginEncodeJobAttempts(DataObjects.EncodeJob,System.String)">
             <summary>
             Opens an encoder and starts encoding a specified job
             </summary>
         </member>
-        <member name="M:AppLogic.RealEncoderManager.AttemptJobEncode(DataObjects.EncodeJob,System.String)">
+        <member name="M:AppLogic.RealEncoderManager.BeginEncodeJobAttempts(DataObjects.EncodeJob,System.String)">
             <summary>
             Opens an encoder and starts encoding a specified job
             </summary>
-        </member>
-        <member name="M:AppLogic.RealEncoderManager.RunAgain(DataObjects.EncodeJob,System.String)">
-            <todo>Move this</todo>
         </member>
         <member name="T:AppLogic.Encoders.EncoderHevcFfmpeg">
             <summary>

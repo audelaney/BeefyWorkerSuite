@@ -16,7 +16,7 @@ namespace AppLogic
             AppConfigManager.WatchForChanges(this);
             SetupFromConfig();
         }
-        
+
         private IFileAccessor _fileAccessor;
         private IVideoAccessor _videoAccessor;
 
@@ -52,13 +52,13 @@ namespace AppLogic
 
             //Concat the video files
             _videoAccessor.ConcatVideosIntoOneOutput(sortedJobOutputFiles.ToList()
-                                    ,Path.Combine(AppConfigManager.Model.CompletedBucketPath,outputFileName));
+                                    , Path.Combine(AppConfigManager.Model.CompletedBucketPath, outputFileName));
         }
 
         /// <summary>
         /// Opens an encoder and starts encoding a specified job
         /// </summary>
-        public override void AttemptJobEncode(EncodeJob job, string encoderType)
+        public override void BeginEncodeJobAttempts(EncodeJob job, string encoderType)
         {
             //make the encoder
             IEncoder encoder = encoderType.ToLower() switch
@@ -93,19 +93,27 @@ namespace AppLogic
                             _videoAccessor.GetVmafScene(Path.Combine(job.VideoDirectoryPath, job.VideoFileName),
                                                         outputPath,
                                                         job.Chunk!.StartTime,
-                                                        job.Chunk!.EndTime ) :
+                                                        job.Chunk!.EndTime) :
                             _videoAccessor.GetVmaf(Path.Combine(job.VideoDirectoryPath, job.VideoFileName), outputPath),
                         FileSize = _fileAccessor.GetFileSize(outputPath)
                     };
+                    var oldJob = (job.Clone() as EncodeJob)!;
+                    oldJob.Id = job.Id;
+                    oldJob.Attempts = job.Attempts;
                     job.Attempts.Add(attempt);
-                    // Update job in db?
+                    try
+                    {
+                        EncodeJobManager.Instance.UpdateJob(oldJob, job);
+                        job = EncodeJobManager.Instance.FindEncodeJob(job.Id) ?? job;
+                    }
+                    catch
+                    { }
                 }
                 catch
                 { attempt = null; }
             } while (RunAgain(job, attempt?.OriginalOutputPath));
         }
 
-        /// <todo>Move this</todo>
         private bool RunAgain(EncodeJob job, string? result)
         {
             if (result == null)
@@ -127,7 +135,7 @@ namespace AppLogic
             {
                 FileAccessorType.real => new RealFileAccessor(),
                 FileAccessorType.workingFake => new GoodFakeFileAccessor(),
-                FileAccessorType.combineSuccessMock 
+                FileAccessorType.combineSuccessMock
                         => new TestingCombineSuccessFakeFileAccessor(),
                 _ => new GoodFakeFileAccessor()
             };

@@ -168,8 +168,8 @@ namespace EncodeJobOverseer
                 t.Name = job.Id.ToString();
                 t.Start(job);
                 runningLocalJobs.Add(t);
-                _logger.LogInformation(string.Format("Encode job {0} started for video file {1}"
-                                        , job.Id.ToString(), job.VideoFileName));
+                _logger.LogInformation(
+                    $"Encode job {job.Id.ToString()} started for video file {job.VideoFileName}");
                 return true;
             }
             catch (Exception ex)
@@ -191,7 +191,7 @@ namespace EncodeJobOverseer
 
             //Do the encode
             string encoderConfig = AppConfigManager.Model.DefaultEncoder;
-            EncoderManager.Instance.AttemptJobEncode(activeJob, encoderConfig);
+            EncoderManager.Instance.BeginEncodeJobAttempts(activeJob, encoderConfig);
 
             // Update job doesn't update the completed status or checked out time.
             EncodeJobManager.Instance.UpdateJob(oldJob, activeJob);
@@ -224,7 +224,7 @@ namespace EncodeJobOverseer
             var doneJobs = runningLocalJobs.Where(t => !t.IsAlive).ToList();
             if (doneJobs.Count != 0)
             {
-                _logger.LogInformation(string.Format("Found {0} finished jobs", doneJobs.Count));
+                _logger.LogInformation($"Found {doneJobs.Count} finished jobs");
                 doneJobs.ForEach(j => runningLocalJobs.Remove(j));
             }
         }

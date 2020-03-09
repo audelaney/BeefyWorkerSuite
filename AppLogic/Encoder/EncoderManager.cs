@@ -48,6 +48,6 @@ namespace AppLogic
         /// <summary>
         /// Opens an encoder and starts encoding a specified job
         /// </summary>
-        public abstract void AttemptJobEncode(EncodeJob job, string encoderType);
+        public abstract void BeginEncodeJobAttempts(EncodeJob job, string encoderType);
     }
 }
