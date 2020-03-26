@@ -16,23 +16,23 @@ namespace DataObjects
         /// <summary>
         /// The command line that was used for that attempt
         /// </summary>
-        public string CommandLineArgs { get; set; }
+        public string CommandLineArgs { get; set; } = "";
         /// <summary>
         /// The time that the attempt started
         /// </summary>
-        public DateTime StartTime { get; set; }
+        public DateTime StartTime { get; set; } = DateTime.Now;
         /// <summary>
         /// The time the attempt ended
         /// </summary>
-        public DateTime EndTime { get; set; }
+        public DateTime EndTime { get; set; } = DateTime.Now;
         /// <summary>
         /// Resulting VMAF of the attempt
         /// </summary>
-        public double VmafResult { get; set; }
+        public double VmafResult { get; set; } = 0;
         /// <summary>
         /// The file size of the resulting output file
         /// </summary>
-        public ulong FileSize { get; set; }
+        public ulong FileSize { get; set; } = 0;
         /// <summary>
         /// The output path that the file was originally pointed towards
         /// </summary>

@@ -1,10 +1,12 @@
 #nullable enable
 using DataObjects;
+using AppConfig;
 using System;
 using DataAccess;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using AppConfig.Models;
 
 namespace AppLogic
 {
@@ -26,7 +28,11 @@ namespace AppLogic
             {
                 if (null == _instance)
                 {
-                    _instance = new RealEncodeJobManager();
+                    _instance = AppConfigManager.Model.Logic switch
+                    {
+                        LogicType.real => new RealEncodeJobManager(),
+                        LogicType.mock => new MockEncodeJobManager()
+                    };
                 }
                 return _instance;
             }

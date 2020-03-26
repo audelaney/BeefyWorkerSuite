@@ -176,6 +176,33 @@
         <member name="M:AppLogic.RealEncodeJobManager.PrintDB">
             Helper for using the logger
         </member>
+        <member name="T:AppLogic.Encoders.EncoderHevcFfmpeg">
+            <summary>
+            Single pass ffmpeg based libaom encoder implementation
+            </summary>
+        </member>
+        <member name="M:AppLogic.Encoders.EncoderHevcFfmpeg.Encode(DataObjects.EncodeJob,System.String)">
+            <summary></summary>
+        </member>
+        <member name="T:AppLogic.Encoders.EncoderLibaomFfmpeg">
+            <summary>
+            Single pass ffmpeg based libaom encoder implementation
+            </summary>
+        </member>
+        <member name="M:AppLogic.Encoders.EncoderLibaomFfmpeg.Encode(DataObjects.EncodeJob,System.String)">
+            <summary></summary>
+        </member>
+        <member name="T:AppLogic.Encoders.IEncoder">
+            <summary>
+            Interface that an encoder is required to implement
+            </summary>
+        </member>
+        <member name="M:AppLogic.Encoders.IEncoder.Encode(DataObjects.EncodeJob,System.String)">
+            <summary>
+            Encodes the specified job, returning the new filename of the encode if successful,
+            or null if unsuccessful.
+            </summary>
+        </member>
         <member name="T:AppLogic.EncoderManager">
             <summary>
             Encoding related logic operations
@@ -210,33 +237,6 @@
         <member name="M:AppLogic.RealEncoderManager.BeginEncodeJobAttempts(DataObjects.EncodeJob,System.String)">
             <summary>
             Opens an encoder and starts encoding a specified job
-            </summary>
-        </member>
-        <member name="T:AppLogic.Encoders.EncoderHevcFfmpeg">
-            <summary>
-            Single pass ffmpeg based libaom encoder implementation
-            </summary>
-        </member>
-        <member name="M:AppLogic.Encoders.EncoderHevcFfmpeg.Encode(DataObjects.EncodeJob,System.String)">
-            <summary></summary>
-        </member>
-        <member name="T:AppLogic.Encoders.EncoderLibaomFfmpeg">
-            <summary>
-            Single pass ffmpeg based libaom encoder implementation
-            </summary>
-        </member>
-        <member name="M:AppLogic.Encoders.EncoderLibaomFfmpeg.Encode(DataObjects.EncodeJob,System.String)">
-            <summary></summary>
-        </member>
-        <member name="T:AppLogic.Encoders.IEncoder">
-            <summary>
-            Interface that an encoder is required to implement
-            </summary>
-        </member>
-        <member name="M:AppLogic.Encoders.IEncoder.Encode(DataObjects.EncodeJob,System.String)">
-            <summary>
-            Encodes the specified job, returning the new filename of the encode if successful,
-            or null if unsuccessful.
             </summary>
         </member>
         <member name="T:AppLogic.RealVideoManager">

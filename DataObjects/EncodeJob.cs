@@ -49,8 +49,7 @@ namespace DataObjects
         /// </summary>
         public int MaxAttempts { get; set; } = 3;
         /// <summary>
-        /// When performing a re-encode, favoring accuracy entails more settings changing
-        /// more drastically.
+        /// Minimum required psnr
         /// </summary>
         public double MinPsnr { get; set; } = 40;
         /// <summary>
@@ -137,13 +136,17 @@ namespace DataObjects
         { }
 
         /// <summary>
+        /// Initialize a valid job with a file name.
+        /// </summary>
+        public EncodeJob(string videoFileName) =>
+            VideoFileName = videoFileName;
+
+        /// <summary>
         /// Does not evaluate Id, completed, time fields, or attempts.
         /// </summary>
         public override bool Equals(object? obj)
         {
-            EncodeJob? otherJob = obj as EncodeJob;
-
-            if (null == otherJob)
+            if (!(obj is EncodeJob otherJob))
             { return false; }
 
             return (otherJob.AdditionalCommandArguments == AdditionalCommandArguments &&

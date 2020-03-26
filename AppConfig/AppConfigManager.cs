@@ -14,10 +14,10 @@ namespace AppConfig
     public static class AppConfigManager
     {
         private static ConfigModel? _model;
-        public static ConfigModel Model 
+        public static ConfigModel Model
         {
             get
-            { return _model ?? throw new System.Exception("Configuration not set"); }
+            { return _model ?? throw new Exception("Configuration not set"); }
             private set 
             {
                 _model = value;

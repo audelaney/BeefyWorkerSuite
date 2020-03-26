@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System;
 using DataObjects;
 using System.IO;
+using AppConfig;
+using AppConfig.Models;
 
 namespace AppLogic
 {
@@ -22,7 +24,13 @@ namespace AppLogic
             get
             {
                 if (_instance == null)
-                { _instance = new RealEncoderManager(); }
+                {
+                    _instance = (AppConfigManager.Model.Logic) switch
+                    {
+                        LogicType.mock => new MockEncoderManager(),
+                        LogicType.real => new RealEncoderManager()
+                    };
+                }
                 return _instance;
             }
         }

@@ -12,18 +12,6 @@ namespace AppLogic
 {
     internal class RealEncodeJobManager : EncodeJobManager, IConfigWatcher
     {
-        /// Helper for using the logger
-        private string PrintDB()
-        {
-            string result = " ";
-            result += "database type: " + AppConfigManager.Model.DBTypeAndString.Key;
-            if (string.IsNullOrWhiteSpace(AppConfigManager.Model.DBTypeAndString.Value))
-            { result += ", no conn string."; }
-            else
-            { result += ", conn string: " + AppConfigManager.Model.DBTypeAndString.Value + "."; }
-            return result;
-        }
-
         private IEncodeJobDAO _jobAccessor;
 
         internal RealEncodeJobManager()
@@ -32,42 +20,42 @@ namespace AppLogic
             SetupFromConfig();
         }
 
-        public override bool AddEncodeJobToQueue(EncodeJob newJob)
+        public override bool AddEncodeJobToQueue(EncodeJob job)
         {
-            if (!newJob.IsValid)
-            { throw new ArgumentException("Cannot add invalid job to queue: " + newJob.ToString()); }
+            if (!job.IsValid)
+            { throw new ArgumentException("Cannot add invalid job to queue: " + job.ToString()); }
 
-            string message = $"Exception encountered while adding job: {newJob.ToString()} + {PrintDB()}";
+            string message = $"Exception encountered while adding job: {job.ToString()} + {PrintDB()}";
             var result = false;
 
             try
             {
-                if (Guid.Empty == newJob.Id)
-                { newJob.Id = Guid.NewGuid(); }
-                if (_jobAccessor.AddEncodeJobToQueue(newJob))
+                if (Guid.Empty == job.Id)
+                { job.Id = Guid.NewGuid(); }
+                if (_jobAccessor.AddEncodeJobToQueue(job))
                 { result = true; }
                 else
                 {
-                    _logger?.LogWarning($"Attempted to add the same job to the datastore. Guid: {newJob.Id}");
-                    var alreadyExistingJob = FindEncodeJob(newJob.Id);
-                    var badGuid = newJob.Id;
-                    newJob.Id = Guid.NewGuid();
+                    _logger?.LogWarning($"Attempted to add the same job to the datastore. Guid: {job.Id}");
+                    var alreadyExistingJob = FindEncodeJob(job.Id);
+                    var badGuid = job.Id;
+                    job.Id = Guid.NewGuid();
                     if (null == alreadyExistingJob)
                     {
                         //try again i guess
                         _logger?.LogWarning("Trying again...");
-                        if (!_jobAccessor.AddEncodeJobToQueue(newJob))
+                        if (!_jobAccessor.AddEncodeJobToQueue(job))
                         {
                             throw new ApplicationException($"A job was not found for old guid: {badGuid} and "
-                            + $"job {newJob.ToString()} was still unable to be added.");
+                            + $"job {job.ToString()} was still unable to be added.");
                         }
                     }
-                    else if (alreadyExistingJob.Equals(newJob))
-                    { throw new JobAlreadyExistsException($"Job: {newJob.ToString()}"); }
+                    else if (alreadyExistingJob.Equals(job))
+                    { throw new JobAlreadyExistsException($"Job: {job.ToString()}"); }
                     else
                     {
                         //Just try again with the new guid, should work for sure
-                        result = _jobAccessor.AddEncodeJobToQueue(newJob);
+                        result = _jobAccessor.AddEncodeJobToQueue(job);
                     }
                 }
             }
@@ -361,7 +349,6 @@ namespace AppLogic
             return output;
         }
 
-
         public override IEnumerable<EncodeJob> GetIncompleteEncodeJobs(int priority)
         {
             IEnumerable<EncodeJob> output = new EncodeJob[0];
@@ -478,6 +465,17 @@ namespace AppLogic
                 DbType.mockBadDb => new EncodeJobDAOMockBadDb(),
                 _ => new EncodeJobDAOMockAlive()
             };
+        }
+
+        /// Helper for using the logger
+        private string PrintDB()
+        {
+            string result = " database type: " + AppConfigManager.Model.DBTypeAndString.Key;
+            if (string.IsNullOrWhiteSpace(AppConfigManager.Model.DBTypeAndString.Value))
+            { result += ", no conn string."; }
+            else
+            { result += $", conn string: {AppConfigManager.Model.DBTypeAndString.Value}."; }
+            return result;
         }
     }
 }

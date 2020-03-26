@@ -21,7 +21,13 @@ namespace AppLogic
             get
             {
                 if (_instance == null)
-                { _instance = new RealVideoManager(); }
+                {
+                    _instance = AppConfigManager.Model.Logic switch
+                    {
+                        LogicType.mock => new MockVideoManager(),
+                        LogicType.real => new RealVideoManager()
+                    };
+                }
                 return _instance;
             }
         }
@@ -31,7 +37,6 @@ namespace AppLogic
         /// Converts a video into timestamped scenes that match criteria
         /// </summary>
         public abstract Scene[] GetScenesFromVideo(string videoPath);
-
 
         #region Static
         /// <summary>

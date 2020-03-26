@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29324.140
@@ -20,11 +20,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EncodeJobOverseer", "Encode
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EncodeJobExecuter", "EncodeJobExecuter\EncodeJobExecuter.csproj", "{88019E1A-6A3F-4E18-ACFA-F527C93D638F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppLogic", "AppLogic\AppLogic.csproj", "{7A33461C-5A0D-4E1F-9FA9-D266E90BAC05}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppLogic", "AppLogic\AppLogic.csproj", "{7A33461C-5A0D-4E1F-9FA9-D266E90BAC05}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestLayer", "TestLayer\TestLayer.csproj", "{E8EB9CC4-84BE-4E9F-98E2-8F912ABC9ECA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestLayer", "TestLayer\TestLayer.csproj", "{E8EB9CC4-84BE-4E9F-98E2-8F912ABC9ECA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MasterApp", "MasterApp\MasterApp.csproj", "{5A7C4D75-F378-4254-89BE-7544EE9A778C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MasterApp", "MasterApp\MasterApp.csproj", "{5A7C4D75-F378-4254-89BE-7544EE9A778C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppConfig", "AppConfig\AppConfig.csproj", "{ED15F25E-1084-4044-A21A-2D6FBFEF6631}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppConfig", "AppConfig\AppConfig.csproj", "{ED15F25E-1084-4044-A21A-2D6FBFEF6631}"
 EndProject

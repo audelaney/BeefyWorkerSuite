@@ -74,5 +74,9 @@ namespace AppConfig.Models
         /// Path to the script used for getting a video's scene change PTS
         /// </summary>
         public string PtsScriptPath { get; set; } = "";
+        /// <summary>
+        /// Type of logic to use for the application
+        /// </summary>
+        public LogicType Logic { get; set; }
     }
 }
